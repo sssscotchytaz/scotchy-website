@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mes jeux • Tableau de bord</title>
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#151923; --muted:#aab0c0; --text:#e8ebf2;
+      --brand:#7c93ff; --brand-2:#76e0c2; --danger:#ff6b6b; --ok:#3ddc97;
+      --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --green-1:#4ade80; --green-2:#22d3ee; --red-1:#ff6b6b; --red-2:#ff3b6b;
+    }
+    html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,rgba(124,147,255,.06),transparent 35%),linear-gradient(0deg,rgba(118,224,194,.05),transparent 45%),var(--bg);background-attachment:fixed;color:var(--text)}
+    *{box-sizing:border-box} a{color:var(--brand)} button,input,select,textarea{font:inherit;color:inherit}
+
+    .container{max-width:1380px;margin:24px auto;padding:0 16px}
+    .layout{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:1280px){.layout{grid-template-columns:1fr 420px;align-items:start}}
+
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:var(--shadow)}
+
+    .search{display:flex;align-items:center;gap:10px;padding:10px 12px}
+    .search input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0c0f14;outline:none}
+
+    .filters{display:flex;gap:10px;padding:10px;flex-wrap:wrap}
+    .chip{position:relative;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.22);cursor:pointer;user-select:none;background:#0c0f14;transition:box-shadow .2s,border-color .2s,background .2s}
+    .chip:hover{border-color:rgba(255,255,255,.35)}
+    .chip:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(124,147,255,.35)}
+    .chip[data-active="true"]{background:#0b0e12;border-color:transparent}
+    .chip[data-active="true"]::before{content:"";position:absolute;inset:-1px;border-radius:999px;padding:1px;background:linear-gradient(90deg,var(--green-1),var(--green-2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+
+    .selects{display:flex;gap:10px;padding:10px;flex-wrap:wrap;align-items:center}
+    .selects select{padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0c0f14;outline:none}
+
+    .switch{position:relative;width:58px;height:30px;display:inline-block}
+    .switch input{opacity:0;width:0;height:0}
+    .slider{position:absolute;cursor:pointer;inset:0;border-radius:999px;background:#0b0e12}
+    .slider::after{content:"";position:absolute;inset:-1px;border-radius:999px;padding:1px;background:linear-gradient(90deg,var(--green-1),var(--green-2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;transition:background .25s ease}
+    .slider:before{content:"↓";position:absolute;height:24px;width:24px;left:3px;top:50%;transform:translateY(-50%);display:grid;place-items:center;border-radius:50%;background:#121620;transition:left .22s ease, transform .22s ease}
+    .switch input:active + .slider:before{transform:translateY(-50%) scale(.97)}
+    .switch input:checked + .slider:before{content:"↑";left:31px}
+    .switch input:checked + .slider::after{background:linear-gradient(90deg,var(--red-1),var(--red-2))}
+    .hint{color:var(--muted);font-size:.85rem}
+
+    .grid{display:grid;gap:14px;grid-template-columns:1fr}
+    @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1100px){.grid{grid-template-columns:1fr 1fr 1fr}}
+
+    .card{position:relative;overflow:hidden}
+    .card .inner{padding:16px}
+    .title{font-weight:700;letter-spacing:.2px}
+    .subtitle{color:var(--muted);font-size:.9rem}
+
+    .cover-wrap{width:100%;aspect-ratio:16/6;background:#0b0e12}
+    .cover-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+
+    .links{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .linkbtn{font-size:.82rem;padding:7px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#0c0f14;text-decoration:none}
+    .linkbtn.vod{border:none;background:linear-gradient(180deg,rgba(124,147,255,.25),rgba(124,147,255,.12));box-shadow:inset 0 0 0 1px rgba(124,147,255,.45);display:inline-flex;align-items:center;gap:8px}
+    .linkbtn .play{font-size:.85rem}
+
+    /* Tags en 1 ligne + bouton Plus, avec fondu fluide via mask */
+    .badges{
+      position:relative;
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+      margin-top:10px;
+      --fade-pad:56px; /* maj en JS */
+    }
+
+    .badgesInner{
+      display:flex;
+      flex-wrap:nowrap;
+      overflow:hidden;
+      flex:1 1 auto;
+      min-width:0;
+      max-width:100%;
+    }
+
+    /* État replié : on laisse de l'espace au bouton + mask de fondu */
+    .badges[data-expanded="false"] .badgesInner{
+      max-width:calc(100% - var(--fade-pad));
+      -webkit-mask-image:linear-gradient(to right,#000 0,#000 calc(100% - var(--fade-pad)),transparent 100%);
+      mask-image:linear-gradient(to right,#000 0,#000 calc(100% - var(--fade-pad)),transparent 100%);
+    }
+
+    .badges[data-expanded="true"] .badgesInner{
+      -webkit-mask-image:none;
+      mask-image:none;
+    }
+
+    .moreBtn{
+      flex:0 0 auto;
+      padding:4px 8px;
+      font-size:.72rem;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:#0c0f14;
+      display:none;
+      white-space:nowrap;
+      position:relative;
+      z-index:3;
+      cursor:pointer;         /* 👍 rendu cliquable visuellement */
+      user-select:none;
+    }
+
+    /* Boutons de tags */
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:.75rem;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:#0c0f14;
+      cursor:pointer;
+    }
+    .badge.selected{
+      border:1px solid transparent;
+      background:#0b0e12;
+      position:relative;
+    }
+    .badge.selected::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:999px;
+      padding:1px;
+      background:linear-gradient(90deg,var(--green-1),var(--green-2));
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;
+      mask-composite:exclude;
+    }
+
+    .progress{height:8px;background:#0b0e12;border-radius:999px;overflow:hidden;margin-top:12px}
+    .progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2));width:0}
+
+    .actions{display:flex;gap:8px;margin-top:14px}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,.15);padding:8px 10px;border-radius:10px;cursor:pointer}
+    .ghost:hover{border-color:rgba(255,255,255,.3)}
+
+    .empty{text-align:center;color:var(--muted);padding:40px}
+
+    .fab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(124,147,255,.25),rgba(124,147,255,.08));border:1px solid rgba(124,147,255,.45);cursor:pointer;box-shadow:var(--shadow);backdrop-filter:blur(6px);z-index:20}
+    .fab[hidden]{display:none}
+    .fab-secondary{right:86px;bottom:20px;width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(118,224,194,.25),rgba(118,224,194,.08));border:1px solid rgba(118,224,194,.45)}
+
+    .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:30}
+    .modal[open]{display:grid}
+    .dialog{width:min(840px,94vw);background:var(--panel);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .dialog .head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .dialog .body{padding:16px 18px;display:grid;gap:12px;grid-template-columns:1fr}
+    @media(min-width:720px){.dialog .body{grid-template-columns:1fr 1fr}}
+    .dialog label{font-size:.85rem;color:var(--muted)}
+    .dialog input,.dialog select,.dialog textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0c0f14;outline:none;resize:vertical}
+    .dialog .row-2{grid-column:1 / -1}
+    .dialog .foot{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-top:1px solid rgba(255,255,255,.08)}
+    .btn{background:linear-gradient(180deg,rgba(118,224,194,.25),rgba(118,224,194,.08));border:1px solid rgba(118,224,194,.45);padding:10px 14px;border-radius:12px;cursor:pointer}
+    .btn[disabled]{opacity:.6;pointer-events:none}
+    .danger{background:linear-gradient(180deg,rgba(255,107,107,.15),rgba(255,107,107,.05));border:1px solid rgba(255,107,107,.5)}
+
+    .twitch{position:sticky;top:16px}
+    .twitch .status{display:flex;align-items:center;gap:8px;padding:10px 12px;font-size:.9rem;color:var(--muted)}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:#0c0f14}
+    .pill.live{border-color:rgba(61,220,151,.65);color:#b8ffe5}
+    .twitchPlayer{aspect-ratio:16/9;width:100%;background:#0b0e12;border-radius:12px;overflow:hidden}
+    .twitchChat{height:380px;margin-top:10px;border-radius:12px;overflow:hidden;background:#0b0e12}
+    @media(max-width:1279px){.twitchChat{display:none}}
+
+    .twitch-fab{position:fixed;right:16px;bottom:84px;display:none;z-index:19}
+    .twitch-fab a{text-decoration:none}
+    @media(max-width:1279px){.twitch-fab{display:block}}
+
+    .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="layout">
+      <main>
+        <h1 style="margin:0 0 12px 0;">Mes jeux</h1>
+        <p style="color:var(--muted); margin:0 0 18px 0;">Rechercher, filtrer, trier. <span class="sr">Texte secondaire.</span></p>
+
+        <div class="panel">
+          <div class="search">
+            <input id="search" type="search" placeholder="Rechercher un jeu (titre, plateforme, tags, note)" autocomplete="off" />
+          </div>
+          <div class="filters" id="statusChips"></div>
+          <div class="selects">
+            <select id="platformSelect"><option value="">Toutes plateformes</option></select>
+            <select id="sortSelect">
+              <option value="alpha">Tri : Titre</option>
+              <option value="updated">Tri : Modifiés récemment</option>
+              <option value="progress">Tri : Progression</option>
+              <option value="rating">Tri : Note</option>
+              <option value="status">Tri : Statut</option>
+            </select>
+            <label class="switch" title="Sens du tri"><input id="sortDir" type="checkbox"><span class="slider"></span></label>
+            <button id="clearFilters" class="ghost">Réinitialiser</button>
+          </div>
+          <div class="hint" style="padding:0 10px 12px 10px">Astuce : clique un tag sur une carte pour filtrer (contour vert = actif).</div>
+        </div>
+
+        <div id="grid" class="grid" style="margin-top:16px"></div>
+        <div id="empty" class="empty" hidden>Aucun résultat. Modifie les filtres ou la recherche.</div>
+      </main>
+
+      <aside>
+        <div id="twitchPanel" class="panel twitch" hidden>
+          <div class="status">
+            <span id="livePill" class="pill">● <span id="liveText">Hors ligne</span></span>
+            <span id="twitchTitle" style="margin-left:auto; color:var(--muted)"></span>
+          </div>
+          <div style="padding:0 10px 10px 10px">
+            <div id="twitchEmbed" class="twitchPlayer"></div>
+            <div id="twitchChat" class="twitchChat"></div>
+            <div style="display:flex; gap:8px; margin-top:10px">
+              <a id="twitchLink" class="btn" target="_blank" rel="noopener">Regarder sur Twitch</a>
+              <button id="minimizeTwitch" class="ghost">Réduire</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- FABs (admin only, localhost) -->
+  <button id="settingsFab" class="fab fab-secondary" title="Paramètres (localhost)" hidden>🛠️</button>
+  <button id="fab" class="fab" title="Administration (localhost)" hidden>⚙️</button>
+
+  <!-- Mobile Twitch quick link -->
+  <div class="twitch-fab"><a id="mobileTwitchBtn" class="btn" target="_blank" rel="noopener">Twitch (live)</a></div>
+
+  <!-- Modal Jeux (ajout/édition) -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="dialog">
+      <div class="head">
+        <strong id="modalTitle">Ajouter un jeu</strong>
+        <div>
+          <button id="deleteBtn" class="ghost danger" title="Supprimer" hidden>Supprimer</button>
+          <button id="closeBtn" class="ghost" title="Fermer">Fermer</button>
+        </div>
+      </div>
+      <div class="body">
+        <div><label for="fTitle">Titre</label><input id="fTitle" placeholder="Ex: Batman: Arkham City" /></div>
+        <div><label for="fPlatform">Plateforme</label><input id="fPlatform" placeholder="PC, PS5, Xbox…" /></div>
+        <div><label for="fStatus">Statut</label><select id="fStatus"></select></div>
+        <div><label for="fProgress">Progression (%)</label><input id="fProgress" type="number" min="0" max="100" step="1" placeholder="laisser vide si non pertinent" /></div>
+        <div><label for="fTags">Tags</label><input id="fTags" placeholder="action, narratif, GOTY… (clic sur un tag pour filtrer)" /></div>
+        <div><label for="fRating">Note perso (/10)</label><input id="fRating" type="number" min="0" max="10" step="0.5" /></div>
+        <div class="row-2"><label for="fNotes">Notes</label><textarea id="fNotes" rows="4" placeholder="Pensées rapides, où j'en suis, etc."></textarea></div>
+        <div><label for="fLink">Lien externe</label><input id="fLink" placeholder="https://… (facultatif)" /></div>
+        <div><label for="fLinkLabel">Texte du lien</label><input id="fLinkLabel" placeholder="VOD, Test, Review… (par défaut : VOD)" /></div>
+        <div><label for="fCover">Image (URL)</label><input id="fCover" placeholder="https://… (facultatif) — recommandé : 1200×450 px (bannière)" /></div>
+      </div>
+      <div class="foot">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+          <button id="settingsBtn" class="ghost" title="Paramètres" style="display:none">⚙ Paramètres</button>
+          <button id="importBtn" class="ghost" title="Importer JSON">Importer JSON</button>
+          <button id="exportBtn" class="ghost" title="Exporter JSON">Exporter JSON</button>
+          <input id="fileInput" type="file" accept="application/json" hidden />
+        </div>
+        <div style="display:flex; gap:8px">
+          <button id="newBtn" class="ghost">Nouveau</button>
+          <button id="saveBtn" class="btn">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Paramètres (dédié) -->
+  <div id="settingsModal" class="modal" aria-hidden="true">
+    <div class="dialog">
+      <div class="head">
+        <strong>Paramètres</strong>
+        <div>
+          <button id="sCloseBtn" class="ghost" title="Fermer">Fermer</button>
+        </div>
+      </div>
+      <div class="body">
+        <div><label for="sTwitch">Chaîne Twitch</label><input id="sTwitch" placeholder="ex: ScotchyTAZ" /></div>
+        <div><label for="sShowTwitch">Afficher panneau Twitch (desktop)</label>
+          <select id="sShowTwitch"><option value="yes">Oui</option><option value="no">Non</option></select>
+        </div>
+        <div><label for="sIsLive">Indicateur Live (manuel)</label>
+          <select id="sIsLive"><option value="auto">Auto (par défaut)</option><option value="live">Forcer : En direct</option><option value="offline">Forcer : Hors ligne</option></select>
+        </div>
+        <div class="row-2">
+          <label for="sStatuses">Statuts & ordre (un par ligne, format id=Label)</label>
+          <textarea id="sStatuses" rows="5" placeholder="Exemple:
+planned=À faire
+playing=En cours
+replaying=Je refais
+unfinished=Pas fini
+abandoned=Abandonné
+finished=Terminé"></textarea>
+        </div>
+      </div>
+      <div class="foot">
+        <div style="display:flex;gap:8px"></div>
+        <div style="display:flex; gap:8px">
+          <button id="sSaveBtn" class="btn">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- Statuts (éditables) ----
+    let STATUS=[
+      {id:'planned',label:'À faire'},
+      {id:'playing',label:'En cours'},
+      {id:'replaying',label:'Je refais'},
+      {id:'unfinished',label:'Pas fini'},
+      {id:'abandoned',label:'Abandonné'},
+      {id:'finished',label:'Terminé'},
+    ];
+    let STATUS_WEIGHT={};
+    function rebuildStatusWeight(){ STATUS_WEIGHT={}; STATUS.forEach((s,i)=>STATUS_WEIGHT[s.id]=i); }
+    rebuildStatusWeight();
+
+    const LS_KEY='gamesDataV3'; const LS_SETTINGS='gamesSettingsV2';
+    const ADMIN_ENABLED=(location.hostname==='localhost'||location.hostname==='127.0.0.1');
+
+    let games=[],filtered=[]; let selectedStatuses=new Set(),selectedPlatform='',selectedTags=new Set(),searchTerm='',sortBy='alpha',sortDir='desc'; let editingId=null;
+    let settings={twitchChannel:'ScotchyTAZ',showTwitch:true,isLive:'auto', customStatuses:null};
+
+    // Refs helpers
+    function $(sel){return document.getElementById(sel)}
+    const grid=$('grid'), emptyEl=$('empty'), searchInput=$('search'), chipsWrap=$('statusChips');
+    const platformSelect=$('platformSelect'), sortSelect=$('sortSelect'), sortDirInput=$('sortDir'), clearFiltersBtn=$('clearFilters');
+    const fab=$('fab'), settingsFab=$('settingsFab'), modal=$('modal'), modalTitle=$('modalTitle'), closeBtn=$('closeBtn'), saveBtn=$('saveBtn'), newBtn=$('newBtn'), deleteBtn=$('deleteBtn');
+    const fTitle=$('fTitle'), fPlatform=$('fPlatform'), fStatus=$('fStatus'), fProgress=$('fProgress'), fTags=$('fTags'), fRating=$('fRating'), fNotes=$('fNotes'), fLink=$('fLink'), fLinkLabel=$('fLinkLabel'), fCover=$('fCover');
+    const exportBtn=$('exportBtn'), importBtn=$('importBtn'), fileInput=$('fileInput');
+    const settingsBtn=$('settingsBtn');
+    const twitchPanel=$('twitchPanel'), twitchEmbed=$('twitchEmbed'), twitchChat=$('twitchChat'), twitchLink=$('twitchLink'), twitchTitle=$('twitchTitle'), livePill=$('livePill'), liveText=$('liveText'), minimizeTwitch=$('minimizeTwitch'), mobileTwitchBtn=$('mobileTwitchBtn');
+
+    // Settings modal refs
+    const settingsModal=$('settingsModal'), sCloseBtn=$('sCloseBtn'), sSaveBtn=$('sSaveBtn'), sTwitch=$('sTwitch'), sShowTwitch=$('sShowTwitch'), sIsLive=$('sIsLive'), sStatuses=$('sStatuses');
+
+    const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36); const nowIso=()=>new Date().toISOString();
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (c)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[c])); }
+    const deburr=(s)=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+
+    function saveLS(){localStorage.setItem(LS_KEY,JSON.stringify(games));localStorage.setItem(LS_SETTINGS,JSON.stringify({...settings, customStatuses:STATUS}))}
+    const loadGames=()=>{try{return JSON.parse(localStorage.getItem(LS_KEY)||'null')}catch{return null}};
+    const loadSettings=()=>{try{return JSON.parse(localStorage.getItem(LS_SETTINGS)||'null')}catch{return null}};
+
+    const statusLabel=id=>STATUS.find(s=>s.id===id)?.label||id;
+    const uniquePlatforms=()=>[...new Set(games.map(g=>g.platform.trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+
+    function computePlatformsSelect(){const prev=platformSelect.value; platformSelect.innerHTML='<option value="">Toutes plateformes</option>'+uniquePlatforms().map(p=>`<option value="${p}">${p}</option>`).join(''); if([...platformSelect.options].some(o=>o.value===prev)) platformSelect.value=prev;}
+
+    function toNum(v){return(typeof v==='number'&&!Number.isNaN(v))?v:-1}
+
+    function applyFilters(){
+      const sTerm=deburr(searchTerm); filtered=games.filter(g=>{
+        if(selectedStatuses.size>0&&!selectedStatuses.has(g.status))return false;
+        if(selectedPlatform&&g.platform!==selectedPlatform)return false;
+        if(selectedTags.size>0){const tagsSet=new Set((g.tags||[]).map(t=>t.toLowerCase())); for(const t of selectedTags){if(!tagsSet.has(t))return false;}}
+        if(sTerm){const hay=deburr([g.title,g.platform,(g.tags||[]).join(' '),g.notes,String(g.rating??'')].join(' ')); if(!hay.includes(sTerm))return false;}
+        return true;
+      });
+      const dir=(sortDir==='asc')?1:-1;
+      switch(sortBy){
+        case 'alpha': filtered.sort((a,b)=>dir*a.title.localeCompare(b.title)); break;
+        case 'updated': filtered.sort((a,b)=>dir*(new Date(a.updatedAt)-new Date(b.updatedAt))); break;
+        case 'progress': filtered.sort((a,b)=>dir*(toNum(a.progress)-toNum(b.progress))); break;
+        case 'rating': filtered.sort((a,b)=>dir*(toNum(a.rating)-toNum(b.rating))); break;
+        case 'status': filtered.sort((a,b)=> dir*((STATUS_WEIGHT[a.status]??99)-(STATUS_WEIGHT[b.status]??99)) || a.title.localeCompare(b.title)); break;
+      }
+      render();
+    }
+
+    /* Mesure + affichage du bouton + calcul du pad fondu */
+    function setupBadgesOverflow(container, inner, btn){
+      inner.style.flexWrap = 'nowrap';
+      inner.style.overflow = 'hidden';
+      inner.style.width = 'auto';
+
+      const need = inner.scrollWidth > inner.clientWidth + 4;
+
+      if (need){
+        container.dataset.expanded = 'false';     // replié => fondu visible
+        btn.style.display = 'inline-block';
+        btn.textContent = 'Plus';
+        const pad = (btn.offsetWidth || 48) + 8;  // réserve à droite
+        container.style.setProperty('--fade-pad', pad + 'px');
+      } else {
+        container.dataset.expanded = 'true';      // pas besoin de “Plus”
+        btn.style.display = 'none';
+        container.style.setProperty('--fade-pad', '0px');
+      }
+    }
+
+    /* 👉 Fonction manquante : ouvre/ferme les tags */
+    function toggleBadges(container, inner, btn){
+      const isOpen = container.dataset.expanded === 'true';
+      if (isOpen){
+        container.dataset.expanded = 'false';
+        inner.style.flexWrap = 'nowrap';
+        inner.style.overflow = 'hidden';
+        inner.style.width = 'auto';
+        btn.textContent = 'Plus';
+      } else {
+        container.dataset.expanded = 'true';
+        inner.style.flexWrap = 'wrap';
+        inner.style.overflow = 'visible';
+        inner.style.width = '100%';
+        btn.textContent = 'Moins';
+      }
+    }
+
+    function render(){
+      grid.innerHTML=''; if(filtered.length===0){emptyEl.hidden=false;return} emptyEl.hidden=true; const frag=document.createDocumentFragment();
+      const measureJobs=[];
+
+      for(const g of filtered){
+        const card=document.createElement('div'); card.className='card panel';
+        if(g.cover){const wrap=document.createElement('div');wrap.className='cover-wrap';const img=document.createElement('img');img.src=g.cover;img.alt='';img.loading='lazy';wrap.appendChild(img);card.appendChild(wrap)}
+        const inner=document.createElement('div'); inner.className='inner'; inner.innerHTML=`<div class="title">${escapeHtml(g.title)}</div><div class="subtitle">${escapeHtml(g.platform)} • ${statusLabel(g.status)}${g.rating!=null?` • ${g.rating}/10`:''}</div>`;
+
+        // Tags (une ligne + Plus/Moins)
+        const badgesWrap=document.createElement('div'); badgesWrap.className='badges';
+        const innerBadges=document.createElement('div'); innerBadges.className='badgesInner';
+        if(g.tags?.length){
+          for(const t of g.tags){
+            const b=document.createElement('span');
+            b.className='badge';
+            b.textContent=t;
+            if(selectedTags.has(t.toLowerCase())) b.classList.add('selected');
+            b.onclick=()=>toggleTagFilter(t);
+            innerBadges.appendChild(b);
+          }
+        }
+        const moreBtn=document.createElement('button'); moreBtn.className='moreBtn'; moreBtn.type='button'; moreBtn.textContent='Plus';
+        moreBtn.onclick=()=> toggleBadges(badgesWrap, innerBadges, moreBtn);
+
+        badgesWrap.appendChild(innerBadges); badgesWrap.appendChild(moreBtn);
+        inner.appendChild(badgesWrap);
+
+        // Progression (facultative)
+        if(typeof g.progress==='number'){const wrap=document.createElement('div');wrap.className='progress';const bar=document.createElement('span');bar.style.width=Math.max(0,Math.min(100,g.progress))+'%';wrap.appendChild(bar);inner.appendChild(wrap)}
+
+        // Liens (ex: VOD)
+        const links=document.createElement('div'); links.className='links';
+        if(g.link){const a=document.createElement('a'); a.className='linkbtn vod'; a.href=g.link; a.target='_blank'; a.rel='noopener'; a.innerHTML=`<span class="play">▶</span><span>${g.linkLabel||'VOD'}</span>`; links.appendChild(a)}
+        if(links.children.length>0) inner.appendChild(links);
+
+        if(g.notes){const p=document.createElement('p');p.style.marginTop='10px';p.style.color='var(--muted)';p.textContent=g.notes;inner.appendChild(p)}
+        if(ADMIN_ENABLED){const actions=document.createElement('div');actions.className='actions';const editBtn=document.createElement('button');editBtn.className='ghost';editBtn.textContent='✏️ Modifier';editBtn.onclick=()=>openModal(g.id);actions.appendChild(editBtn);inner.appendChild(actions)}
+        card.appendChild(inner); frag.appendChild(card);
+
+        measureJobs.push(()=>setupBadgesOverflow(badgesWrap, innerBadges, moreBtn));
+      }
+      grid.appendChild(frag);
+      requestAnimationFrame(()=>{ measureJobs.forEach(fn=>fn()); });
+    }
+
+    // Recompute badges on resize
+    window.addEventListener('resize', ()=>{
+      document.querySelectorAll('.badges').forEach(bw=>{
+        const inner=bw.querySelector('.badgesInner'); const btn=bw.querySelector('.moreBtn'); if(inner&&btn) setupBadgesOverflow(bw, inner, btn);
+      });
+    });
+
+    // UI statuts
+    function buildStatusUI(){
+      chipsWrap.innerHTML='';
+      for(const s of STATUS){
+        const chip=document.createElement('button');
+        chip.className='chip'; chip.type='button'; chip.textContent=s.label; chip.dataset.id=s.id; chip.dataset.active='false';
+        chip.onclick=()=>{ if(selectedStatuses.has(s.id))selectedStatuses.delete(s.id); else selectedStatuses.add(s.id); chip.dataset.active=selectedStatuses.has(s.id)?'true':'false'; applyFilters(); };
+        chipsWrap.appendChild(chip)
+      }
+      fStatus.innerHTML=STATUS.map(s=>`<option value="${s.id}">${s.label}</option>`).join('');
+    }
+
+    function toggleTagFilter(tag){const key=String(tag).toLowerCase(); if(selectedTags.has(key)) selectedTags.delete(key); else selectedTags.add(key); applyFilters();}
+
+    // ---- Admin: blindage côté JS ----
+    function openModal(id=null){ if(!ADMIN_ENABLED) return; editingId=id; modal.setAttribute('open',''); modal.setAttribute('aria-hidden','false'); if(id){const g=games.find(x=>x.id===id); modalTitle.textContent='Modifier un jeu'; deleteBtn.hidden=false; fillForm(g);} else {modalTitle.textContent='Ajouter un jeu'; deleteBtn.hidden=true; clearForm();}}
+    function closeModal(){modal.removeAttribute('open'); modal.setAttribute('aria-hidden','true');}
+
+    function clearForm(){fTitle.value=''; fPlatform.value=''; fStatus.value=(STATUS[0]?.id||'planned'); fProgress.value=''; fTags.value=''; fRating.value=''; fNotes.value=''; fLink.value=''; fLinkLabel.value='VOD'; fCover.value='';}
+    function fillForm(g){fTitle.value=g.title; fPlatform.value=g.platform; fStatus.value=g.status; fProgress.value=(g.progress??''); fTags.value=(g.tags||[]).join(', '); fRating.value=(g.rating??''); fNotes.value=g.notes||''; fLink.value=g.link??''; fLinkLabel.value=g.linkLabel||'VOD'; fCover.value=g.cover??'';}
+    function readForm(){return{title:fTitle.value.trim(),platform:fPlatform.value.trim(),status:fStatus.value,progress:fProgress.value===''?null:Math.max(0,Math.min(100,Number(fProgress.value))),tags:fTags.value.split(',').map(s=>s.trim()).filter(Boolean),rating:fRating.value===''?null:Number(fRating.value),notes:fNotes.value.trim(),link:fLink.value.trim()||null,linkLabel:fLinkLabel.value.trim()||'VOD',cover:fCover.value.trim()||null}}
+
+    function upsertGame(){ if(!ADMIN_ENABLED) return;
+      const data=readForm(); if(!data.title){alert('Titre obligatoire');return} if(!data.platform){alert('Plateforme obligatoire');return}
+      if(editingId){const idx=games.findIndex(g=>g.id===editingId); if(idx>-1){games[idx]={...games[idx],...data,updatedAt:nowIso()}} }
+      else {games.push({id:uid(),createdAt:nowIso(),updatedAt:nowIso(),progress:null,rating:null,notes:'',cover:null,link:null,linkLabel:'VOD',tags:[],...data})}
+      saveLS(); computePlatformsSelect(); applyFilters(); setupTwitch(); closeModal();
+    }
+
+    function deleteGame(){ if(!ADMIN_ENABLED) return;
+      if(!editingId)return; if(!confirm('Supprimer ce jeu ?'))return; games=games.filter(g=>g.id!==editingId); saveLS(); applyFilters(); closeModal();
+    }
+
+    // Import/export (bundle settings+games)
+    function exportJSON(){const bundle={settings:{...settings,customStatuses:STATUS},games}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='games_bundle.json'; a.click(); URL.revokeObjectURL(a.href);}
+    function importJSON(file){ if(!ADMIN_ENABLED) return;
+      const reader=new FileReader(); reader.onload=()=>{try{
+        const data=JSON.parse(reader.result);
+        if(Array.isArray(data)){games=data;}
+        else if(data&&Array.isArray(data.games)){games=data.games; if(data.settings){settings={...settings,...data.settings}; if(Array.isArray(data.settings.customStatuses)){STATUS=data.settings.customStatuses; rebuildStatusWeight();}} else if(Array.isArray(data.customStatuses)){STATUS=data.customStatuses; rebuildStatusWeight();} }
+        else {throw new Error('JSON invalide')}
+        saveLS(); computePlatformsSelect(); buildStatusUI(); applyFilters(); setupTwitch(); closeModal();
+      }catch(e){alert('Import impossible : '+e.message)}}; reader.readAsText(file);
+    }
+
+    // ---- Twitch embed (player + chat sur desktop) ----
+    function setupTwitch(){
+      const show=!!settings.showTwitch; const channel=(settings.twitchChannel||'').trim(); const parent=encodeURIComponent(location.hostname||'localhost'); const twitchUrl=`https://www.twitch.tv/${channel}`;
+      if(!show||!channel){twitchPanel.hidden=true; mobileTwitchBtn.style.display='none'; return;}
+      twitchPanel.hidden=false; twitchLink.href=twitchUrl; twitchTitle.textContent=channel?`@${channel}`:''; mobileTwitchBtn.href=twitchUrl;
+      const forced=settings.isLive; let live=false; if(forced==='live') live=true; else if(forced==='offline') live=false; else live=false;
+      livePill.className='pill'+(live?' live':''); liveText.textContent=live?'En direct':'Hors ligne'; mobileTwitchBtn.textContent=live?'Twitch (LIVE)':'Twitch';
+      twitchEmbed.innerHTML=''; const ifr=document.createElement('iframe'); ifr.allow='autoplay; fullscreen; picture-in-picture'; ifr.frameBorder='0'; ifr.width='100%'; ifr.height='100%'; ifr.src=`https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=${parent}&muted=true`; twitchEmbed.appendChild(ifr);
+      twitchChat.innerHTML=''; const chat=document.createElement('iframe'); chat.frameBorder='0'; chat.width='100%'; chat.height='100%'; chat.src=`https://www.twitch.tv/embed/${encodeURIComponent(channel)}/chat?parent=${parent}`; twitchChat.appendChild(chat);
+    }
+
+    // ---- Paramètres: helpers (fix) ----
+    function statusesToText(arr) { return arr.map(s => `${s.id}=${s.label}`).join('\n'); }
+    function parseStatuses(text) {
+      const out = [];
+      for (const line of text.split(/\r?\n/)) {
+        const m = line.trim(); if (!m) continue;
+        const [id, ...labelParts] = m.split('='); const idClean = (id || '').trim(); const label = (labelParts.join('=') || '').trim();
+        if (!idClean || !label) continue; out.push({ id: idClean, label });
+      }
+      return out.length ? out : null;
+    }
+
+    // ---- Modal Paramètres dédié ----
+    function openSettingsModal(){
+      if(!ADMIN_ENABLED) return;
+      sTwitch.value=settings.twitchChannel||''; sShowTwitch.value=settings.showTwitch?'yes':'no'; sIsLive.value=settings.isLive||'auto'; sStatuses.value=statusesToText(STATUS);
+      settingsModal.setAttribute('open',''); settingsModal.setAttribute('aria-hidden','false');
+    }
+    function closeSettingsModal(){ settingsModal.removeAttribute('open'); settingsModal.setAttribute('aria-hidden','true'); }
+    function saveSettings(){
+      if(!ADMIN_ENABLED) return;
+      settings.twitchChannel=sTwitch.value.trim()||settings.twitchChannel; settings.showTwitch=(sShowTwitch.value==='yes'); settings.isLive=sIsLive.value;
+      const parsed=parseStatuses(sStatuses.value); if(parsed){ STATUS=parsed; rebuildStatusWeight(); }
+      saveLS(); buildStatusUI(); applyFilters(); setupTwitch(); closeSettingsModal();
+    }
+
+    // ---- Données d'exemple ----
+    function initSample(){return[
+      {id:uid(),title:'Batman: Arkham City',platform:'PC',status:'replaying',progress:35,tags:['action','Batman'],rating:9.5,notes:'Reprise en hard mode.',link:'',linkLabel:'VOD',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'The Last of Us Part I',platform:'PC',status:'finished',progress:100,tags:['narratif'],rating:10,notes:'Coup de cœur.',link:'',linkLabel:'VOD',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Red Dead Redemption 2',platform:'PC',status:'planned',progress:null,tags:['open-world'],rating:null,notes:'Prévu pour stream.',link:'',linkLabel:'VOD',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Days Gone',platform:'PC',status:'unfinished',progress:52,tags:['zombies'],rating:6,notes:'Hésite à reprendre.',link:'',linkLabel:'VOD',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Metal Gear Solid',platform:'PS1',status:'playing',progress:18,tags:['infiltration','classique'],rating:null,notes:'Découverte.',link:'',linkLabel:'VOD',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+    ]}
+
+    function init(){
+      if(ADMIN_ENABLED){fab.hidden=false; settingsFab.hidden=false}
+      const lsG=loadGames(); const lsS=loadSettings(); games=(lsG&&Array.isArray(lsG))?lsG:initSample(); if(lsS){settings={...settings,...lsS}; if(Array.isArray(lsS.customStatuses)){STATUS=lsS.customStatuses; rebuildStatusWeight();}}
+      buildStatusUI(); computePlatformsSelect(); applyFilters(); setupTwitch();
+
+      // Events
+      searchInput.addEventListener('input',e=>{searchTerm=e.target.value; applyFilters()});
+      platformSelect.addEventListener('change',e=>{selectedPlatform=e.target.value; applyFilters()});
+      sortSelect.addEventListener('change',e=>{sortBy=e.target.value; applyFilters()});
+      sortDirInput.addEventListener('change',e=>{sortDir=e.target.checked?'asc':'desc'; applyFilters()});
+      clearFiltersBtn.onclick=()=>{selectedStatuses.clear(); [...chipsWrap.children].forEach(ch=>ch.dataset.active='false'); selectedPlatform=''; platformSelect.value=''; sortBy='alpha'; sortSelect.value='alpha'; sortDir='desc'; sortDirInput.checked=false; searchTerm=''; searchInput.value=''; selectedTags.clear(); applyFilters();};
+
+      // Admin triggers (localhost only)
+      fab.onclick=()=>openModal();
+      settingsFab.onclick=()=>openSettingsModal();
+      closeBtn.onclick=()=>closeModal(); saveBtn.onclick=()=>upsertGame(); newBtn.onclick=()=>{editingId=null; clearForm(); modalTitle.textContent='Ajouter un jeu'; deleteBtn.hidden=true}; deleteBtn.onclick=()=>deleteGame();
+      exportBtn.onclick=()=>exportJSON(); importBtn.onclick=()=>fileInput.click(); fileInput.onchange=()=>{const f=fileInput.files?.[0]; if(f) importJSON(f)};
+
+      // Settings modal buttons
+      sCloseBtn.onclick=()=>closeSettingsModal(); sSaveBtn.onclick=()=>saveSettings();
+
+      // Raccourci admin caché
+      let seq=''; document.addEventListener('keydown',e=>{if((e.ctrlKey&&e.altKey&&e.key.toLowerCase()==='a')&&ADMIN_ENABLED){openModal()} seq+=e.key.toLowerCase(); if(seq.length>7) seq=seq.slice(-7); if(seq.endsWith('scotch')&&ADMIN_ENABLED){openSettingsModal(); seq=''}});
+
+      // Twitch minimize
+      minimizeTwitch.onclick=()=>{const hidden=twitchEmbed.style.display==='none'; twitchEmbed.style.display=hidden?'block':'none'; minimizeTwitch.textContent=hidden?'Réduire':'Agrandir'};
+    }
+
+    document.addEventListener('DOMContentLoaded',init);
+  </script>
+</body>
+</html>
