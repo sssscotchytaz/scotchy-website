@@ -560,35 +560,82 @@ finished=Terminé"></textarea>
       {id:uid(),title:'Metal Gear Solid',platform:'PS1',status:'playing',progress:18,tags:['infiltration','classique'],rating:null,notes:'Découverte.',link:'',linkLabel:'VOD',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
     ]}
 
-    function init(){
-      if(ADMIN_ENABLED){fab.hidden=false; settingsFab.hidden=false}
-      const lsG=loadGames(); const lsS=loadSettings(); games=(lsG&&Array.isArray(lsG))?lsG:initSample(); if(lsS){settings={...settings,...lsS}; if(Array.isArray(lsS.customStatuses)){STATUS=lsS.customStatuses; rebuildStatusWeight();}}
-      buildStatusUI(); computePlatformsSelect(); applyFilters(); setupTwitch();
+<script>
+async function loadBundle() {
+  try {
+    // ?ts=... pour éviter le cache de Pages/CDN
+    const res = await fetch('games_bundle.json?ts=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('no json');
+    const data = await res.json();
+    // Compat : si jamais tu fournis un tableau pur
+    if (Array.isArray(data)) return { games: data, settings: null };
+    if (data && Array.isArray(data.games)) return data;
+  } catch (e) {
+    // Pas de JSON → on tombera sur le fallback local/LS
+  }
+  return null;
+}
+</script>
 
-      // Events
-      searchInput.addEventListener('input',e=>{searchTerm=e.target.value; applyFilters()});
-      platformSelect.addEventListener('change',e=>{selectedPlatform=e.target.value; applyFilters()});
-      sortSelect.addEventListener('change',e=>{sortBy=e.target.value; applyFilters()});
-      sortDirInput.addEventListener('change',e=>{sortDir=e.target.checked?'asc':'desc'; applyFilters()});
-      clearFiltersBtn.onclick=()=>{selectedStatuses.clear(); [...chipsWrap.children].forEach(ch=>ch.dataset.active='false'); selectedPlatform=''; platformSelect.value=''; sortBy='alpha'; sortSelect.value='alpha'; sortDir='desc'; sortDirInput.checked=false; searchTerm=''; searchInput.value=''; selectedTags.clear(); applyFilters();};
+    
+<script>
+async function init(){
+  if(ADMIN_ENABLED){fab.hidden=false; settingsFab.hidden=false}
 
-      // Admin triggers (localhost only)
-      fab.onclick=()=>openModal();
-      settingsFab.onclick=()=>openSettingsModal();
-      closeBtn.onclick=()=>closeModal(); saveBtn.onclick=()=>upsertGame(); newBtn.onclick=()=>{editingId=null; clearForm(); modalTitle.textContent='Ajouter un jeu'; deleteBtn.hidden=true}; deleteBtn.onclick=()=>deleteGame();
-      exportBtn.onclick=()=>exportJSON(); importBtn.onclick=()=>fileInput.click(); fileInput.onchange=()=>{const f=fileInput.files?.[0]; if(f) importJSON(f)};
+  // === NOUVEAU : on tente d'abord le bundle JSON hébergé ===
+  const bundle = await loadBundle();
 
-      // Settings modal buttons
-      sCloseBtn.onclick=()=>closeSettingsModal(); sSaveBtn.onclick=()=>saveSettings();
+  // Ancien code (LS + initSample) comme fallback
+  const lsG = loadGames();
+  const lsS = loadSettings();
 
-      // Raccourci admin caché
-      let seq=''; document.addEventListener('keydown',e=>{if((e.ctrlKey&&e.altKey&&e.key.toLowerCase()==='a')&&ADMIN_ENABLED){openModal()} seq+=e.key.toLowerCase(); if(seq.length>7) seq=seq.slice(-7); if(seq.endsWith('scotch')&&ADMIN_ENABLED){openSettingsModal(); seq=''}});
-
-      // Twitch minimize
-      minimizeTwitch.onclick=()=>{const hidden=twitchEmbed.style.display==='none'; twitchEmbed.style.display=hidden?'block':'none'; minimizeTwitch.textContent=hidden?'Réduire':'Agrandir'};
+  if (bundle) {
+    games = bundle.games;
+    if (bundle.settings) {
+      settings = { ...settings, ...bundle.settings };
+      if (Array.isArray(bundle.settings.customStatuses)) {
+        STATUS = bundle.settings.customStatuses;
+        rebuildStatusWeight();
+      }
     }
+  } else {
+    games = (lsG && Array.isArray(lsG)) ? lsG : initSample();
+    if (lsS) {
+      settings = { ...settings, ...lsS };
+      if (Array.isArray(lsS.customStatuses)) {
+        STATUS = lsS.customStatuses;
+        rebuildStatusWeight();
+      }
+    }
+  }
 
-    document.addEventListener('DOMContentLoaded',init);
-  </script>
+  buildStatusUI(); computePlatformsSelect(); applyFilters(); setupTwitch();
+
+  // Events (inchangé)
+  searchInput.addEventListener('input',e=>{searchTerm=e.target.value; applyFilters()});
+  platformSelect.addEventListener('change',e=>{selectedPlatform=e.target.value; applyFilters()});
+  sortSelect.addEventListener('change',e=>{sortBy=e.target.value; applyFilters()});
+  sortDirInput.addEventListener('change',e=>{sortDir=e.target.checked?'asc':'desc'; applyFilters()});
+  clearFiltersBtn.onclick=()=>{selectedStatuses.clear(); [...chipsWrap.children].forEach(ch=>ch.dataset.active='false'); selectedPlatform=''; platformSelect.value=''; sortBy='alpha'; sortSelect.value='alpha'; sortDir='desc'; sortDirInput.checked=false; searchTerm=''; searchInput.value=''; selectedTags.clear(); applyFilters();};
+
+  // Admin triggers (localhost only)
+  fab.onclick=()=>openModal();
+  settingsFab.onclick=()=>openSettingsModal();
+  closeBtn.onclick=()=>closeModal(); saveBtn.onclick=()=>upsertGame(); newBtn.onclick=()=>{editingId=null; clearForm(); modalTitle.textContent='Ajouter un jeu'; deleteBtn.hidden=true}; deleteBtn.onclick=()=>deleteGame();
+  exportBtn.onclick=()=>exportJSON(); importBtn.onclick=()=>fileInput.click(); fileInput.onchange=()=>{const f=fileInput.files?.[0]; if(f) importJSON(f)};
+
+  // Settings modal buttons
+  sCloseBtn.onclick=()=>closeSettingsModal(); sSaveBtn.onclick=()=>saveSettings();
+
+  // Raccourci admin caché
+  let seq=''; document.addEventListener('keydown',e=>{if((e.ctrlKey&&e.altKey&&e.key.toLowerCase()==='a')&&ADMIN_ENABLED){openModal()} seq+=e.key.toLowerCase(); if(seq.length>7) seq=seq.slice(-7); if(seq.endsWith('scotch')&&ADMIN_ENABLED){openSettingsModal(); seq=''}});
+
+  // Twitch minimize
+  minimizeTwitch.onclick=()=>{const hidden=twitchEmbed.style.display==='none'; twitchEmbed.style.display=hidden?'block':'none'; minimizeTwitch.textContent=hidden?'Réduire':'Agrandir'};
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+
 </body>
 </html>
+
