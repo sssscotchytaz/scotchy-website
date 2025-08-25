@@ -1,0 +1,63 @@
+{
+  "settings": {
+    "twitchChannel": "ScotchyTAZ",
+    "showTwitch": true,
+    "isLive": "auto",
+    "customStatuses": [
+      {
+        "id": "planned",
+        "label": "À faire"
+      },
+      {
+        "id": "playing",
+        "label": "En cours"
+      },
+      {
+        "id": "replaying",
+        "label": "Je refais"
+      },
+      {
+        "id": "unfinished",
+        "label": "Pas fini"
+      },
+      {
+        "id": "abandoned",
+        "label": "Abandonné"
+      },
+      {
+        "id": "finished",
+        "label": "Terminé"
+      }
+    ]
+  },
+  "games": [
+    {
+      "id": "yhisfxnkx2ameqlb0l5",
+      "createdAt": "2025-08-25T04:01:09.305Z",
+      "updatedAt": "2025-08-25T04:01:09.305Z",
+      "progress": null,
+      "rating": 8,
+      "notes": "",
+      "cover": "https://miro.medium.com/v2/resize:fit:1200/1*3zyVTXZoY36ZlMAJ484jLw.jpeg",
+      "link": "https://www.youtube.com/watch?v=L1xT8Q-28hw&list=PLKn0YIxb2VjSvykJiDK9YGD6ySm4yWTsq",
+      "linkLabel": "VOD",
+      "tags": [
+        "Monde ouvert",
+        "Narratif",
+        "Western",
+        "Aventure",
+        "Action",
+        "Réaliste",
+        "Solo",
+        "Tir",
+        "Chevaux",
+        "Beau",
+        "Adulte",
+        "3e personne"
+      ],
+      "title": "Red Dead Redemption 2",
+      "platform": "PC",
+      "status": "finished"
+    }
+  ]
+}
