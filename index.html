@@ -130,19 +130,17 @@
 
     /* ====== ÉTOILES (SVG, remplissage précis) ====== */
     .star-row{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
-    .star-row.sm svg{width:22px;height:22px}     /* cartes */
-    .star-row.lg svg{width:30px;height:30px}     /* picker */
+    .star-row.sm svg{width:22px;height:22px}
+    .star-row.lg svg{width:30px;height:30px}
     .star-row svg{display:block}
     .star-svg .bg{fill:rgba(255,255,255,.28)}
     .star-svg .fill{fill:var(--brand-2)}
     .star-svg{shape-rendering:geometricPrecision}
-    .star-row, .star-row *{pointer-events:none}  /* affichage non interactif */
+    .star-row, .star-row *{pointer-events:none}
 
     .star-input{display:flex;align-items:center;gap:10px}
     .star-input .stars-wrap{position:relative;display:inline-block}
-    .star-input .hit{
-      position:absolute;inset:0;display:grid;grid-template-columns:repeat(10,1fr);cursor:pointer
-    }
+    .star-input .hit{position:absolute;inset:0;display:grid;grid-template-columns:repeat(10,1fr);cursor:pointer}
     .star-input .hit button{all:unset;cursor:pointer}
     .star-input .hint{color:var(--muted);font-size:.9rem}
   </style>
@@ -232,12 +230,14 @@
           <input id="fRating" type="hidden" />
         </div>
 
+        <div class="row-2"><label for="fReviewSafe">Avis sans spoil</label><textarea id="fReviewSafe" rows="4" placeholder="Résumé sans spoiler…"></textarea></div>
+        <div class="row-2"><label for="fReview">Avis complet (peut contenir des spoilers)</label><textarea id="fReview" rows="6" placeholder="Écris ton avis complet ici…"></textarea></div>
+
         <div><label for="fLink">Lien externe</label><input id="fLink" placeholder="https://… (facultatif)" /></div>
         <div><label for="fLinkLabel">Texte du lien</label><input id="fLinkLabel" placeholder="VOD, Test, Review… (par défaut : VOD)" /></div>
         <div><label for="fCover">Image (URL)</label><input id="fCover" placeholder="https://… (facultatif) — recommandé : 1200×450 px (bannière)" /></div>
 
-        <div class="row-2"><label for="fNotes">Notes</label><textarea id="fNotes" rows="4" placeholder="Pensées rapides, où j'en suis, etc."></textarea></div>
-        <div class="row-2"><label for="fReview">Avis (long)</label><textarea id="fReview" rows="6" placeholder="Écris ton avis complet ici…"></textarea></div>
+        <div class="row-2"><label for="fNotes">Notes (privées)</label><textarea id="fNotes" rows="4" placeholder="Pensées rapides, où j'en suis, etc."></textarea></div>
       </div>
       <div class="foot">
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
@@ -255,7 +255,7 @@
     </div>
   </div>
 
-  <!-- Modal Paramètres (dédié) -->
+  <!-- Modal Paramètres -->
   <div id="settingsModal" class="modal" aria-hidden="true">
     <div class="dialog">
       <div class="head">
@@ -267,9 +267,16 @@
         <div><label for="sShowTwitch">Afficher panneau Twitch (desktop)</label>
           <select id="sShowTwitch"><option value="yes">Oui</option><option value="no">Non</option></select>
         </div>
-        <div><label for="sIsLive">Indicateur Live (manuel)</label>
-          <select id="sIsLive"><option value="auto">Auto (par défaut)</option><option value="live">Forcer : En direct</option><option value="offline">Forcer : Hors ligne</option></select>
+        <div><label for="sIsLive">Indicateur Live</label>
+          <select id="sIsLive">
+            <option value="auto">Auto (recommandé)</option>
+            <option value="live">Forcer : En direct</option>
+            <option value="offline">Forcer : Hors ligne</option>
+          </select>
         </div>
+        <div><label for="sClientId">Twitch Client ID (optionnel, pour auto)</label><input id="sClientId" placeholder="xxxxxxxxxxxxxxxxxxxx" /></div>
+        <div><label for="sToken">Twitch App Access Token (optionnel)</label><input id="sToken" placeholder="Bearer token…" /></div>
+
         <div class="row-2">
           <label for="sStatuses">Statuts & ordre (un par ligne, format id=Label)</label>
           <textarea id="sStatuses" rows="5" placeholder="Exemple:
@@ -288,7 +295,25 @@ finished=Terminé"></textarea>
     </div>
   </div>
 
-  <!-- Modal Avis -->
+  <!-- Modal Choix Avis -->
+  <div id="reviewChoiceModal" class="modal" aria-hidden="true">
+    <div class="dialog" style="width:min(520px,94vw)">
+      <div class="head">
+        <strong>Affichage de l’avis</strong>
+        <button id="revChoiceClose" class="ghost">Retour</button>
+      </div>
+      <div class="body" style="grid-template-columns:1fr">
+        <p style="color:var(--muted);margin:0">Choisis la version à afficher :</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+          <button id="revChoiceSafe" class="btn">Voir l’avis sans spoil</button>
+          <button id="revChoiceFull" class="ghost">Voir l’avis complet (contient des spoilers)</button>
+        </div>
+        <p id="revChoiceNoSafe" style="color:#ffb4b4;display:none;margin:0">Aucun avis « sans spoiler » n’est disponible pour ce jeu.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Avis (contenu) -->
   <div id="reviewModal" class="modal" aria-hidden="true">
     <div class="dialog">
       <div class="head">
@@ -303,7 +328,7 @@ finished=Terminé"></textarea>
   </div>
 
   <script>
-    // ---- Statuts (éditables) ----
+    /* ====== Statuts ====== */
     let STATUS=[
       {id:'planned',label:'À faire'},
       {id:'playing',label:'En cours'},
@@ -321,16 +346,20 @@ finished=Terminé"></textarea>
     let games=[],filtered=[];
     let selectedStatuses=new Set(),selectedPlatform='',selectedTags=new Set(),searchTerm='',sortBy='status',sortDir='asc';
     let editingId=null;
-    let settings={twitchChannel:'ScotchyTAZ',showTwitch:true,isLive:'auto', customStatuses:null};
+    let settings={twitchChannel:'ScotchyTAZ',showTwitch:true,isLive:'auto',twitchClientId:'',twitchToken:'', customStatuses:null};
 
+    /* ====== Refs ====== */
     const $=id=>document.getElementById(id);
     const grid=$('grid'), emptyEl=$('empty'), searchInput=$('search'), chipsWrap=$('statusChips');
     const platformSelect=$('platformSelect'), sortSelect=$('sortSelect'), sortDirInput=$('sortDir'), clearFiltersBtn=$('clearFilters');
     const fab=$('fab'), settingsFab=$('settingsFab'), modal=$('modal'), modalTitle=$('modalTitle'), closeBtn=$('closeBtn'), saveBtn=$('saveBtn'), newBtn=$('newBtn'), deleteBtn=$('deleteBtn');
-    const fTitle=$('fTitle'), fPlatform=$('fPlatform'), fStatus=$('fStatus'), fProgress=$('fProgress'), fTags=$('fTags'), fRating=$('fRating'), fNotes=$('fNotes'), fReview=$('fReview'), fLink=$('fLink'), fLinkLabel=$('fLinkLabel'), fCover=$('fCover');
+    const fTitle=$('fTitle'), fPlatform=$('fPlatform'), fStatus=$('fStatus'), fProgress=$('fProgress'), fTags=$('fTags'),
+          fRating=$('fRating'), fNotes=$('fNotes'), fReview=$('fReview'), fReviewSafe=$('fReviewSafe'),
+          fLink=$('fLink'), fLinkLabel=$('fLinkLabel'), fCover=$('fCover');
     const exportBtn=$('exportBtn'), importBtn=$('importBtn'), fileInput=$('fileInput'), copyBtn=$('copyBtn');
     const twitchPanel=$('twitchPanel'), twitchEmbed=$('twitchEmbed'), twitchChat=$('twitchChat'), twitchLink=$('twitchLink'), twitchTitle=$('twitchTitle'), livePill=$('livePill'), liveText=$('liveText'), minimizeTwitch=$('minimizeTwitch'), mobileTwitchBtn=$('mobileTwitchBtn');
     const reviewModal=$('reviewModal'), revTitle=$('revTitle'), revContent=$('revContent'), revMeta=$('revMeta'), revCloseBtn=$('revCloseBtn');
+    const reviewChoiceModal=$('reviewChoiceModal'), revChoiceClose=$('revChoiceClose'), revChoiceSafe=$('revChoiceSafe'), revChoiceFull=$('revChoiceFull'), revChoiceNoSafe=$('revChoiceNoSafe');
 
     const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
     const nowIso=()=>new Date().toISOString();
@@ -345,9 +374,7 @@ finished=Terminé"></textarea>
     const uniquePlatforms=()=>[...new Set(games.map(g=>String(g.platform||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
     function computePlatformsSelect(){const prev=platformSelect.value; platformSelect.innerHTML='<option value="">Toutes plateformes</option>'+uniquePlatforms().map(p=>`<option value="${p}">${p}</option>`).join(''); if([...platformSelect.options].some(o=>o.value===prev)) platformSelect.value=prev;}
 
-    function toNum(v){return(typeof v==='number'&&!Number.isNaN(v))?v:-1}
-
-    /* ====== SVG ETOILES ====== */
+    /* ====== Étoiles SVG ====== */
     const SVG_NS="http://www.w3.org/2000/svg";
     const STAR_PATH="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z";
 
@@ -398,7 +425,7 @@ finished=Terminé"></textarea>
       return null;
     }
 
-    // Durée (depuis linkLabel)
+    /* ====== Durée ====== */
     function parseDurationToSeconds(label){
       if(!label) return null;
       const s = String(label).toLowerCase();
@@ -411,19 +438,19 @@ finished=Terminé"></textarea>
       return null;
     }
 
-    // Prefs tri
+    /* ====== Prefs tri ====== */
     function savePrefs(){ localStorage.setItem(LS_PREFS, JSON.stringify({ sortBy, sortDir })); }
     function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(LS_PREFS)||'null') } catch { return null } }
 
-    // Groupes pour le tri Progression
+    /* ====== Groupes progression ====== */
     function progressGroupRank(g){
       if(g.status==='playing') return 0;
       if(g.status==='finished') return 1;
       return 2;
     }
 
-    // Modale Avis
-    function openReview(g){
+    /* ====== Avis ====== */
+    function openReview(g, mode='full'){
       revTitle.textContent = g.title || 'Avis';
       const metaParts = [];
       if(g.platform) metaParts.push(escapeHtml(g.platform));
@@ -431,13 +458,29 @@ finished=Terminé"></textarea>
       const rs=getRatingStars(g);
       if(typeof rs==='number') metaParts.push(`${rs}★/5`);
       if(typeof g.progress==='number') metaParts.push(`${g.progress}%`);
+      metaParts.push(mode==='safe'?'Version sans spoiler':'Version complète');
       revMeta.innerHTML = metaParts.join(' • ');
-      revContent.textContent = g.review || '(Aucun avis pour le moment)';
+
+      const content = (mode==='safe' ? (g.reviewSafe||'') : (g.review||'')) || '(Aucun avis pour le moment)';
+      revContent.textContent = content;
+
       reviewModal.setAttribute('open',''); reviewModal.setAttribute('aria-hidden','false');
     }
     function closeReview(){ reviewModal.removeAttribute('open'); reviewModal.setAttribute('aria-hidden','true'); }
 
-    // Filtre + tri
+    let pendingReviewGame=null;
+    function openReviewChoice(g){
+      pendingReviewGame=g;
+      const hasSafe=!!(g.reviewSafe && g.reviewSafe.trim());
+      revChoiceSafe.disabled = !hasSafe;
+      revChoiceNoSafe.style.display = hasSafe ? 'none' : 'block';
+      reviewChoiceModal.setAttribute('open',''); reviewChoiceModal.setAttribute('aria-hidden','false');
+    }
+    function closeReviewChoice(){
+      reviewChoiceModal.removeAttribute('open'); reviewChoiceModal.setAttribute('aria-hidden','true');
+    }
+
+    /* ====== Filtre + tri ====== */
     function applyFilters(){
       const sTerm=deburr(searchTerm);
       filtered=games.filter(g=>{
@@ -448,7 +491,7 @@ finished=Terminé"></textarea>
           for(const t of selectedTags){ if(!tagsSet.has(t)) return false; }
         }
         if(sTerm){
-          const hay=deburr([g.title,g.platform,(g.tags||[]).join(' '),g.notes,g.review,String(g.rating??''),String(g.ratingStars??'')].join(' '));
+          const hay=deburr([g.title,g.platform,(g.tags||[]).join(' '),g.notes,g.review,g.reviewSafe,String(g.rating??''),String(g.ratingStars??'')].join(' '));
           if(!hay.includes(sTerm)) return false;
         }
         return true;
@@ -457,28 +500,22 @@ finished=Terminé"></textarea>
       const dir=(sortDir==='asc')?1:-1;
 
       switch(sortBy){
-        case 'alpha':
-          filtered.sort((a,b)=>dir*a.title.localeCompare(b.title)); break;
-
-        case 'updated':
-          filtered.sort((a,b)=>dir*(new Date(a.updatedAt)-new Date(b.updatedAt))); break;
-
+        case 'alpha': filtered.sort((a,b)=>dir*a.title.localeCompare(b.title)); break;
+        case 'updated': filtered.sort((a,b)=>dir*(new Date(a.updatedAt)-new Date(b.updatedAt))); break;
         case 'rating': {
           filtered.sort((a,b)=>{
             const ar = (typeof a.ratingStars==='number') ? a.ratingStars : (typeof a.rating==='number' ? a.rating/2 : null);
             const br = (typeof b.ratingStars==='number') ? b.ratingStars : (typeof b.rating==='number' ? b.rating/2 : null);
             const aHas = ar!=null, bHas = br!=null;
-            if(aHas!==bHas) return aHas? -1 : 1; // toujours ceux AVEC note en premier
+            if(aHas!==bHas) return aHas? -1 : 1;
             if(!aHas) return 0;
             return dir*(ar - br);
           });
           break;
         }
-
         case 'status':
           filtered.sort((a,b)=> dir*((STATUS_WEIGHT[a.status]??99)-(STATUS_WEIGHT[b.status]??99)) || a.title.localeCompare(b.title));
           break;
-
         case 'duration':
           filtered.sort((a,b)=>{
             const da=parseDurationToSeconds(a.linkLabel||'');
@@ -490,13 +527,12 @@ finished=Terminé"></textarea>
             return dir*(da-db);
           });
           break;
-
         case 'progress':
           filtered.sort((a,b)=>{
             const ga=progressGroupRank(a), gb=progressGroupRank(b);
             if(ga!==gb) return ga-gb;
             const aHas=typeof a.progress==='number', bHas=typeof b.progress==='number';
-            if(aHas!==bHas) return aHas? -1 : 1;   // sans progression en bas du groupe
+            if(aHas!==bHas) return aHas? -1 : 1;
             if(!aHas && !bHas) return 0;
             return dir*(a.progress - b.progress);
           });
@@ -505,7 +541,7 @@ finished=Terminé"></textarea>
       render();
     }
 
-    /* Tags overflow */
+    /* ====== Tags overflow ====== */
     function setupBadgesOverflow(container, inner, btn){
       inner.style.flexWrap='nowrap'; inner.style.overflow='hidden'; inner.style.width='auto';
       const need = inner.scrollWidth > inner.clientWidth + 4;
@@ -523,7 +559,7 @@ finished=Terminé"></textarea>
       }
     }
 
-    // Rendu cartes
+    /* ====== Rendu ====== */
     function render(){
       grid.innerHTML='';
       if(filtered.length===0){ emptyEl.hidden=false; return }
@@ -550,11 +586,8 @@ finished=Terminé"></textarea>
 
         const rs=getRatingStars(g);
         if(rs!=null){
-          const sep=document.createElement('span'); sep.textContent='•';
-          sep.style.opacity='.5';
-          subtitle.appendChild(sep);
-          const stars=buildStarRow(rs,'sm');
-          subtitle.appendChild(stars);
+          const sep=document.createElement('span'); sep.textContent='•'; sep.style.opacity='.5'; subtitle.appendChild(sep);
+          const stars=buildStarRow(rs,'sm'); subtitle.appendChild(stars);
         }
         inner.appendChild(subtitle);
 
@@ -588,9 +621,9 @@ finished=Terminé"></textarea>
           a.innerHTML=`<span class="play">▶</span><span>${g.linkLabel||'VOD'}</span>`;
           links.appendChild(a);
         }
-        if(typeof g.review==='string' && g.review.trim()){
+        if( (g.review && g.review.trim()) || (g.reviewSafe && g.reviewSafe.trim()) ){
           const r=document.createElement('button'); r.className='linkbtn review'; r.type='button'; r.textContent="Voir l'avis";
-          r.onclick=()=>openReview(g);
+          r.onclick=()=>openReviewChoice(g);
           links.appendChild(r);
         }
         if(links.children.length>0) inner.appendChild(links);
@@ -654,7 +687,7 @@ finished=Terminé"></textarea>
       wrap.addEventListener('mouseleave',()=>{ const v=Number(fRating.value||0); setStarRow(row,v); $('ratingHint').textContent=v? (v+' / 5') : '(aucune)'; });
     }
 
-    // ---- Admin: modal jeu
+    /* ====== Admin: modal jeu ====== */
     function openModal(id=null){
       if(!ADMIN_ENABLED) return;
       editingId=id;
@@ -672,17 +705,18 @@ finished=Terminé"></textarea>
 
     function clearForm(){
       fTitle.value=''; fPlatform.value=''; fStatus.value=(STATUS[0]?.id||'planned');
-      fProgress.value=''; fTags.value=''; fRating.value=''; fNotes.value=''; fReview.value='';
+      fProgress.value=''; fTags.value=''; fRating.value=''; fNotes.value='';
+      fReview.value=''; fReviewSafe.value='';
       fLink.value=''; fLinkLabel.value='VOD'; fCover.value='';
     }
     function fillForm(g){
       fTitle.value=g.title; fPlatform.value=g.platform; fStatus.value=g.status;
       fProgress.value=(g.progress??''); fTags.value=(g.tags||[]).join(', ');
       const rs=getRatingStars(g)||''; fRating.value=rs;
-      fNotes.value=g.notes||''; fReview.value=g.review||'';
+      fNotes.value=g.notes||''; fReview.value=g.review||''; fReviewSafe.value=g.reviewSafe||'';
       fLink.value=g.link??''; fLinkLabel.value=g.linkLabel||'VOD'; fCover.value=g.cover??'';
     }
-    function readForm(){ 
+    function readForm(){
       const rs = fRating.value===''? null : Number(fRating.value);
       return {
         title:fTitle.value.trim(),
@@ -694,10 +728,11 @@ finished=Terminé"></textarea>
         rating: rs==null? null : rs*2, // compat /10
         notes:fNotes.value.trim(),
         review:fReview.value.trim(),
+        reviewSafe:fReviewSafe.value.trim(),
         link:fLink.value.trim()||null,
         linkLabel:fLinkLabel.value.trim()||'VOD',
         cover:fCover.value.trim()||null
-      } 
+      }
     }
 
     function upsertGame(){
@@ -709,7 +744,7 @@ finished=Terminé"></textarea>
         const idx=games.findIndex(g=>g.id===editingId);
         if(idx>-1){games[idx]={...games[idx],...data,updatedAt:nowIso()}}
       } else {
-        games.push({id:uid(),createdAt:nowIso(),updatedAt:nowIso(),progress:null,rating:null,ratingStars:null,notes:'',review:'',cover:null,link:null,linkLabel:'VOD',tags:[],...data});
+        games.push({id:uid(),createdAt:nowIso(),updatedAt:nowIso(),progress:null,rating:null,ratingStars:null,notes:'',review:'',reviewSafe:'',cover:null,link:null,linkLabel:'VOD',tags:[],...data});
       }
       saveLS(); computePlatformsSelect(); applyFilters(); setupTwitch(); closeModal();
     }
@@ -722,7 +757,7 @@ finished=Terminé"></textarea>
       saveLS(); applyFilters(); closeModal();
     }
 
-    // ====== Export / Copier / Import ======
+    /* ====== Export / Copier / Import ====== */
     function bundleJSON(){
       return JSON.stringify({settings:{...settings,customStatuses:STATUS},games}, null, 2);
     }
@@ -762,24 +797,85 @@ finished=Terminé"></textarea>
             if(Array.isArray(data.settings.customStatuses)){STATUS=data.settings.customStatuses; rebuildStatusWeight();}
           } else if(Array.isArray(data.customStatuses)){STATUS=data.customStatuses; rebuildStatusWeight();}
         } else {throw new Error('JSON invalide')}
-        games = games.map(g => ({ ...g, review: (g.review ?? ''), ratingStars: (typeof g.ratingStars==='number'? g.ratingStars : (typeof g.rating==='number'? g.rating/2 : null)) }));
+        games = games.map(g => ({
+          ...g,
+          review: (g.review ?? ''),
+          reviewSafe: (g.reviewSafe ?? ''),
+          ratingStars: (typeof g.ratingStars==='number'? g.ratingStars : (typeof g.rating==='number'? g.rating/2 : null))
+        }));
         saveLS(); computePlatformsSelect(); buildStatusUI(); applyFilters(); setupTwitch(); closeModal();
       }catch(e){alert('Import impossible : '+e.message)}};
       reader.readAsText(file);
     }
 
-    // Twitch
-    function setupTwitch(){
-      const show=!!settings.showTwitch; const channel=(settings.twitchChannel||'').trim(); const parent=encodeURIComponent(location.hostname||'localhost'); const twitchUrl=`https://www.twitch.tv/${channel}`;
-      if(!show||!channel){twitchPanel.hidden=true; mobileTwitchBtn.style.display='none'; return;}
-      twitchPanel.hidden=false; twitchLink.href=twitchUrl; twitchTitle.textContent=channel?`@${channel}`:''; mobileTwitchBtn.href=twitchUrl;
-      const forced=settings.isLive; let live=false; if(forced==='live') live=true; else if(forced==='offline') live=false; else live=false;
-      livePill.className='pill'+(live?' live':''); liveText.textContent=live?'En direct':'Hors ligne'; mobileTwitchBtn.textContent=live?'Twitch (LIVE)':'Twitch';
-      twitchEmbed.innerHTML=''; const ifr=document.createElement('iframe'); ifr.allow='autoplay; fullscreen; picture-in-picture'; ifr.frameBorder='0'; ifr.width='100%'; ifr.height='100%'; ifr.src=`https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=${parent}&muted=true`; twitchEmbed.appendChild(ifr);
-      twitchChat.innerHTML=''; const chat=document.createElement('iframe'); chat.frameBorder='0'; chat.width='100%'; chat.height='100%'; chat.src=`https://www.twitch.tv/embed/${encodeURIComponent(channel)}/chat?parent=${parent}`; twitchChat.appendChild(chat);
+    /* ====== Twitch ====== */
+    let liveTimer=null;
+    function setLiveUI(live){
+      livePill.className='pill'+(live?' live':'');
+      liveText.textContent=live?'En direct':'Hors ligne';
+      mobileTwitchBtn.textContent=live?'Twitch (LIVE)':'Twitch';
     }
 
-    // Param helpers
+    async function fetchLiveHelix(channel, clientId, token){
+      try{
+        const res = await fetch(`https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(channel)}`, {
+          headers: { 'Client-ID': clientId, 'Authorization': `Bearer ${token}` }
+        });
+        if(!res.ok) throw new Error('Helix error');
+        const data=await res.json();
+        return Array.isArray(data.data) && data.data.length>0;
+      }catch{ return null } // null = inconnu (erreur)
+    }
+    async function fetchLiveFallback(channel){
+      try{
+        const res=await fetch(`https://decapi.me/twitch/uptime/${encodeURIComponent(channel)}`, {cache:'no-store'});
+        if(!res.ok) throw new Error('decapi error');
+        const txt=await res.text();
+        const offline = /offline/i.test(txt);
+        if(offline) return false;
+        const live = /(live|uptime|has been live)/i.test(txt);
+        return live ? true : false;
+      }catch{ return null }
+    }
+
+    async function updateLive(){
+      const channel=(settings.twitchChannel||'').trim();
+      if(!settings.showTwitch || !channel){ setLiveUI(false); return; }
+
+      if(settings.isLive==='live'){ setLiveUI(true); return; }
+      if(settings.isLive==='offline'){ setLiveUI(false); return; }
+
+      // Auto
+      let live=null;
+      if(settings.twitchClientId && settings.twitchToken){
+        live = await fetchLiveHelix(channel, settings.twitchClientId, settings.twitchToken);
+      }
+      if(live===null){
+        live = await fetchLiveFallback(channel);
+      }
+      if(live===null){
+        // indéterminé -> ne rien changer
+        return;
+      }
+      setLiveUI(!!live);
+    }
+
+    function setupTwitch(){
+      const show=!!settings.showTwitch; const channel=(settings.twitchChannel||'').trim(); const parent=encodeURIComponent(location.hostname||'localhost'); const twitchUrl=`https://www.twitch.tv/${channel}`;
+      if(!show||!channel){twitchPanel.hidden=true; mobileTwitchBtn.style.display='none'; if(liveTimer) clearInterval(liveTimer); return;}
+      twitchPanel.hidden=false; twitchLink.href=twitchUrl; twitchTitle.textContent=channel?`@${channel}`:''; mobileTwitchBtn.href=twitchUrl;
+
+      // Embed
+      twitchEmbed.innerHTML=''; const ifr=document.createElement('iframe'); ifr.allow='autoplay; fullscreen; picture-in-picture'; ifr.frameBorder='0'; ifr.width='100%'; ifr.height='100%'; ifr.src=`https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=${parent}&muted=true`; twitchEmbed.appendChild(ifr);
+      twitchChat.innerHTML=''; const chat=document.createElement('iframe'); chat.frameBorder='0'; chat.width='100%'; chat.height='100%'; chat.src=`https://www.twitch.tv/embed/${encodeURIComponent(channel)}/chat?parent=${parent}`; twitchChat.appendChild(chat);
+
+      // Auto live polling
+      if(liveTimer) clearInterval(liveTimer);
+      updateLive();
+      liveTimer=setInterval(updateLive, 60000); // 60s
+    }
+
+    /* ====== Param helpers ====== */
     function statusesToText(arr) { return arr.map(s => `${s.id}=${s.label}`).join('\n'); }
     function parseStatuses(text) {
       const out = [];
@@ -793,27 +889,36 @@ finished=Terminé"></textarea>
     }
     function openSettingsModal(){
       if(!ADMIN_ENABLED) return;
-      $('sTwitch').value=settings.twitchChannel||''; $('sShowTwitch').value=settings.showTwitch?'yes':'no'; $('sIsLive').value=settings.isLive||'auto'; $('sStatuses').value=statusesToText(STATUS);
+      $('sTwitch').value=settings.twitchChannel||'';
+      $('sShowTwitch').value=settings.showTwitch?'yes':'no';
+      $('sIsLive').value=settings.isLive||'auto';
+      $('sClientId').value=settings.twitchClientId||'';
+      $('sToken').value=settings.twitchToken||'';
+      $('sStatuses').value=statusesToText(STATUS);
       $('settingsModal').setAttribute('open',''); $('settingsModal').setAttribute('aria-hidden','false');
     }
     function closeSettingsModal(){ $('settingsModal').removeAttribute('open'); $('settingsModal').setAttribute('aria-hidden','true'); }
     function saveSettings(){
       if(!ADMIN_ENABLED) return;
-      settings.twitchChannel=$('sTwitch').value.trim()||settings.twitchChannel; settings.showTwitch=($('sShowTwitch').value==='yes'); settings.isLive=$('sIsLive').value;
+      settings.twitchChannel=$('sTwitch').value.trim()||settings.twitchChannel;
+      settings.showTwitch=($('sShowTwitch').value==='yes');
+      settings.isLive=$('sIsLive').value;
+      settings.twitchClientId=$('sClientId').value.trim();
+      settings.twitchToken=$('sToken').value.trim();
       const parsed=parseStatuses($('sStatuses').value); if(parsed){ STATUS=parsed; rebuildStatusWeight(); }
       saveLS(); buildStatusUI(); applyFilters(); setupTwitch(); closeSettingsModal();
     }
 
-    // Données d'exemple
+    /* ====== Données d'exemple ====== */
     function initSample(){return[
-      {id:uid(),title:'Batman: Arkham City',platform:'PC',status:'replaying',progress:35,tags:['action','Batman'],ratingStars:4.5,rating:9,notes:'Reprise en hard mode.',review:'Un classique qui tient encore bien la route.',link:'',linkLabel:'VOD | 1h37',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'The Last of Us Part I',platform:'PC',status:'finished',progress:100,tags:['narratif'],ratingStars:5,rating:10,notes:'Coup de cœur.',review:'Histoire et rythme impeccables.',link:'',linkLabel:'VOD | 2h05',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Red Dead Redemption 2',platform:'PC',status:'planned',progress:null,tags:['open-world'],ratingStars:null,rating:null,notes:'Prévu pour stream.',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Days Gone',platform:'PC',status:'unfinished',progress:52,tags:['zombies'],ratingStars:3,rating:6,notes:'Hésite à reprendre.',review:'Bons gunfights, répétitif sur la durée.',link:'',linkLabel:'VOD | 45:12',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Metal Gear Solid',platform:'PS1',status:'playing',progress:18,tags:['infiltration','classique'],ratingStars:null,rating:null,notes:'Découverte.',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Batman: Arkham City',platform:'PC',status:'replaying',progress:35,tags:['action','Batman'],ratingStars:4.5,rating:9,notes:'Reprise en hard mode.',reviewSafe:'Quelques faiblesses de rythme, mais une boucle de gameplay encore super efficace.',review:'Un classique qui tient encore bien la route. Les combats sont toujours top, quelques longueurs au milieu et la cam n’aide pas dans certains couloirs.',link:'',linkLabel:'VOD | 1h37',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'The Last of Us Part I',platform:'PC',status:'finished',progress:100,tags:['narratif'],ratingStars:5,rating:10,notes:'Coup de cœur.',reviewSafe:'Une histoire forte et émouvante, servie par une réalisation irréprochable.',review:'Histoire et rythme impeccables. La scène du **spoiler** fonctionne toujours autant, et le final est percutant.',link:'',linkLabel:'VOD | 2h05',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Red Dead Redemption 2',platform:'PC',status:'planned',progress:null,tags:['open-world'],ratingStars:null,rating:null,notes:'Prévu pour stream.',reviewSafe:'',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Days Gone',platform:'PC',status:'unfinished',progress:52,tags:['zombies'],ratingStars:3,rating:6,notes:'Hésite à reprendre.',reviewSafe:'Bon défouloir mais répétitif.',review:'Bons gunfights, répétitif sur la durée.',link:'',linkLabel:'VOD | 45:12',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Metal Gear Solid',platform:'PS1',status:'playing',progress:18,tags:['infiltration','classique'],ratingStars:null,rating:null,notes:'Découverte.',reviewSafe:'',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
     ]}
 
-    // Bundle JSON
+    /* ====== Bundle JSON embarqué (optionnel) ====== */
     async function loadBundle() {
       try {
         const res = await fetch('games_bundle.json?ts=' + Date.now(), { cache: 'no-store' });
@@ -825,7 +930,7 @@ finished=Terminé"></textarea>
       return null;
     }
 
-    // INIT
+    /* ====== INIT ====== */
     async function init(){
       if(ADMIN_ENABLED){fab.hidden=false; settingsFab.hidden=false}
 
@@ -847,10 +952,11 @@ finished=Terminé"></textarea>
         }
       }
 
-      // compat
-      games = games.map(g => ({ 
-        ...g, 
-        review: (g.review ?? ''), 
+      // compat anciennes sauvegardes
+      games = games.map(g => ({
+        ...g,
+        review: (g.review ?? ''),
+        reviewSafe: (g.reviewSafe ?? ''),
         ratingStars: (typeof g.ratingStars==='number' ? g.ratingStars : (typeof g.rating==='number' ? g.rating/2 : null))
       }));
 
@@ -898,7 +1004,7 @@ finished=Terminé"></textarea>
       $('sCloseBtn').onclick=()=>closeSettingsModal();
       $('sSaveBtn').onclick=()=>saveSettings();
 
-      // Raccourci admin
+      // Raccourci admin (easter egg)
       let seq=''; document.addEventListener('keydown',e=>{
         if((e.ctrlKey&&e.altKey&&e.key.toLowerCase()==='a')&&ADMIN_ENABLED){openModal()}
         seq+=e.key.toLowerCase(); if(seq.length>7) seq=seq.slice(-7);
@@ -911,7 +1017,12 @@ finished=Terminé"></textarea>
       // Modale Avis
       revCloseBtn.onclick = closeReview;
       reviewModal.addEventListener('click', (e)=>{ if(e.target===reviewModal) closeReview(); });
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeReview(); });
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') { closeReview(); closeReviewChoice(); } });
+
+      revChoiceClose.onclick = closeReviewChoice;
+      reviewChoiceModal.addEventListener('click', (e)=>{ if(e.target===reviewChoiceModal) closeReviewChoice(); });
+      revChoiceSafe.onclick = ()=>{ if(pendingReviewGame){ closeReviewChoice(); openReview(pendingReviewGame,'safe'); } };
+      revChoiceFull.onclick = ()=>{ if(pendingReviewGame){ closeReviewChoice(); openReview(pendingReviewGame,'full'); } };
     }
     document.addEventListener('DOMContentLoaded',init);
   </script>
