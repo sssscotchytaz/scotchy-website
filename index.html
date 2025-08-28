@@ -1,1030 +1,836 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mes jeux • Tableau de bord</title>
-  <style>
-    :root{
-      --bg:#0f1115; --panel:#151923; --muted:#aab0c0; --text:#e8ebf2;
-      --brand:#7c93ff; --brand-2:#76e0c2; --danger:#ff6b6b; --ok:#3ddc97;
-      --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
-      --green-1:#4ade80; --green-2:#22d3ee; --red-1:#ff6b6b; --red-2:#ff3b6b;
-    }
-    html,body{height:100%}
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,rgba(124,147,255,.06),transparent 35%),linear-gradient(0deg,rgba(118,224,194,.05),transparent 45%),var(--bg);background-attachment:fixed;color:var(--text)}
-    *{box-sizing:border-box} a{color:var(--brand)} button,input,select,textarea{font:inherit;color:inherit}
-
-    .container{max-width:1380px;margin:24px auto;padding:0 16px}
-    .layout{display:grid;grid-template-columns:1fr;gap:16px}
-    @media(min-width:1280px){.layout{grid-template-columns:1fr 420px;align-items:start}}
-
-    .panel{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:var(--shadow)}
-
-    .search{display:flex;align-items:center;gap:10px;padding:10px 12px}
-    .search input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0c0f14;outline:none}
-
-    .filters{display:flex;gap:10px;padding:10px;flex-wrap:wrap}
-    .chip{position:relative;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.22);cursor:pointer;user-select:none;background:#0c0f14;transition:box-shadow .2s,border-color .2s,background .2s}
-    .chip:hover{border-color:rgba(255,255,255,.35)}
-    .chip:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(124,147,255,.35)}
-    .chip[data-active="true"]{background:#0b0e12;border-color:transparent}
-    .chip[data-active="true"]::before{content:"";position:absolute;inset:-1px;border-radius:999px;padding:1px;background:linear-gradient(90deg,var(--green-1),var(--green-2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-
-    .selects{display:flex;gap:10px;padding:10px;flex-wrap:wrap;align-items:center}
-    .selects select{padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0c0f14;outline:none}
-
-    .switch{position:relative;width:58px;height:30px;display:inline-block}
-    .switch input{opacity:0;width:0;height:0}
-    .slider{position:absolute;cursor:pointer;inset:0;border-radius:999px;background:#0b0e12}
-    .slider::after{content:"";position:absolute;inset:-1px;border-radius:999px;padding:1px;background:linear-gradient(90deg,var(--green-1),var(--green-2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;transition:background .25s ease}
-    .slider:before{content:"↓";position:absolute;height:24px;width:24px;left:3px;top:50%;transform:translateY(-50%);display:grid;place-items:center;border-radius:50%;background:#121620;transition:left .22s ease, transform .22s ease}
-    .switch input:active + .slider:before{transform:translateY(-50%) scale(.97)}
-    .switch input:checked + .slider:before{content:"↑";left:31px}
-    .switch input:checked + .slider::after{background:linear-gradient(90deg,var(--red-1),var(--red-2))}
-    .hint{color:var(--muted);font-size:.85rem}
-
-    .grid{display:grid;gap:14px;grid-template-columns:1fr}
-    @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
-    @media(min-width:1100px){.grid{grid-template-columns:1fr 1fr 1fr}}
-
-    .card{position:relative;overflow:hidden}
-    .card .inner{padding:16px}
-    .title{font-weight:700;letter-spacing:.2px}
-    .subtitle{color:var(--muted);font-size:.9rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-
-    .cover-wrap{width:100%;aspect-ratio:16/6;background:#0b0e12}
-    .cover-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-
-    .links{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;position:relative;z-index:5}
-    .linkbtn{font-size:.82rem;padding:7px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#0c0f14;text-decoration:none;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
-    .linkbtn.vod{border:none;background:linear-gradient(180deg,rgba(124,147,255,.25),rgba(124,147,255,.12));box-shadow:inset 0 0 0 1px rgba(124,147,255,.45)}
-    .linkbtn .play{font-size:.85rem}
-    .linkbtn.review{border:none;background:linear-gradient(180deg,rgba(61,220,151,.25),rgba(61,220,151,.12));box-shadow:inset 0 0 0 1px rgba(61,220,151,.45)}
-
-    /* Tags 1 ligne + Plus/Moins */
-    .badges{position:relative;display:flex;align-items:flex-start;gap:8px;margin-top:10px;--fade-pad:56px}
-    .badgesInner{display:flex;flex-wrap:nowrap;overflow:hidden;flex:1 1 auto;min-width:0;max-width:100%}
-    .badges[data-expanded="false"] .badgesInner{
-      max-width:calc(100% - var(--fade-pad));
-      -webkit-mask-image:linear-gradient(to right,#000 0,#000 calc(100% - var(--fade-pad)),transparent 100%);
-      mask-image:linear-gradient(to right,#000 0,#000 calc(100% - var(--fade-pad)),transparent 100%);
-    }
-    .badges[data-expanded="true"] .badgesInner{-webkit-mask-image:none;mask-image:none}
-    .moreBtn{flex:0 0 auto;padding:4px 8px;font-size:.72rem;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:#0c0f14;display:none;white-space:nowrap;position:relative;z-index:3;cursor:pointer;user-select:none}
-
-    .badge{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:#0c0f14;cursor:pointer}
-    .badge.selected{border:1px solid transparent;background:#0b0e12;position:relative}
-    .badge.selected::before{
-      content:"";position:absolute;inset:-1px;border-radius:999px;padding:1px;background:linear-gradient(90deg,var(--green-1),var(--green-2));
-      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-      -webkit-mask-composite:xor;mask-composite:exclude;
-    }
-
-    .progress{height:8px;background:#0b0e12;border-radius:999px;overflow:hidden;margin-top:12px}
-    .progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2));width:0}
-
-    .actions{display:flex;gap:8px;margin-top:14px}
-    .ghost{background:transparent;border:1px solid rgba(255,255,255,.15);padding:8px 10px;border-radius:10px;cursor:pointer}
-    .ghost:hover{border-color:rgba(255,255,255,.3)}
-
-    .empty{text-align:center;color:var(--muted);padding:40px}
-
-    .fab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(124,147,255,.25),rgba(124,147,255,.08));border:1px solid rgba(124,147,255,.45);cursor:pointer;box-shadow:var(--shadow);backdrop-filter:blur(6px);z-index:20}
-    .fab[hidden]{display:none}
-    .fab-secondary{right:86px;bottom:20px;width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(118,224,194,.25),rgba(118,224,194,.08));border:1px solid rgba(118,224,194,.45)}
-
-    /* ==== Modales scrollables ==== */
-    .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:30;padding:12px}
-    .modal[open]{display:grid}
-    .dialog{
-      width:min(840px,94vw);background:var(--panel);border:1px solid rgba(255,255,255,.1);
-      border-radius:var(--radius);box-shadow:var(--shadow);max-height:90vh;display:flex;flex-direction:column;
-    }
-    .dialog .head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
-    .dialog .body{padding:16px 18px;display:grid;gap:12px;grid-template-columns:1fr;flex:1 1 auto;overflow:auto}
-    @media(min-width:720px){.dialog .body{grid-template-columns:1fr 1fr}}
-    .dialog label{font-size:.85rem;color:var(--muted)}
-    .dialog input,.dialog select,.dialog textarea{
-      width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0c0f14;color:inherit;outline:none;resize:vertical
-    }
-    .dialog .row-2{grid-column:1 / -1}
-    .dialog .foot{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-top:1px solid rgba(255,255,255,.08)}
-    .btn{background:linear-gradient(180deg,rgba(118,224,194,.25),rgba(118,224,194,.08));border:1px solid rgba(118,224,194,.45);padding:10px 14px;border-radius:12px;cursor:pointer}
-    .btn[disabled]{opacity:.6;pointer-events:none}
-    .danger{background:linear-gradient(180deg,rgba(255,107,107,.15),rgba(255,107,107,.05));border:1px solid rgba(255,107,107,.5)}
-
-    .twitch{position:sticky;top:16px}
-    .twitch .status{display:flex;align-items:center;gap:8px;padding:10px 12px;font-size:.9rem;color:var(--muted)}
-    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:#0c0f14}
-    .pill.live{border-color:rgba(61,220,151,.65);color:#b8ffe5}
-    .twitchPlayer{aspect-ratio:16/9;width:100%;background:#0b0e12;border-radius:12px;overflow:hidden}
-    .twitchChat{height:380px;margin-top:10px;border-radius:12px;overflow:hidden;background:#0b0e12}
-    @media(max-width:1279px){.twitchChat{display:none}}
-
-    .twitch-fab{position:fixed;right:16px;bottom:84px;display:none;z-index:19}
-    .twitch-fab a{text-decoration:none}
-    @media(max-width:1279px){.twitch-fab{display:block}}
-
-    .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-
-    /* ====== ÉTOILES (SVG, remplissage précis) ====== */
-    .star-row{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
-    .star-row.sm svg{width:22px;height:22px}
-    .star-row.lg svg{width:30px;height:30px}
-    .star-row svg{display:block}
-    .star-svg .bg{fill:rgba(255,255,255,.28)}
-    .star-svg .fill{fill:var(--brand-2)}
-    .star-svg{shape-rendering:geometricPrecision}
-    .star-row, .star-row *{pointer-events:none}
-
-    .star-input{display:flex;align-items:center;gap:10px}
-    .star-input .stars-wrap{position:relative;display:inline-block}
-    .star-input .hit{position:absolute;inset:0;display:grid;grid-template-columns:repeat(10,1fr);cursor:pointer}
-    .star-input .hit button{all:unset;cursor:pointer}
-    .star-input .hint{color:var(--muted);font-size:.9rem}
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="layout">
-      <main>
-        <h1 style="margin:0 0 12px 0;">Mes jeux</h1>
-        <p style="color:var(--muted); margin:0 0 18px 0;">Rechercher, filtrer, trier. <span class="sr">Texte secondaire.</span></p>
-
-        <div class="panel">
-          <div class="search">
-            <input id="search" type="search" placeholder="Rechercher un jeu (titre, plateforme, tags, note)" autocomplete="off" />
-          </div>
-          <div class="filters" id="statusChips"></div>
-          <div class="selects">
-            <select id="platformSelect"><option value="">Toutes plateformes</option></select>
-            <select id="sortSelect">
-              <option value="alpha">Tri : Titre</option>
-              <option value="updated">Tri : Modifiés récemment</option>
-              <option value="progress">Tri : Progression</option>
-              <option value="rating">Tri : Note</option>
-              <option value="status">Tri : Statut</option>
-              <option value="duration">Tri : Durée (VOD)</option>
-            </select>
-            <label class="switch" title="Sens du tri"><input id="sortDir" type="checkbox"><span class="slider"></span></label>
-            <button id="clearFilters" class="ghost">Réinitialiser</button>
-          </div>
-          <div class="hint" style="padding:0 10px 12px 10px">Astuce : clique un tag sur une carte pour filtrer (contour vert = actif).</div>
-        </div>
-
-        <div id="grid" class="grid" style="margin-top:16px"></div>
-        <div id="empty" class="empty" hidden>Aucun résultat. Modifie les filtres ou la recherche.</div>
-      </main>
-
-      <aside>
-        <div id="twitchPanel" class="panel twitch" hidden>
-          <div class="status">
-            <span id="livePill" class="pill">● <span id="liveText">Hors ligne</span></span>
-            <span id="twitchTitle" style="margin-left:auto; color:var(--muted)"></span>
-          </div>
-          <div style="padding:0 10px 10px 10px">
-            <div id="twitchEmbed" class="twitchPlayer"></div>
-            <div id="twitchChat" class="twitchChat"></div>
-            <div style="display:flex; gap:8px; margin-top:10px">
-              <a id="twitchLink" class="btn" target="_blank" rel="noopener">Regarder sur Twitch</a>
-              <button id="minimizeTwitch" class="ghost">Réduire</button>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </div>
-
-  <!-- FABs (admin only, localhost) -->
-  <button id="settingsFab" class="fab fab-secondary" title="Paramètres (localhost)" hidden>🛠️</button>
-  <button id="fab" class="fab" title="Administration (localhost)" hidden>⚙️</button>
-
-  <!-- Mobile Twitch quick link -->
-  <div class="twitch-fab"><a id="mobileTwitchBtn" class="btn" target="_blank" rel="noopener">Twitch (live)</a></div>
-
-  <!-- Modal Jeux (ajout/édition) -->
-  <div id="modal" class="modal" aria-hidden="true">
-    <div class="dialog">
-      <div class="head">
-        <strong id="modalTitle">Ajouter un jeu</strong>
-        <div>
-          <button id="deleteBtn" class="ghost danger" title="Supprimer" hidden>Supprimer</button>
-          <button id="closeBtn" class="ghost" title="Fermer">Fermer</button>
-        </div>
-      </div>
-      <div class="body">
-        <div><label for="fTitle">Titre</label><input id="fTitle" placeholder="Ex: Batman: Arkham City" /></div>
-        <div><label for="fPlatform">Plateforme</label><input id="fPlatform" placeholder="PC, PS5, Xbox…" /></div>
-        <div><label for="fStatus">Statut</label><select id="fStatus"></select></div>
-        <div><label for="fProgress">Progression (%)</label><input id="fProgress" type="number" min="0" max="100" step="1" placeholder="laisser vide si non pertinent" /></div>
-        <div><label for="fTags">Tags</label><input id="fTags" placeholder="action, narratif, GOTY… (clic sur un tag pour filtrer)" /></div>
-
-        <!-- Note étoiles -->
-        <div class="row-2">
-          <label>Note</label>
-          <div class="star-input">
-            <div class="stars-wrap" id="ratingPickerWrap"></div>
-            <span id="ratingHint" class="hint">(aucune)</span>
-          </div>
-          <input id="fRating" type="hidden" />
-        </div>
-
-        <div class="row-2"><label for="fReviewSafe">Avis sans spoil</label><textarea id="fReviewSafe" rows="4" placeholder="Résumé sans spoiler…"></textarea></div>
-        <div class="row-2"><label for="fReview">Avis complet (peut contenir des spoilers)</label><textarea id="fReview" rows="6" placeholder="Écris ton avis complet ici…"></textarea></div>
-
-        <div><label for="fLink">Lien externe</label><input id="fLink" placeholder="https://… (facultatif)" /></div>
-        <div><label for="fLinkLabel">Texte du lien</label><input id="fLinkLabel" placeholder="VOD, Test, Review… (par défaut : VOD)" /></div>
-        <div><label for="fCover">Image (URL)</label><input id="fCover" placeholder="https://… (facultatif) — recommandé : 1200×450 px (bannière)" /></div>
-
-        <div class="row-2"><label for="fNotes">Notes (privées)</label><textarea id="fNotes" rows="4" placeholder="Pensées rapides, où j'en suis, etc."></textarea></div>
-      </div>
-      <div class="foot">
-        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
-          <button id="settingsBtn" class="ghost" title="Paramètres" style="display:none">⚙ Paramètres</button>
-          <button id="importBtn" class="ghost" title="Importer JSON">Importer JSON</button>
-          <button id="exportBtn" class="ghost" title="Exporter JSON">Exporter JSON</button>
-          <button id="copyBtn" class="ghost" title="Copier le JSON dans le presse-papiers">Copier le JSON</button>
-          <input id="fileInput" type="file" accept="application/json" hidden />
-        </div>
-        <div style="display:flex; gap:8px">
-          <button id="newBtn" class="ghost">Nouveau</button>
-          <button id="saveBtn" class="btn">Enregistrer</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Paramètres -->
-  <div id="settingsModal" class="modal" aria-hidden="true">
-    <div class="dialog">
-      <div class="head">
-        <strong>Paramètres</strong>
-        <div><button id="sCloseBtn" class="ghost" title="Fermer">Fermer</button></div>
-      </div>
-      <div class="body">
-        <div><label for="sTwitch">Chaîne Twitch</label><input id="sTwitch" placeholder="ex: ScotchyTAZ" /></div>
-        <div><label for="sShowTwitch">Afficher panneau Twitch (desktop)</label>
-          <select id="sShowTwitch"><option value="yes">Oui</option><option value="no">Non</option></select>
-        </div>
-        <div><label for="sIsLive">Indicateur Live</label>
-          <select id="sIsLive">
-            <option value="auto">Auto (recommandé)</option>
-            <option value="live">Forcer : En direct</option>
-            <option value="offline">Forcer : Hors ligne</option>
-          </select>
-        </div>
-        <div><label for="sClientId">Twitch Client ID (optionnel, pour auto)</label><input id="sClientId" placeholder="xxxxxxxxxxxxxxxxxxxx" /></div>
-        <div><label for="sToken">Twitch App Access Token (optionnel)</label><input id="sToken" placeholder="Bearer token…" /></div>
-
-        <div class="row-2">
-          <label for="sStatuses">Statuts & ordre (un par ligne, format id=Label)</label>
-          <textarea id="sStatuses" rows="5" placeholder="Exemple:
-planned=À faire
-playing=En cours
-replaying=Je refais
-unfinished=Pas fini
-abandoned=Abandonné
-finished=Terminé"></textarea>
-        </div>
-      </div>
-      <div class="foot">
-        <div style="display:flex;gap:8px"></div>
-        <div style="display:flex; gap:8px"><button id="sSaveBtn" class="btn">Enregistrer</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Choix Avis -->
-  <div id="reviewChoiceModal" class="modal" aria-hidden="true">
-    <div class="dialog" style="width:min(520px,94vw)">
-      <div class="head">
-        <strong>Affichage de l’avis</strong>
-        <button id="revChoiceClose" class="ghost">Retour</button>
-      </div>
-      <div class="body" style="grid-template-columns:1fr">
-        <p style="color:var(--muted);margin:0">Choisis la version à afficher :</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
-          <button id="revChoiceSafe" class="btn">Voir l’avis sans spoil</button>
-          <button id="revChoiceFull" class="ghost">Voir l’avis complet (contient des spoilers)</button>
-        </div>
-        <p id="revChoiceNoSafe" style="color:#ffb4b4;display:none;margin:0">Aucun avis « sans spoiler » n’est disponible pour ce jeu.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Avis (contenu) -->
-  <div id="reviewModal" class="modal" aria-hidden="true">
-    <div class="dialog">
-      <div class="head">
-        <strong id="revTitle">Avis</strong>
-        <button id="revCloseBtn" class="ghost" title="Fermer">Fermer</button>
-      </div>
-      <div class="body">
-        <div class="row-2" id="revMeta" style="color:var(--muted)"></div>
-        <div class="row-2" id="revContent" style="white-space:pre-wrap; line-height:1.6; overflow-wrap:anywhere;"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    /* ====== Statuts ====== */
-    let STATUS=[
-      {id:'planned',label:'À faire'},
-      {id:'playing',label:'En cours'},
-      {id:'replaying',label:'Je refais'},
-      {id:'unfinished',label:'Pas fini'},
-      {id:'abandoned',label:'Abandonné'},
-      {id:'finished',label:'Terminé'},
-    ];
-    let STATUS_WEIGHT={}; function rebuildStatusWeight(){ STATUS_WEIGHT={}; STATUS.forEach((s,i)=>STATUS_WEIGHT[s.id]=i); }
-    rebuildStatusWeight();
-
-    const LS_KEY='gamesDataV3', LS_SETTINGS='gamesSettingsV2', LS_PREFS='gamesPrefsV1';
-    const ADMIN_ENABLED=(location.hostname==='localhost'||location.hostname==='127.0.0.1');
-
-    let games=[],filtered=[];
-    let selectedStatuses=new Set(),selectedPlatform='',selectedTags=new Set(),searchTerm='',sortBy='status',sortDir='asc';
-    let editingId=null;
-    let settings={twitchChannel:'ScotchyTAZ',showTwitch:true,isLive:'auto',twitchClientId:'',twitchToken:'', customStatuses:null};
-
-    /* ====== Refs ====== */
-    const $=id=>document.getElementById(id);
-    const grid=$('grid'), emptyEl=$('empty'), searchInput=$('search'), chipsWrap=$('statusChips');
-    const platformSelect=$('platformSelect'), sortSelect=$('sortSelect'), sortDirInput=$('sortDir'), clearFiltersBtn=$('clearFilters');
-    const fab=$('fab'), settingsFab=$('settingsFab'), modal=$('modal'), modalTitle=$('modalTitle'), closeBtn=$('closeBtn'), saveBtn=$('saveBtn'), newBtn=$('newBtn'), deleteBtn=$('deleteBtn');
-    const fTitle=$('fTitle'), fPlatform=$('fPlatform'), fStatus=$('fStatus'), fProgress=$('fProgress'), fTags=$('fTags'),
-          fRating=$('fRating'), fNotes=$('fNotes'), fReview=$('fReview'), fReviewSafe=$('fReviewSafe'),
-          fLink=$('fLink'), fLinkLabel=$('fLinkLabel'), fCover=$('fCover');
-    const exportBtn=$('exportBtn'), importBtn=$('importBtn'), fileInput=$('fileInput'), copyBtn=$('copyBtn');
-    const twitchPanel=$('twitchPanel'), twitchEmbed=$('twitchEmbed'), twitchChat=$('twitchChat'), twitchLink=$('twitchLink'), twitchTitle=$('twitchTitle'), livePill=$('livePill'), liveText=$('liveText'), minimizeTwitch=$('minimizeTwitch'), mobileTwitchBtn=$('mobileTwitchBtn');
-    const reviewModal=$('reviewModal'), revTitle=$('revTitle'), revContent=$('revContent'), revMeta=$('revMeta'), revCloseBtn=$('revCloseBtn');
-    const reviewChoiceModal=$('reviewChoiceModal'), revChoiceClose=$('revChoiceClose'), revChoiceSafe=$('revChoiceSafe'), revChoiceFull=$('revChoiceFull'), revChoiceNoSafe=$('revChoiceNoSafe');
-
-    const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
-    const nowIso=()=>new Date().toISOString();
-    const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[c]));
-    const deburr=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
-
-    function saveLS(){localStorage.setItem(LS_KEY,JSON.stringify(games));localStorage.setItem(LS_SETTINGS,JSON.stringify({...settings, customStatuses:STATUS}))}
-    const loadGames=()=>{try{return JSON.parse(localStorage.getItem(LS_KEY)||'null')}catch{return null}};
-    const loadSettings=()=>{try{return JSON.parse(localStorage.getItem(LS_SETTINGS)||'null')}catch{return null}};
-
-    const statusLabel=id=>STATUS.find(s=>s.id===id)?.label||id;
-    const uniquePlatforms=()=>[...new Set(games.map(g=>String(g.platform||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-    function computePlatformsSelect(){const prev=platformSelect.value; platformSelect.innerHTML='<option value="">Toutes plateformes</option>'+uniquePlatforms().map(p=>`<option value="${p}">${p}</option>`).join(''); if([...platformSelect.options].some(o=>o.value===prev)) platformSelect.value=prev;}
-
-    /* ====== Étoiles SVG ====== */
-    const SVG_NS="http://www.w3.org/2000/svg";
-    const STAR_PATH="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z";
-
-    function createSvgStar(fillRatio){
-      const svg=document.createElementNS(SVG_NS,"svg");
-      svg.setAttribute("viewBox","0 0 24 24");
-      svg.classList.add("star-svg");
-      const bg=document.createElementNS(SVG_NS,"path");
-      bg.setAttribute("d",STAR_PATH); bg.setAttribute("class","bg");
-      svg.appendChild(bg);
-      const defs=document.createElementNS(SVG_NS,"defs");
-      const clip=document.createElementNS(SVG_NS,"clipPath");
-      const clipId="clip-"+Math.random().toString(36).slice(2);
-      clip.setAttribute("id",clipId);
-      const clipShape=document.createElementNS(SVG_NS,"path");
-      clipShape.setAttribute("d",STAR_PATH);
-      clip.appendChild(clipShape); defs.appendChild(clip); svg.appendChild(defs);
-      const fill=document.createElementNS(SVG_NS,"rect");
-      fill.setAttribute("x","0"); fill.setAttribute("y","0"); fill.setAttribute("height","24");
-      fill.setAttribute("class","fill"); fill.setAttribute("clip-path",`url(#${clipId})`);
-      svg.appendChild(fill);
-      fill.setAttribute("width", String(Math.max(0,Math.min(1,fillRatio))*24));
-      return { svg, rectFill: fill };
-    }
-    function buildStarRow(value=0, size='sm'){
-      const row=document.createElement('span');
-      row.className='star-row '+(size==='lg'?'lg':'sm');
-      row._fills=[];
-      for(let i=0;i<5;i++){
-        const {svg,rectFill}=createSvgStar(0);
-        row._fills.push(rectFill);
-        row.appendChild(svg);
+{
+  "settings": {
+    "twitchChannel": "ScotchyTAZ",
+    "showTwitch": true,
+    "isLive": "auto",
+    "twitchClientId": "",
+    "twitchToken": "",
+    "customStatuses": [
+      {
+        "id": "playing",
+        "label": "En cours"
+      },
+      {
+        "id": "planned",
+        "label": "À faire"
+      },
+      {
+        "id": "replaying",
+        "label": "Je refais"
+      },
+      {
+        "id": "finished",
+        "label": "Terminé"
+      },
+      {
+        "id": "unfinished",
+        "label": "Pas fini"
+      },
+      {
+        "id": "abandoned",
+        "label": "Abandonné"
       }
-      setStarRow(row, value);
-      return row;
+    ]
+  },
+  "games": [
+    {
+      "id": "yhisfxnkx2ameqlb0l5",
+      "createdAt": "2025-08-25T04:01:09.305Z",
+      "updatedAt": "2025-08-28T23:00:27.324Z",
+      "progress": 100,
+      "rating": 10,
+      "notes": "",
+      "cover": "https://miro.medium.com/v2/resize:fit:1200/1*3zyVTXZoY36ZlMAJ484jLw.jpeg",
+      "link": "https://www.youtube.com/watch?v=L1xT8Q-28hw&list=PLKn0YIxb2VjSvykJiDK9YGD6ySm4yWTsq",
+      "linkLabel": "VOD | 42h40",
+      "tags": [
+        "Monde ouvert",
+        "Narratif",
+        "Western",
+        "Aventure",
+        "Action",
+        "Réaliste",
+        "Solo",
+        "Tir",
+        "Chevaux",
+        "Beau",
+        "Adulte",
+        "3e personne"
+      ],
+      "title": "Red Dead Redemption 2",
+      "platform": "PC",
+      "status": "finished",
+      "review": "Un jeu qui prend son temps, parfois trop, mais qui sait récompenser ta patience. L’histoire est une claque, pleine de retournements et de personnages ultra travaillés. Arthur Morgan, c’est clairement l’un des meilleurs persos de JV que j’ai vus : on le suit de chien loyal de Dutch à un homme qui ouvre enfin les yeux, son arc de rédemption est magistral.\n\nL’open world ? Une masterclass. Pas juste une carte immense, mais un monde qui vit : PNJ crédibles, évènements aléatoires, missions secondaires qui ont un vrai sens. Chaque trajet devenait une aventure. Le gameplay par contre… efficace mais sans éclat, ça reste du Rockstar pur jus, ça fait le taf sans révolution.\n\nMoments cultes : Hosea, Dutch, Arthur… et un épilogue qui m’a paru de trop avec John. Techniquement c’est une pépite, une vraie fresque vidéoludique, mais pas forcément “le plus beau jeu de l’histoire” comme certains le hurlent.\n\n⚠️ Défauts : un démarrage BEAUCOUP trop lent, quelques lourdeurs, et des longueurs pas toujours justifiées.\n\n🎵 Bande-son, ambiance, immersion ? Rien à redire, c’est au top.\n\n👉 RDR2 est un chef-d’œuvre, un jeu que j’oublierai jamais, mais pas le meilleur de la décennie.",
+      "ratingStars": 5,
+      "reviewSafe": "Un jeu qui prend son temps, parfois même un peu trop, mais qui finit toujours par récompenser la patience avec une histoire marquante et des personnages d’une richesse rare. L’open world est une masterclass : vivant, crédible, regorgeant de détails qui transforment chaque trajet en véritable aventure.\n\nLe gameplay reste efficace sans révolutionner le genre, du pur travail d’orfèvre qui fait ce qu’il doit. Techniquement, c’est une claque visuelle et sonore, avec une immersion difficile à égaler.\n\n⚠️ Défauts : un début trop lent, quelques lourdeurs et certaines longueurs qui cassent parfois le rythme.\n\n👉 Un chef-d’œuvre inoubliable, mais pas pour autant “le meilleur jeu de la décennie” comme on l’entend souvent."
+    },
+    {
+      "id": "b5qkzmk32wmeqlrg0z",
+      "createdAt": "2025-08-25T04:13:55.811Z",
+      "updatedAt": "2025-08-28T23:01:29.512Z",
+      "progress": 100,
+      "rating": 8,
+      "notes": "",
+      "cover": "https://media.senscritique.com/media/000022514465/1200/split_fiction.jpg",
+      "link": "https://www.youtube.com/watch?v=90rHoSIHMQQ&list=PLKn0YIxb2VjRPYRoYAYc7ZiOp6yg5law2",
+      "linkLabel": "VOD | 12h02",
+      "tags": [
+        "Coop",
+        "Protagoniste féminine",
+        "Action",
+        "Aventure",
+        "Plateforme 3D",
+        "Fantasy",
+        "Science-Fiction",
+        "Narratif",
+        "Humour"
+      ],
+      "title": "Split Fiction",
+      "platform": "PC",
+      "status": "finished",
+      "review": "C’est rare un jeu coopératif qui donne autant envie de tendre la manette à un pote et de dire : \"Viens, on vit un truc.\" Split Fiction, c’est un peu ça. Une aventure à deux, en ligne ou sur le canapé, sans prise de tête, mais avec beaucoup de cœur.\nL’ADN Hazelight est bien là : gameplay asymétrique, narration en duo, transitions fluides… Et même si on avance souvent en mode \"instinct pur\" sans trop se parler ni réfléchir, bah on s’éclate. L’expérience coule, littéralement.\n\nL’univers Sci-Fi met un peu de temps à faire son nid, mais finit par s’imposer avec une vraie esthétique. Et visuellement ? Claques sur claques. Mention spéciale pour la dernière ligne droite et son boss final, qui m’a laissé bouche bée.\n\nLe jeu ose. Il se réinvente en permanence. Pas une minute d’ennui. C’est accessible même pour les joueurs occasionnels (à condition d’y aller à la manette, parce que le clavier-souris, c’est pas trop ça).\nLa relation entre les deux persos ? Un peu cliché, mais fonctionne. Ce qui fonctionne moins par contre, c’est le doublage français : à fuir. Vraiment. Passez en VO et vous verrez la différence.\nLe scénario se devine un peu trop tôt, mais reste efficace. Et alors la BO… wow. Chaque note est bien placée, chaque montée musicale donne envie de jouer à fond.\n\nBref, c’est pas parfait, mais c’est généreux, honnête, et surtout hyper fun. Une pépite coop comme on en voit trop peu.\nUn must-play.",
+      "ratingStars": 4,
+      "reviewSafe": "C’est rare un jeu coop qui donne autant envie de tendre la manette à un pote et de dire : \"Viens, on vit un truc.\" Split Fiction, c’est exactement ça. Une aventure à deux, en ligne ou sur le canapé, simple d’accès mais pleine de cœur.\n\nOn retrouve bien l’ADN Hazelight : gameplay asymétrique, narration en duo, transitions fluides. Ça se joue souvent à l’instinct, sans réfléchir, et pourtant ça marche : l’expérience coule toute seule et l’amusement est constant.\n\nL’univers Sci-Fi prend son temps à s’installer, mais finit par séduire par son esthétique. Visuellement, c’est une claque quasi permanente. Et le jeu n’a pas peur de se réinventer, offrant un rythme varié sans jamais laisser place à l’ennui. Accessible aux joueurs occasionnels (à condition de jouer à la manette), il mise sur l’originalité et l’inventivité.\n\nLe scénario est prévisible mais efficace, les personnages un peu clichés mais attachants. Le vrai gros bémol, c’est le doublage français : à éviter absolument. En VO, l’immersion est bien meilleure. Côté musique, par contre, c’est une réussite totale : chaque morceau tombe au bon moment et amplifie l’expérience.\n\n👉 Pas parfait, mais généreux, honnête, et surtout hyper fun. Une pépite coopérative, et clairement un must-play."
+    },
+    {
+      "id": "1i042qkft7dhmeqlzsj2",
+      "createdAt": "2025-08-25T04:20:25.262Z",
+      "updatedAt": "2025-08-28T23:01:43.782Z",
+      "progress": 100,
+      "rating": 8,
+      "notes": "⚠️ La VOD n'est pas complète à cause d'une erreur de ma part.",
+      "cover": "https://image.api.playstation.com/vulcan/ap/rnd/202206/0720/0kRqUeSBIbQzz7cen3c989c6.jpg",
+      "link": "https://www.youtube.com/watch?v=ACutXCOWO0c&list=PLKn0YIxb2VjR-wK3rZ_PRfUUt0ONLsoIz",
+      "linkLabel": "VOD | 15h14",
+      "tags": [
+        "Narratif",
+        "Postapocalyptique",
+        "Zombies",
+        "Action",
+        "Aventure",
+        "Tir",
+        "Horreur",
+        "Solo",
+        "Survie",
+        "Cinématographique",
+        "Action",
+        "Émotions",
+        "Thriller",
+        "Drame",
+        "Remake"
+      ],
+      "title": "The Last of Us Part I",
+      "platform": "PC",
+      "status": "finished",
+      "review": "Une histoire marquante, poignante et immersive, qui parvient à nous faire ressentir avec justesse les émotions des personnages. L’écriture est excellente, avec une relation centrale entre Joel et Ellie qui évolue de façon marquante… même si, personnellement, je déteste Joel et j’espère que c’est voulu.\n\nLe gameplay, lui, oscille entre moments brillants et frustrations. Quand il fonctionne, il est ultra-immersif, mais certains bugs et un système de difficulté maladroit plombent un peu l’expérience. Plutôt que de proposer un vrai challenge intelligent, le mode Survivant se contente d’appauvrir les ressources et de gonfler les vagues d’ennemis, ce qui finit par sembler artificiel.\n\nL’ambiance et la direction artistique sont magistrales : chaque environnement est un plaisir à contempler, porté par un sound design et une bande-son d’exception. Le rythme du jeu est parfaitement maîtrisé, et même si les personnages secondaires sont un peu en retrait, ils jouent leur rôle efficacement.\n\nMon principal reproche ? L’existence de dialogues secondaires qui influencent l’évolution des personnages mais sont bien trop faciles à rater. Ce choix casse un peu la fluidité de la narration et donne une impression de progression irrégulière dans la relation entre Joel et Ellie.\n\nMalgré ces défauts, The Last of Us Part I reste un chef-d’œuvre du jeu narratif, à la fois intense et mémorable.",
+      "ratingStars": 4,
+      "reviewSafe": "Une histoire marquante, poignante et immersive, qui transmet avec justesse les émotions des personnages. L’écriture est excellente, portée par une relation centrale qui évolue de manière marquante et qui donne toute sa force au récit.\n\nCôté gameplay, on oscille entre moments brillants et frustrations. Quand tout fonctionne, l’immersion est totale. Mais certains bugs et un système de difficulté qui mise davantage sur la rareté des ressources et la multiplication des ennemis que sur un vrai challenge intelligent peuvent casser le rythme.\n\nL’ambiance et la direction artistique sont magistrales : chaque décor est une claque visuelle, sublimée par un sound design et une bande-son exceptionnels. Le rythme global est parfaitement tenu, et même si les personnages secondaires manquent parfois de présence, ils soutiennent efficacement l’histoire.\n\nMon vrai reproche ? Des dialogues secondaires qui influencent subtilement la progression, mais trop faciles à manquer. Ça casse un peu la fluidité narrative et donne parfois une impression d’évolution inégale.\n\n👉 Malgré ces défauts, The Last of Us Part I reste un chef-d’œuvre du jeu narratif, à la fois intense et inoubliable."
+    },
+    {
+      "id": "ls1wg2tim8omeqm2rwe",
+      "createdAt": "2025-08-25T04:22:44.414Z",
+      "updatedAt": "2025-08-28T23:00:48.680Z",
+      "progress": 100,
+      "rating": 10,
+      "notes": "",
+      "cover": "https://gaming-cdn.com/images/products/6215/orig/the-last-of-us-part-ii-remastered-pc-steam-cover.jpg?v=1750336184",
+      "link": "https://www.youtube.com/watch?v=ijosSWB6Qoo&list=PLKn0YIxb2VjTexdXlWKf9l4xbfuBFJj_C",
+      "linkLabel": "VOD | 33h01",
+      "tags": [
+        "Narratif",
+        "Postapocalyptique",
+        "Action",
+        "Aventure",
+        "Horreur",
+        "Infiltration",
+        "Émotions",
+        "Réaliste",
+        "Solo",
+        "Drame",
+        "Thriller",
+        "Survie",
+        "Sombre",
+        "Zombies"
+      ],
+      "title": "The Last of Us Part II",
+      "platform": "PC",
+      "status": "finished",
+      "review": "\"Et si la vengeance ne valait rien d'autre qu'un vide ? Pas un trou noir dramatique, juste... le silence après le bruit.\"\n\nJ’ai vécu ce jeu comme une claque douce-amère. Pas une surprise brutale, mais une évidence inévitable : Joel devait mourir. Et il l’a fait, dans une scène aussi cruelle que logique, car il incarnait depuis le début cette frontière floue entre amour et monstruosité. Sa mort n’est pas une trahison, c’est une conséquence.\n\nEt c’est là que le jeu devient brillant : en me forçant à incarner Abby, en me demandant \"et si tu avais tort ?\". Et très vite, j’ai compris. Non seulement je n’ai pas détesté Abby, je l’ai adorée. C’est l’un des personnages les plus humains et touchants que The Last of Us ait jamais proposés. Là où Joel se consumait dans l’égoïsme, Abby s’ouvre à l’autre, à Lev, à un monde qui ne tourne plus autour de sa douleur. Le parallèle avec Ellie est glaçant : Ellie perd tout ce qu’Abby réussit à sauver. Et pourtant, aucune n’en sort victorieuse. Elles sont les deux visages d’un même fantôme.\n\nDina, Jesse, Lev... tous les personnages secondaires sonnent justes, portés par une écriture sobre mais redoutablement efficace. Mention spéciale à Dina, cette \"anti-Joel\" discrète, pleine d’amour et de lucidité. Elle est peut-être la seule à vraiment voir clair dans tout ça.\n\nCôté gameplay, j’ai trouvé un équilibre presque parfait : exploration, infiltration, tension constante. Deux ou trois scènes un peu longues, mais noyées dans un flot de moments mémorables. Le sound design et la direction artistique frôlent la perfection : chaque lieu est un tableau, chaque bruit, un avertissement. Pas un bug ou un ralentissement ne m’a sorti de cette immersion absolue. Un exploit.\n\nLa peur, la colère, la tristesse, la beauté. Le jeu m’a fait traverser tout ça, souvent dans un simple regard, une ambiance, une lumière filtrée à travers des feuilles. Forêt, neige, pluie, ruines, plage… The Last of Us Part II n’est pas seulement un jeu post-apo. C’est une traversée émotionnelle, un pèlerinage intérieur.\n\nJe ne pense pas qu’Ellie ait gagné quoi que ce soit. Ni Abby. Mais moi, oui. J’ai gagné un morceau de vérité sur ce que veut dire être humain, certainement un très beau jeu.",
+      "ratingStars": 5,
+      "reviewSafe": "\"Et si la vengeance ne valait rien d’autre qu’un vide ? Pas un trou noir dramatique, juste… le silence après le bruit.\"\n\nCe jeu est une claque douce-amère. Pas une surprise brutale, mais une évidence qui s’impose comme une fatalité. C’est dans cette douleur qu’il devient brillant : il renverse nos certitudes, nous met face à nos contradictions, et ose nous demander \"et si tu avais tort ?\".\n\nLes personnages sont d’une humanité rare, profonds, nuancés, parfois contradictoires, mais toujours justes. Aucun n’est réduit à un rôle simple : ils vivent, ils souffrent, ils aiment, et l’écriture parvient à rendre chacun d’eux inoubliable.\n\nLe gameplay trouve un équilibre presque parfait entre exploration, tension et infiltration. Quelques longueurs existent, mais elles s’effacent devant la richesse des moments marquants. Techniquement, c’est un bijou : un sound design chirurgical, une direction artistique à couper le souffle, et une immersion totale.\n\nLa peur, la colère, la tristesse, la beauté. Ce jeu fait traverser tout ça, souvent sans un mot, juste par un regard, une lumière, une ambiance. C’est bien plus qu’un simple jeu post-apocalyptique : c’est un voyage intérieur, une traversée émotionnelle.\n\n👉 Un chef-d’œuvre qui ne laisse pas indemne, et qui m’a offert un morceau de vérité sur ce que veut dire être humain."
+    },
+    {
+      "id": "m8xxyztzv0dmeqm5wfb",
+      "createdAt": "2025-08-25T04:25:10.247Z",
+      "updatedAt": "2025-08-28T23:03:28.426Z",
+      "progress": 100,
+      "rating": 5,
+      "notes": "",
+      "cover": "https://i.ytimg.com/vi/muOMN45PbRY/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDhsmHCWSa6_pxgLDYaqcZUWrkhtw",
+      "link": "https://youtu.be/MD7jZZDo52s?si=WNmdeb4v2EJWyU68",
+      "linkLabel": "VOD | 2h11",
+      "tags": [
+        "DLC",
+        "Action",
+        "Aventure",
+        "Narratif",
+        "Postapocalyptique",
+        "Horreur",
+        "Zombies",
+        "Surive",
+        "Drame",
+        "Solo",
+        "Remake"
+      ],
+      "title": "The Last of Us: Left Behind",
+      "platform": "PC",
+      "status": "finished",
+      "review": "Un bon DLC, mais pas un indispensable. Left Behind fait ce qu’il a à faire : étoffer un peu plus Ellie, montrer un peu de son passé, et offrir quelques moments touchants. Mais si The Last of Us est une claque, ce DLC, lui, reste dans l’ombre.\n\nL’histoire fonctionne bien. Elle est loin d’être aussi marquante que celle du jeu principal, mais elle reste plus touchante que ce à quoi on pourrait s’attendre d’un simple DLC. On ressort satisfait sur ce point, sans pour autant être profondément marqué. Riley est un bon personnage, une amie crédible, et la relation entre les deux est bien développée, sans en faire trop.\n\nLe gameplay, lui, ne se renouvelle pas du tout. C’est The Last of Us, en plus court, avec ses qualités… et ses défauts. Et comme dans le jeu principal, Naughty Dog ne peut pas s’empêcher d’infliger des vagues d’ennemis inutiles à la fin, qui n’apportent rien si ce n’est de la frustration. Ça sent l’extension de durée artificielle, et ça fait plus soupirer qu’autre chose.\n\nL’alternance entre les moments calmes et les phases d’action est correcte, mais sans être transcendante. Ça fait le job, sans jamais atteindre les sommets émotionnels du jeu principal. L’ambiance sonore, en revanche, est toujours au top. Naughty Dog sait créer des atmosphères et Left Behind ne fait pas exception.\n\nFinalement, c’est un DLC sympa mais clairement secondaire. Il offre un peu de lore, mais rien de vital, surtout qu’Ellie en spoil déjà l’issue dans le jeu principal. On y découvre malgré tout quelques nouvelles séquences intéressantes, mais rien qui change la donne.\n\nUn bon petit bonus, mais pas de quoi bouleverser l’expérience globale.",
+      "ratingStars": 2.5,
+      "reviewSafe": "Un bon DLC, mais pas un indispensable. Il fait ce qu’il doit : approfondir un peu plus le personnage principal, explorer une partie de son passé et offrir quelques moments touchants. Mais là où le jeu de base est une claque, cette extension reste dans son ombre.\n\nL’histoire fonctionne bien, touchante à sa manière, mais loin d’atteindre l’intensité du récit principal. On en ressort satisfait, sans pour autant être profondément marqué. La relation mise en avant est crédible et bien développée, sans en faire trop.\n\nCôté gameplay, rien de nouveau : c’est la même formule, en plus court, avec ses qualités… et ses défauts. Comme souvent, quelques vagues d’ennemis ajoutées pour rallonger artificiellement l’expérience créent plus de frustration que d’intérêt. L’alternance entre moments calmes et action reste correcte, mais n’atteint jamais les sommets émotionnels du jeu principal.\n\nL’ambiance sonore, en revanche, est irréprochable, toujours immersive et parfaitement maîtrisée.\n\n👉 En bref : un DLC sympa, agréable à parcourir, mais clairement secondaire. Un petit bonus qui enrichit sans jamais bouleverser l’expérience globale."
+    },
+    {
+      "id": "hkyib469duemeqm8vfc",
+      "createdAt": "2025-08-25T04:27:28.920Z",
+      "updatedAt": "2025-08-28T23:03:41.472Z",
+      "progress": 100,
+      "rating": 5,
+      "notes": "",
+      "cover": "https://nexushub.co.za/images/gallery/00010/10895_until_dawn.jpg",
+      "link": "https://www.youtube.com/watch?v=kiXPN2DOYpc&list=PLKn0YIxb2VjSi1oQYiNo2lAdEiyks1nza",
+      "linkLabel": "VOD | 7h00",
+      "tags": [
+        "Choix multiples",
+        "Horreur",
+        "Aventure",
+        "Solo",
+        "Interactive",
+        "Fins multiples",
+        "Exploration",
+        "Atmosphère",
+        "Narratif",
+        "Mort permanente",
+        "Drame",
+        "Cinématographique",
+        "Mystère",
+        "Émotions",
+        "Sombre",
+        "Gore",
+        "Remake"
+      ],
+      "title": "Until Dawn",
+      "platform": "PC",
+      "status": "finished",
+      "review": "Until Dawn, c’est un peu comme une soirée film d’horreur entre potes où chacun prend une manette et essaie de sauver tout le monde… ou au moins de buter Emily. L’histoire est captivante, rythmée sans longueur, et s’amuse avec tous les clichés du slasher, mais d’une façon qui fonctionne bien. Les dialogues sont volontairement caricaturaux, ce qui donne parfois un côté humoristique qui ne jure pas avec l’ambiance horrifique. D’ailleurs, niveau horreur, c’est surtout les jumpscares qui font le taf. L’ambiance, elle, ne m’a pas spécialement oppressé, et au bout d’un moment, la peur s’estompe pour laisser place à un jeu narratif où on traverse des couloirs en espérant que personne ne meure bêtement.\n\nEt ça, c’est là où Until Dawn me frustre. Parce que oui, c’est bien sympa de faire des choix, mais j’ai jamais su si ça avait un vrai impact ou si c’était du bluff à la Telltale. Tout le monde peut mourir, tout le monde peut survivre, mais encore faut-il que le jeu t’explique correctement comment éviter les catastrophes… Parce que perdre des personnages à cause d’une ampoule qui explose une baraque, c’est pas du \"choix difficile\", c’est juste mal amené et ultra frustrant. T’as beau jouer intelligemment, si le jeu décide de te piéger avec une explication foireuse, t’es foutu.\n\nLes QTE font le taf, même si j’ai trouvé ça plus gadget qu’autre chose (surtout le système de ne pas bouger avec la manette Xbox). Par contre, les phases d’exploration sont vraiment limitées. C’est du couloir, et ça se ressent. On est loin d’un jeu qui te laisse fouiller ou te perdre. Heureusement, les séquences avec le Dr. Hill sont excellentes, et j’aurais adoré en avoir plus. C’est là qu’il y avait un vrai potentiel pour rentrer dans la psyché du joueur et du jeu.\n\nTechniquement, le jeu n’est pas parfait non plus. Entre les shaders à refaire à chaque lancement, les freezes aux changements de scènes, et les animations parfois douteuses, ça casse un peu l’immersion. Les bruitages ne sont pas toujours bien mixés, et certaines voix semblent sortir de nulle part.\n\nAu final, Until Dawn est une expérience divertissante, surtout si on aime les slashers et les choix narratifs, mais il lui manque un vrai attachement aux personnages et une meilleure gestion des conséquences pour vraiment marquer le joueur. Je le recommanderais quand même, surtout à ceux qui découvrent le genre, mais Detroit: Become Human ou The Walking Dead de Telltale font un bien meilleur travail pour créer de l’émotion et de l’implication.",
+      "ratingStars": 2.5,
+      "reviewSafe": "Until Dawn, c’est comme une soirée film d’horreur interactive entre potes : une histoire captivante, rythmée, qui joue à fond avec les clichés du slasher mais d’une façon qui fonctionne. Les dialogues sont caricaturaux mais assumés, ajoutant parfois une touche humoristique qui ne détonne pas avec l’ambiance horrifique. Niveau peur, le jeu mise surtout sur les jumpscares. L’oppression, elle, s’essouffle vite pour laisser place à un jeu narratif où on avance surtout en espérant sauver tout le monde.\n\nEt c’est là que le jeu frustre : les choix semblent importants, mais leur impact paraît parfois artificiel. Tout le monde peut survivre ou mourir, mais certaines issues sont si mal amenées qu’elles paraissent injustes. Plutôt que des décisions difficiles, ça ressemble à des pièges mal expliqués.\n\nLes QTE font le job sans briller, les phases d’exploration sont limitées à des couloirs, mais quelques séquences plus psychologiques viennent relever l’expérience. Techniquement, l’ensemble est correct mais entaché de bugs, de freezes et de mixages sonores approximatifs.\n\n👉 Au final, Until Dawn reste divertissant, surtout pour les amateurs de slashers et de choix narratifs. Mais il manque d’attachement aux personnages et d’une meilleure gestion des conséquences pour marquer durablement. Sympa, mais pas du niveau des meilleures expériences narratives du genre."
+    },
+    {
+      "id": "inpo55cww29meqmaaky",
+      "createdAt": "2025-08-25T04:28:35.218Z",
+      "updatedAt": "2025-08-28T23:03:16.229Z",
+      "progress": 100,
+      "rating": 6,
+      "notes": "",
+      "cover": "https://cdn2.unrealengine.com/Diesel%2Fproductv2%2Fmafia-definitive-edition%2Fhome%2FEGS_MafiaDefinitiveEditionPreOrder_Hangar13_S1-2560x1440-51a358a38280a9e6e64027b80eb87f55711d1f6c.jpg?resize=1&w=480&h=270&quality=medium",
+      "link": "https://www.youtube.com/watch?v=IhKA_J1Lkeg&list=PLKn0YIxb2VjQ0aqNS_Ri4EY7_7fp5lXCh",
+      "linkLabel": "VOD | 9h18",
+      "tags": [
+        "Monde ouvert",
+        "Crime",
+        "Narratif",
+        "Action",
+        "Solo",
+        "Aventure",
+        "Remake",
+        "Violence",
+        "Tir",
+        "Atmosphère",
+        "Culte",
+        "Adulte",
+        "Film noir",
+        "Gore",
+        "Course"
+      ],
+      "title": "Mafia: Definitive Edition",
+      "platform": "PC",
+      "status": "finished",
+      "review": "Dès le début, l’histoire m’a accroché sans moments vraiment faibles ou de longueurs. On est direct plongé dans l’ascension de Tommy Angelo, un type ordinaire qui devient un pilier du crime organisé. Ça fonctionne bien, mais j’aurais aimé qu’on creuse plus sa psychologie. Il grimpe les échelons, oui, mais mentalement, il n’évolue pas tant que ça. J’aurais voulu sentir davantage son conflit intérieur, son rapport à la violence, ses doutes. Là, il est surtout un témoin du destin qui l’attend, et on aurait pu aller plus loin dans sa tête.\n\nLe casting de personnages est bon, mais un peu trop dense d’un coup. Trop de noms à retenir en peu de temps, ce qui m’a parfois perdu dans les premières heures. Cela dit, la relation entre Tommy, Paulie et Sam fonctionne bien. Pas assez longue pour que je m’attache profondément à eux, mais suffisamment pour que la mort de Paulie me fasse chier quand même. C’est là que le jeu fait bien son taf : on ne s’attache pas forcément aux personnages comme dans un The Last of Us, mais quand un des nôtres tombe, ça pique.\n\nL’ambiance, par contre, est une masterclass. Les musiques sont dingues, la ville de Lost Heaven est immersive, avec une reconstitution historique franchement réussie. Mais… en y regardant de plus près, il manque du détail. Les rues sont trop propres, trop vides. Peu de déchets, pas assez de vie urbaine. Et c’est frustrant, parce qu’on sent que tout est là pour nous plonger dans les années 30, mais ça manque juste d’un peu plus de bordel pour que ça fasse vraiment vivant.\n\nLe gameplay est solide. Gunfights sympas avec un bon feeling des armes, même si jouer à la manette était plus confortable parce que le clavier/souris, c’était une horreur. La conduite des véhicules est plutôt cool, même si ça dépend de la caisse qu’on chope. Une fois qu’on trouve une bonne bagnole, ça devient vraiment plaisant. Le jeu est linéaire, et ça ne m’a pas dérangé parce qu’il ne traîne pas en longueur. Il répète un peu ses mécaniques, mais vu qu’il est court, ça passe. Par contre, les touches clavier sont catastrophiques, et les contrôles manette sont parfois surprenants.\n\nCôté technique, c’est propre, pas de bugs majeurs, mais le sound design, lui, est parfois aux fraises. Genre entendre un mec parler comme s’il était collé à mon oreille alors qu’il est à 15 mètres ou dans une bagnole fermée… ça casse l’immersion. Autre détail frustrant : les dialogues qui se coupent tout seuls. T’écoutes un perso parler, et bim, un chargement ou une autre ligne de dialogue le coupe net.\n\nLa fin, elle, est marquante, mais le dernier acte aurait mérité plus de transition. On passe de la mort de Sam à la vieillesse et la fin de Tommy un peu trop vite. Ça méritait un meilleur enchaînement pour que le poids du temps se ressente davantage.\n\nEn résumé, Mafia: Definitive Edition est un bon jeu, bien écrit, immersif, mais qui manque de profondeur psychologique et de finesse dans ses détails pour atteindre l’excellence. J’ai passé un bon moment, mais ce n’est pas un chef-d’œuvre. Une expérience solide qui méritait juste un peu plus de peaufinage.",
+      "ratingStars": 3,
+      "reviewSafe": "Dès le début, l’histoire accroche sans réelles longueurs. On suit l’ascension d’un homme ordinaire plongé dans le crime organisé, et si le récit fonctionne bien, il manque un vrai travail sur sa psychologie. On aurait aimé sentir davantage son conflit intérieur, ses doutes, son rapport à la violence.\n\nLe casting est solide mais un peu trop dense d’un coup, ce qui peut perdre dans les premières heures. Les relations entre les personnages clés fonctionnent, mais manquent de temps pour devenir vraiment profondes. L’attachement existe, mais reste limité.\n\nL’ambiance, en revanche, est une masterclass : musiques incroyables, ville immersive, reconstitution historique réussie. Mais les rues sont trop propres, trop vides, pas assez vivantes. Tout est là pour plonger dans les années 30, mais il manque ce petit chaos urbain qui aurait donné plus de réalisme.\n\nLe gameplay est efficace : gunfights plaisants, conduite agréable une fois la bonne voiture trouvée. Le jeu est linéaire et court, mais ça joue en sa faveur en évitant les longueurs. En revanche, les contrôles clavier/manette sont parfois catastrophiques ou mal pensés.\n\nTechniquement, c’est propre, sans bugs majeurs, mais le sound design déçoit avec des dialogues mal mixés ou coupés brutalement, ce qui casse l’immersion. La fin est marquante, mais la transition vers le dernier acte est trop brusque pour vraiment en ressentir le poids.\n\n👉 Mafia: Definitive Edition est un jeu solide, bien écrit et immersif, mais qui manque de profondeur psychologique et de détails pour atteindre l’excellence. Une expérience réussie, mais pas un chef-d’œuvre."
+    },
+    {
+      "id": "3np8w0nzza5meqme6xd",
+      "createdAt": "2025-08-25T04:31:37.105Z",
+      "updatedAt": "2025-08-28T23:04:03.525Z",
+      "progress": 100,
+      "rating": 5,
+      "notes": "",
+      "cover": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/960910/capsule_616x353.jpg?t=1675271942",
+      "link": "https://www.youtube.com/watch?v=Rkug9gMclzM&list=PLKn0YIxb2VjTUkMYpBKw3y7ZkPzs9zQAW",
+      "linkLabel": "VOD | 8h43",
+      "tags": [
+        "Choix multiples",
+        "Narratif",
+        "Fins multiples",
+        "Cinématographique",
+        "Aventure",
+        "Détective",
+        "Thriller",
+        "Émotions",
+        "Enquête",
+        "Mystère",
+        "Solo",
+        "Crime",
+        "Violence"
+      ],
+      "title": "Heavy Rain",
+      "platform": "PC",
+      "status": "finished",
+      "review": "David Cage voulait nous faire ressentir des émotions fortes. Mission accomplie : j’ai ressenti de la frustration, de l’ennui, et un soupçon d’irritation.\n\nHeavy Rain, c’est un jeu qui démarre lentement, mais pas désagréablement. Le quotidien paisible du début fait son taf : on s’installe dans la routine, on incarne un père de famille, on vit des instants simples… puis le drame. Jusque-là, ça fonctionne. Mais dès que le jeu entre dans le vif du sujet, tout commence à s’effondrer comme un château de cartes sous une pluie battante.\n\nLe scénario ? Il essaie d’être un thriller haletant, mais se prend les pieds dans le tapis. La révélation finale tombe à plat, les motivations du tueur sonnent creux, et surtout, on sent que la seule vraie intention, c’était de créer un twist choc plutôt qu’une histoire cohérente. Ajoutez à ça des personnages qui prennent systématiquement les pires décisions possibles, des dialogues mal doublés en VF, et des moments qui traînent en longueur… et on se retrouve à lutter contre l’ennui plus que contre la tension.\n\nLe gameplay ? Si on peut appeler ça du gameplay. Les QTE sont omniprésents et rarement bien pensés. Ceux où il faut être lent ? Horrible. Ceux où il faut bouger la souris au point de sortir du tapis ? Une blague. Ceux qui sont buggés sur manette Xbox ? Trop nombreux. À certains moments, j’avais l’impression que le jeu faisait tout pour me mettre des bâtons dans les roues, et pas de la bonne manière. Pire encore, les choix ne semblent pas avoir de vrai poids. J’ai essayé de refuser certaines actions, et le jeu m’a simplement forcé à les faire. Une illusion de liberté.\n\nL’ambiance aurait pu sauver le tout, mais même là, ça coince. Les musiques ne marquent pas, la mise en scène est plombée par des effets de bordure façon bande dessinée qui cassent totalement l’immersion, et certaines séquences s’étirent au point de donner envie de ragequit. Il y a quelques scènes qui fonctionnent émotionnellement, notamment sur la fin, mais elles sont noyées dans un océan de maladresses et de longueurs.\n\nGraphiquement, le jeu s’en sort encore aujourd’hui, mais tout ce qui gravite autour est trop bancal pour en profiter pleinement. Entre les bugs d’animation, les contrôles rigides et la VF pas toujours convaincante, difficile de vraiment s’immerger.\n\nEn résumé, Heavy Rain a des ambitions, mais elles sont portées par un gameplay pénible, un scénario qui force le drame au détriment de la logique, et des personnages aux décisions absurdes. David Cage a fait beaucoup mieux par la suite, et avec le recul, Heavy Rain ressemble plus à une ébauche maladroite qu’à un chef-d’œuvre narratif.",
+      "ratingStars": 2.5,
+      "reviewSafe": "Heavy Rain voulait être une claque émotionnelle, mais m’a surtout laissé frustration et ennui. Le jeu démarre bien, avec un quotidien paisible qui installe l’ambiance, mais dès que l’intrigue prend de l’ampleur, tout s’effondre. Le scénario cherche le grand frisson du thriller, mais se perd dans ses propres ficelles, et l’envie de choquer prend le pas sur la cohérence. Les personnages multiplient les décisions absurdes, les dialogues ne convainquent pas, et le rythme traîne en longueur.\n\nLe gameplay se résume à des QTE omniprésents et souvent mal pensés : imprécis, frustrants, parfois même buggés. On a l’impression d’une illusion de choix plus que d’une vraie liberté, ce qui casse totalement l’implication.\n\nCôté ambiance, rien ne parvient à rattraper les maladresses. La mise en scène est plombée par des effets artificiels, les musiques ne marquent pas, et certaines séquences s’étirent inutilement. Graphiquement, ça tient encore la route, mais les animations, les contrôles rigides et la VF bancale cassent l’immersion.\n\n👉 Heavy Rain avait de l’ambition, mais entre scénario bancal, gameplay laborieux et mise en scène maladroite, il ressemble plus à une ébauche ratée qu’à un vrai chef-d’œuvre narratif."
+    },
+    {
+      "id": "b88jukgycn4meqmghfh",
+      "createdAt": "2025-08-25T04:33:24.029Z",
+      "updatedAt": "2025-08-28T23:02:27.438Z",
+      "progress": 100,
+      "rating": 7,
+      "notes": "",
+      "cover": "https://gaming-cdn.com/images/products/7000/616x353/beyond-two-souls-pc-jeu-steam-cover.jpg?v=1707225887",
+      "link": "https://www.youtube.com/watch?v=KHzyVjb4cFw&list=PLKn0YIxb2VjRlZT3DlaLdNmFHpgLeLT4R",
+      "linkLabel": "VOD | 9h40",
+      "tags": [
+        "Choix multiples",
+        "Aventure",
+        "Narratif",
+        "Protagoniste féminine",
+        "Solo",
+        "Cinématographique",
+        "Émotions",
+        "Horreur",
+        "Science-Fiction",
+        "Thriller",
+        "Drame",
+        "Beau",
+        "Violence"
+      ],
+      "title": "Beyond: Two Souls",
+      "platform": "PC",
+      "status": "finished",
+      "review": "Une aventure narrative intense, qui jongle entre moments poignants et quelques frustrations techniques (par exemple la limite de FPS, et les contrôles). L’histoire fonctionne bien, portée par des personnages attachants et des scènes qui parviennent à toucher sans trop en faire. Certaines séquences sont particulièrement marquantes, avec une vraie montée en émotion à mesure que l’on avance.\n\nLe choix d’une narration découper en plusieurs morceaux et qui jongle avec des avants/après peut surprendre au début, mais il finit par s’imposer comme une bonne idée, ajoutant du rythme et une certaine tension à l’ensemble. Quant au gameplay, il est à la fois simple et parfois maladroit : répétitif sans être ennuyant, mais plombé par des contrôles rigides qui rendent certaines actions plus frustrantes que nécessaire, comme passer par un trou de porte.\n\nL’ambiance est immersive, bien que moins marquante que dans d’autres jeux narratifs du même genre. On n’est pas dans un monde qui cherche à en mettre plein la vue, mais plutôt dans une histoire qui mise sur ses personnages et leur évolution.\n\nSi certains passages manquent d’originalité ou auraient mérité plus de profondeur (surtout, j'aurais aimer plus d'enquêtes et mieux réaliser), l’expérience reste globalement réussie. Ce n’est peut-être pas le plus grand jeu d",
+      "ratingStars": 3.5,
+      "reviewSafe": "Une aventure narrative intense, qui alterne entre moments poignants et frustrations techniques (limite de FPS, contrôles rigides). L’histoire fonctionne bien, soutenue par des personnages attachants et des scènes qui marquent sans tomber dans l’excès. Certaines séquences offrent même une vraie montée en émotion à mesure que l’on progresse.\n\nLa narration découpée, jouant sur les avants/après, peut surprendre au début, mais finit par donner du rythme et de la tension. Le gameplay est simple, parfois répétitif, mais rarement ennuyant. Ce sont surtout les contrôles un peu lourds qui rendent certaines actions inutilement frustrantes.\n\nL’ambiance est immersive, même si elle manque un peu de force face à d’autres références du genre. Ici, ce ne sont pas les décors qui impressionnent, mais bien les personnages et leur évolution.\n\nCertains passages manquent d’originalité ou auraient mérité plus de profondeur (notamment les phases d’enquête), mais l’expérience reste globalement réussie. 👉 Pas le plus grand jeu narratif, mais un récit solide et marquant."
+    },
+    {
+      "id": "3kah6pnlextmeqmjdkm",
+      "createdAt": "2025-08-25T04:35:38.998Z",
+      "updatedAt": "2025-08-28T23:04:30.575Z",
+      "progress": 100,
+      "rating": 4,
+      "notes": "",
+      "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2475490/header.jpg?t=1754505528",
+      "link": "https://www.youtube.com/watch?v=QsMcSDYmMi8&list=PLKn0YIxb2VjS8FVLAguvQDFsXshfu_z28",
+      "linkLabel": "VOD | 2h28",
+      "tags": [
+        "Horreur psychologique",
+        "Narratif",
+        "Horreur",
+        "Atmosphère",
+        "Rétro",
+        "Psychologique",
+        "Gore",
+        "Indépendant",
+        "Simulation de marche",
+        "Sombre",
+        "Surréaliste",
+        "Thriller",
+        "Espace",
+        "1re personne",
+        "Solo",
+        "Mystère",
+        "Exploration",
+        "Aventure",
+        "Humour noir"
+      ],
+      "title": "Mouthwashing",
+      "platform": "PC",
+      "status": "finished",
+      "review": "Mouthwashing est un jeu d’horreur qui mise tout sur son ambiance rétro PS1 et ses effets visuels stylisés… mais qui, narrativement, m’a laissé sur ma faim. L’histoire n’est pas mauvaise en soi, mais sa compréhension repose trop sur le fait de le finir d’une traite. Le découper en plusieurs sessions rend le tout inutilement confus, et ça devrait être dit clairement dès le départ.\n\nCôté gameplay, c’est limité. Aucun réel impact narratif, et le seul \"boss fight\" est une catastrophe : ne pas bouger pour survivre, c’est littéralement le concept le moins engageant possible. Les personnages ne m’ont pas marqué, probablement parce que je n’ai pas réussi à m’immerger pleinement, mais c’est un point qui aurait pu être mieux travaillé.\n\nHeureusement, la DA sauve une partie de l’expérience. Le mélange entre graphismes PS1, effets de lumière modernes et faux crashs en guise de transitions est une excellente idée. L’ambiance n’est pas pesante comme un Silent Hill, mais elle reste prenante visuellement. La fin, elle, relève un peu l’ensemble en donnant à réfléchir sur les motivations des personnages.\n\nAu final, Mouthwashing n’est pas mauvais, mais il ne fait pas partie des incontournables du genre. Il brille par son esthétique, mais son rythme, son manque d’impact narratif et ses mécaniques maladroites l’empêchent d’atteindre le sommet des jeux horrifiques indés.",
+      "ratingStars": 2,
+      "reviewSafe": "Mouthwashing est un jeu d’horreur qui mise avant tout sur son ambiance rétro PS1 et ses effets visuels stylisés. L’esthétique est réussie, mais narrativement, l’expérience reste en demi-teinte : l’histoire n’est pas mauvaise, mais sa compréhension repose trop sur le fait de la vivre d’une seule traite, ce qui la rend inutilement confuse si on la coupe en plusieurs sessions.\n\nLe gameplay est limité, sans réel impact narratif, et certaines mécaniques manquent d’engagement, ce qui casse l’immersion. Les personnages, eux, peinent à marquer, en partie parce que l’implication n’est pas totale.\n\nHeureusement, la direction artistique rattrape une partie du tout : graphismes rétro combinés à des effets de lumière modernes, transitions façon faux crashs… l’idée est brillante et donne une vraie identité visuelle. L’ambiance n’atteint pas le niveau oppressant d’un Silent Hill, mais reste prenante. La conclusion, enfin, relève un peu l’expérience en amenant une réflexion intéressante.\n\n👉 Au final, Mouthwashing n’est pas un mauvais jeu, mais il n’a pas l’impact des incontournables du genre. Une esthétique marquée qui mérite d’être saluée, mais un récit et des mécaniques trop maladroits pour atteindre le sommet."
+    },
+    {
+      "id": "aedtveu8e67meqmmb3c",
+      "createdAt": "2025-08-25T04:37:55.752Z",
+      "updatedAt": "2025-08-28T23:01:59.873Z",
+      "progress": 100,
+      "rating": 8,
+      "notes": "",
+      "cover": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/250320/capsule_616x353.jpg?t=1734104991",
+      "link": "https://www.youtube.com/watch?v=0IwkdeA-DXs&list=PLKn0YIxb2VjQfIJhDIxMP8q1be-elv_Sk",
+      "linkLabel": "VOD | 8h16",
+      "tags": [
+        "Aventure",
+        "Détective",
+        "Narratif",
+        "Fins multiples",
+        "Interactive",
+        "Choix multiples",
+        "Roman graphique",
+        "Action",
+        "Bien écrit",
+        "Série",
+        "Pointer et cliquer",
+        "Film noir",
+        "Adulte",
+        "Solo",
+        "Atmosphère",
+        "Bande dessinée",
+        "Mystère",
+        "Cinématographique",
+        "Sombre",
+        "Fantasy"
+      ],
+      "title": "The Wolf Among Us",
+      "platform": "PC",
+      "status": "finished",
+      "review": "The Wolf Among Us est une pépite du jeu narratif. Son ambiance néo-noir est impeccable, servie par une direction artistique sublime et un mystère captivant du début à la fin. L’histoire est bien rythmée, dévoilant ses secrets sans précipitation, et même si j’ai parfois eu du mal à tout suivre en streamant en même temps, l’intrigue reste marquante.\n\nBigby Wolf est un excellent protagoniste, mais son évolution m’a semblé un peu figée. À l’inverse, les personnages secondaires sont mémorables, avec des personnalités marquées qui restent en tête bien après avoir terminé le jeu. Les choix paraissent lourds de conséquences, mais connaissant Telltale, difficile de dire si l’impact est réel ou juste bien maquillé.\n\nSi le jeu avait été un peu plus long et proposait plus de QTE variés, il aurait frôlé la perfection. Malgré ça, il reste l’un des meilleurs Telltale, juste derrière The Walking Dead pour moi. Une enquête immersive et stylée qui mérite largement d’être vécue.",
+      "ratingStars": 4,
+      "reviewSafe": "The Wolf Among Us est une pépite du jeu narratif. Son ambiance néo-noir est impeccable, sublimée par une direction artistique marquante et un mystère captivant du début à la fin. L’histoire se déroule avec un rythme maîtrisé, dévoilant ses secrets sans se précipiter, et même en ayant parfois du mal à tout suivre, on reste accroché.\n\nLe protagoniste est charismatique et marquant, mais son évolution paraît parfois figée. À l’inverse, les personnages secondaires sont mémorables, avec des personnalités fortes qui restent en tête bien après la fin. Les choix paraissent lourds de conséquences, même si, fidèle à la recette Telltale, il est parfois difficile de juger de leur véritable impact.\n\nUn peu plus de variété dans les QTE et une durée de vie plus longue auraient pu en faire un quasi sans-faute. Malgré ça, c’est l’un des meilleurs Telltale, juste derrière The Walking Dead pour moi. Une enquête immersive, stylée et incontournable."
+    },
+    {
+      "id": "ujod4wo1cg8meqmp772",
+      "createdAt": "2025-08-25T04:40:10.670Z",
+      "updatedAt": "2025-08-28T23:02:43.798Z",
+      "progress": 100,
+      "rating": 7,
+      "notes": "",
+      "cover": "https://i.ytimg.com/vi/VDO39mY2gq4/maxresdefault.jpg",
+      "link": "https://www.youtube.com/watch?v=i55bzFZ7oME&list=PLKn0YIxb2VjQLSfmIoi7vWFfxVcb9ypJU",
+      "linkLabel": "VOD | 16h50",
+      "tags": [
+        "Horreur psychologique",
+        "Horreur",
+        "Survie",
+        "Narratif",
+        "Atmosphère",
+        "Remake",
+        "Solo",
+        "Fins multiples",
+        "Aventure",
+        "Exploration",
+        "Action",
+        "Cinématographique",
+        "Violence",
+        "Culte",
+        "3D"
+      ],
+      "title": "SILENT HILL 2",
+      "platform": "PC",
+      "status": "finished",
+      "review": "Il y a des jeux qui te marquent par leur histoire, d’autres par leur gameplay, et puis il y a ceux qui te laissent une impression plus insidieuse, une empreinte étrange qui ne s’efface pas tout de suite. Silent Hill 2, c’est ça. Un jeu qui hante sans qu’on sache trop pourquoi.\n\nCe qui frappe d’abord, c’est l’ambiance. C’est lourd, pesant, suffocant. Le son y joue un rôle énorme : la musique, les bruits lointains, les silences... tout est parfait.\n\nIl y a des scènes qui, même si on les oublie vite en surface, laissent une sensation étrange, un malaise diffus qui s’accroche.\n\nLes décors et le level design sont aussi à saluer. Tout est beau, mais d’une beauté dérangeante, crasseuse, réaliste. Chaque lieu semble avoir une histoire, une âme, et cette sensation d’exploration immersive est réussie de bout en bout. Les notes et documents disséminés un peu partout sont aussi maîtrisés à la perfection : ni trop nombreux, ni trop absents, toujours bien écrits, toujours intéressants. Ce n’est jamais du lore pour du lore, ça enrichit vraiment l’expérience.\n\nMais si l’enrobage est magistral, le gameplay, lui, est une autre histoire. Il ne se réinvente jamais et tourne vite en boucle : taper des monstres, courir, ouvrir des portes, se soigner… et répéter. Heureusement, les énigmes viennent casser cette routine. Elles sont toutes différentes, parfois brillantes, parfois tordues, parfois nuls et apportent ce qu’il faut de variété pour maintenir l’intérêt. En revanche, les combats de boss sont vraiment mauvais. Peu intéressants, mécaniquement plats, ils ressemblent plus à des sacs de PV qu’à de vrais affrontements marquants.\n\nL’histoire est forte, elle touche, mais difficile d’avoir de l’empathie pour James. Trop bête, trop passif, trop détaché… Impossible de s’y attacher, et c’est peut-être voulu. Un peu comme Joel dans The Last of Us Part 1, il est intéressant sur le papier, mais compliqué à apprécier vraiment.\n\nEt l’horreur dans tout ça ? Le jeu ne cherche pas à faire sursauter à tout prix. Il y a bien quelques jumpscares, mais c’est surtout une tension psychologique constante. On n’est pas terrifié en permanence, mais on n’est jamais serein non plus.\n\nCe qui différencie vraiment Silent Hill 2 des autres jeux d’horreur, c’est sa narration. Pas juste dans l’histoire qu’il raconte, mais dans la façon dont il la raconte. Le jeu ne te dit rien directement, il te fait ressentir, il te pousse à comprendre par toi-même. Il ne prend pas le joueur par la main et, à la fin, il te laisse avec plus de questions que de réponses.\n\nUn jeu marquant ? Oui. Un jeu parfait ? Clairement pas. Mais un jeu qui mérite d’être vécu, rien que pour l’expérience unique qu’il propose.\n\nPar contre, il vaut définitivement pas 70€ mais plus 30€.",
+      "ratingStars": 3.5,
+      "reviewSafe": "Il y a des jeux qui te marquent par leur histoire, d’autres par leur gameplay, et puis il y a ceux qui laissent une empreinte plus étrange, qui continue de hanter longtemps après. Silent Hill 2, c’est ça. Une expérience qui dérange sans qu’on sache vraiment pourquoi.\n\nL’ambiance est suffocante : musique, sons lointains, silences… tout est pensé pour peser sur le joueur. Les décors sont superbes dans leur laideur crasseuse, réalistes et dérangeants, chaque lieu semblant avoir une histoire. Les documents disséminés sont parfaitement dosés et enrichissent vraiment l’immersion, sans jamais tomber dans le remplissage gratuit.\n\nMais si l’atmosphère est magistrale, le gameplay est plus répétitif : courir, frapper, ouvrir des portes, se soigner… et recommencer. Heureusement, les énigmes viennent varier le rythme, certaines brillantes, d’autres moins, mais toujours utiles pour relancer l’intérêt. Les affrontements, en revanche, manquent cruellement de profondeur et se résument souvent à encaisser et frapper.\n\nL’histoire est forte, marquante, mais difficile d’éprouver de l’attachement pour le protagoniste, volontairement détaché et passif. On observe plus qu’on ne s’identifie, ce qui crée une distance troublante.\n\nL’horreur, ici, n’est pas faite de sursauts faciles : elle est psychologique, diffuse, constante. On n’est pas terrifié, mais jamais en sécurité non plus. Et la narration fait toute la différence : elle ne dicte rien, elle suggère, elle pousse à ressentir et à interpréter, laissant plus de questions que de réponses.\n\n👉 Pas un jeu parfait, mais une œuvre marquante et unique, à vivre au moins une fois. Même si, soyons honnêtes, son vrai prix devrait tourner autour de 30€ plutôt que 70€."
+    },
+    {
+      "id": "o2f2wz2uwtmeqmrqd7",
+      "createdAt": "2025-08-25T04:42:08.827Z",
+      "updatedAt": "2025-08-28T23:04:56.472Z",
+      "progress": 100,
+      "rating": 2,
+      "notes": "",
+      "cover": "https://images.gog-statics.com/b55fc72410714d3b10a866de04462ad02a2f6ad86ae36eb27360d897a2402d1d.jpg",
+      "link": "https://www.youtube.com/watch?v=HK4QnBtTL8A&list=PLKn0YIxb2VjRNUEIr4lauxUwqCU7oJI-Z",
+      "linkLabel": "VOD | 1h37",
+      "tags": [
+        "Narratif",
+        "Atmosphère",
+        "Simulation de marche",
+        "1re personne",
+        "Mystère",
+        "Exploration",
+        "Aventure",
+        "Solo",
+        "Protagoniste féminine",
+        "Indépendant",
+        "Court",
+        "Sombre",
+        "Drame",
+        "Casse-tête",
+        "Roman graphique",
+        "Émotions"
+      ],
+      "title": "What Remains of Edith Finch",
+      "platform": "PC",
+      "status": "finished",
+      "review": "Un walking simulator qui fait le boulot… pour ceux qui arrivent à accrocher. Moi, j’ai surtout vu un enchaînement de séquences absurdes, servies avec une narration qui me forçait constamment à regarder là où elle voulait, au lieu de me laisser apprécier les décors.\n\nL’histoire ? Pas touchante. Impossible de s’attacher à des personnages déjà morts qu’on n’a jamais connus. À peine le temps de comprendre qui ils sont qu’on passe à autre chose. C’est trop court pour provoquer une vraie connexion émotionnelle, et ça se ressent. Certains passages m’ont même plus fait rire qu’autre chose, avec des musiques et des mises en scène qui donnent parfois l’impression que le jeu est un troll assumé (coucou la BD horrifique et sa musique sortie de nulle part).\n\nLe gameplay est varié, et c’est sûrement son plus grand atout : chaque séquence a son identité propre, certaines sont originales, mais traînent trop en longueur et deviennent répétitives. L’immersion est présente par moments, mais cassée par des contrôles trop lents et des séquences où on galère juste à bouger correctement (le bateau avec le monstre, une horreur).\n\nL’ambiance globale ne m’a pas marqué. Pas désagréable, mais rien qui me donne envie d’y repenser une fois le jeu terminé. La fin ? Déjà oubliée. Comme tout le reste du jeu, en fait.\n\nUn indé narratif qui a ses adeptes, mais qui, pour moi, restera dans la catégorie des expériences qui ne laissent aucune trace.\n\nLe jeu devrait être gratuit, il vaut pas 18,49€ et encore moins 4€ (le prix auquel je l'ai eu).",
+      "ratingStars": 1,
+      "reviewSafe": "Un walking simulator qui fait le job… si on arrive à accrocher. De mon côté, j’ai surtout vu un enchaînement de séquences déconnectées, portées par une narration qui force constamment le regard au lieu de laisser apprécier les environnements.\n\nL’histoire ne m’a pas touché : difficile de créer une connexion émotionnelle quand on n’a pas le temps de connaître les personnages. Les séquences s’enchaînent trop vite pour qu’un attachement s’installe, et certaines mises en scène frôlent même le ridicule avec leurs choix de musique ou de présentation.\n\nLe gameplay varie d’une scène à l’autre et c’est sans doute son meilleur atout : chaque passage a sa propre identité, parfois originale, mais souvent trop long ou répétitif. L’immersion est brisée par des contrôles lents et peu agréables.\n\nL’ambiance globale n’a rien de marquant. Pas désagréable, mais rien qui reste une fois le jeu terminé. La conclusion, elle aussi, s’oublie aussitôt vue.\n\n👉 Un jeu narratif indé qui peut séduire certains, mais qui, pour moi, n’a laissé aucune trace. Et clairement, il ne vaut pas son prix."
+    },
+    {
+      "id": "wlvbsoe74omeqmv87u",
+      "createdAt": "2025-08-25T04:44:51.930Z",
+      "updatedAt": "2025-08-28T23:05:18.981Z",
+      "progress": 50,
+      "rating": null,
+      "notes": "",
+      "cover": "https://cdn.shopify.com/s/files/1/2231/0539/files/images_-_2025-06-09T124914.250.png?v=1749474066",
+      "link": "https://www.youtube.com/watch?v=qUblAY5O5nM&list=PLKn0YIxb2VjQ8Zm86N2f9ysVbYW6LbU_p",
+      "linkLabel": "VOD | 12h38",
+      "tags": [
+        "Exploration",
+        "Espace",
+        "Mystère",
+        "Narratif",
+        "Aventure",
+        "Atmosphère",
+        "Casse-tête",
+        "Solo",
+        "Monde ouvert",
+        "Indépendant",
+        "Science-fiction",
+        "Horreur",
+        "1re personne",
+        "Beau",
+        "Épopée",
+        "3D",
+        "Simulation"
+      ],
+      "title": "Outer Wilds",
+      "platform": "PC",
+      "status": "abandoned",
+      "review": "Trop cool mais malheureusement pas trop mon style de jeu je crois bien :/",
+      "ratingStars": null,
+      "reviewSafe": "Trop cool mais malheureusement pas trop mon style de jeu je crois bien :/"
+    },
+    {
+      "id": "gybsknyd71qmeqmzmc3",
+      "createdAt": "2025-08-25T04:48:16.851Z",
+      "updatedAt": "2025-08-25T04:48:16.851Z",
+      "progress": 10,
+      "rating": null,
+      "notes": "",
+      "cover": "https://external-preview.redd.it/JHhKBTQzwPjgRHvYX3CgJ6w0fw1jY-yby3wESN6Lf24.jpg?auto=webp&s=6d2290be389ed1543f88a9cf0f760659d78b6bd0",
+      "link": "https://www.youtube.com/watch?v=r-Yv8kQ--OE&list=PLKn0YIxb2VjQy7KYTWwf3eb2w3mN28b21",
+      "linkLabel": "VOD | 2h06",
+      "tags": [
+        "Aventure",
+        "Monde ouvert",
+        "Narratif",
+        "Arts martiaux",
+        "Culte",
+        "Action",
+        "RPG",
+        "Atmosphère",
+        "Combat",
+        "Classique",
+        "Solo",
+        "Rétro",
+        "Japonais",
+        "Beat Them All",
+        "Épopée",
+        "3e personne",
+        "Simulation",
+        "Anime"
+      ],
+      "title": "Shenmue",
+      "platform": "PC",
+      "status": "unfinished",
+      "review": "",
+      "ratingStars": null,
+      "reviewSafe": ""
+    },
+    {
+      "id": "fhlc8k2aa1meqn2dt1",
+      "createdAt": "2025-08-25T04:50:25.765Z",
+      "updatedAt": "2025-08-28T23:04:43.437Z",
+      "progress": 10,
+      "rating": 3,
+      "notes": "",
+      "cover": "https://www.vgr.com/wp-content/uploads/2018/08/dishonored-series-resting-1-1200x450.jpg",
+      "link": "https://www.youtube.com/watch?v=Vn3nKKB5Uac&list=PLKn0YIxb2VjTZ31pehMS6dzNoWj3aw_Gv",
+      "linkLabel": "VOD | 1h30",
+      "tags": [
+        "Infiltration",
+        "1re personne",
+        "Assassinat",
+        "Action",
+        "Steampunk",
+        "Solo",
+        "Atmosphère",
+        "Narratif",
+        "Fins multiples",
+        "Aventure",
+        "Sombre",
+        "Magie",
+        "Dystopique",
+        "FPS",
+        "RPG",
+        "Fantasy"
+      ],
+      "title": "Dishonored",
+      "platform": "PC",
+      "status": "abandoned",
+      "review": "Quand j’ai lancé Dishonored, j’ai vu un concept cool sur le papier : un jeu d’infiltration avec des pouvoirs surnaturels. Sur le papier, ça devait être génial, mais en réalité, l’exécution m’a laissé un goût amer. Le système de pouvoirs est censé offrir des possibilités infinies, mais en pratique, changer de pouvoir devient vite une galère avec des contrôles peu intuitifs. Changer entre les différents pouvoirs, et parfois même activer les bons au bon moment, était tout sauf fluide. Cela brisait le rythme du jeu et donnait l'impression que tout était trop rigide et forcé.\n\nLe côté infiltration aurait pu être sympa, mais les ennemis sont soit trop incompétents, soit trop omniprésents. Le système de détection est un désastre : parfois, on peut se faufiler devant eux sans qu’ils réagissent, et parfois ils te repèrent instantanément sans raison. Tout ça rend l’expérience beaucoup plus frustrante que prévue, et le sentiment de liberté que le jeu voulait offrir devient vite un cauchemar de répétitions.\n\nEn fin de compte, Dishonored m’a paru plus un exercice de style qu’une véritable aventure immersive. Au lieu de me donner une expérience marquante, je me suis retrouvé dans une série de missions répétitives avec un sentiment de « déjà-vu » à chaque tournant. Et au final, aucun personnage ou élément n’a réussi à sortir du lot.",
+      "ratingStars": 1.5,
+      "reviewSafe": "Dishonored part d’un concept prometteur : un jeu d’infiltration porté par des pouvoirs surnaturels. Sur le papier, c’est excitant, mais dans la pratique, l’exécution laisse un goût amer. Les pouvoirs censés offrir une grande liberté deviennent vite contraignants à utiliser : la gestion et l’activation manquent de fluidité, ce qui brise le rythme et donne une impression de rigidité constante.\n\nLe côté infiltration aurait pu séduire, mais le système de détection est bancal : parfois trop permissif, parfois injustement punitif. On oscille entre des gardes aveugles et des réactions instantanées incompréhensibles, ce qui rend l’expérience frustrante et éloigne du sentiment de liberté promis.\n\nAu final, Dishonored ressemble plus à un exercice de style qu’à une aventure immersive. Les missions finissent par se ressembler, et l’ensemble donne une impression de répétition. Aucun personnage ou élément narratif ne parvient vraiment à marquer.\n\n👉 Une idée séduisante en théorie, mais qui échoue à devenir l’expérience marquante qu’elle voulait être."
+    },
+    {
+      "id": "e1olv38vtpumeqn3piu",
+      "createdAt": "2025-08-25T04:51:27.606Z",
+      "updatedAt": "2025-08-25T05:02:35.332Z",
+      "progress": 30,
+      "rating": null,
+      "notes": "",
+      "cover": "https://gpstatic.com/acache/23/40/1/fr/t620x300-07f1a8324ba9457aa129cff02cf296e3.jpg",
+      "link": "https://www.youtube.com/watch?v=1AreoLB0uOc&list=PLKn0YIxb2VjS05sfB8ixq5MB2AwZAJWY5",
+      "linkLabel": "VOD",
+      "tags": [
+        "LEGO",
+        "Action",
+        "Aventure",
+        "Superhéros",
+        "Familial",
+        "Solo",
+        "Comédie",
+        "Bande dessinée",
+        "Humour",
+        "3e personne",
+        "Culte",
+        "Casse-tête",
+        "Narratif"
+      ],
+      "title": "LEGO Batman: The Videogame",
+      "platform": "PC",
+      "status": "playing",
+      "review": "",
+      "ratingStars": null,
+      "reviewSafe": ""
+    },
+    {
+      "id": "nhuuy39bo0qmeqn86co",
+      "createdAt": "2025-08-25T04:54:56.040Z",
+      "updatedAt": "2025-08-28T23:01:10.966Z",
+      "progress": 100,
+      "rating": 9,
+      "notes": "",
+      "cover": "https://images.gog-statics.com/e7c6ab0d300a11ed9195f0d8bf65954d042a2d4d405d99069edb3fbe3b1906c8.jpg",
+      "link": "https://www.youtube.com/watch?v=Oy2EDnU63WQ&list=PLKn0YIxb2VjRKNz-zJxAT69znm9qCzECT",
+      "linkLabel": "VOD | 14h23",
+      "tags": [
+        "Action",
+        "Infiltration",
+        "Aventure",
+        "Narratif",
+        "Cinématographique",
+        "Exploration",
+        "3D",
+        "Militaire",
+        "Tactique",
+        "Solo",
+        "Drame",
+        "Guerre",
+        "Culte",
+        "Violence",
+        "Gore",
+        "Tanks"
+      ],
+      "title": "METAL GEAR SOLID",
+      "platform": "PC",
+      "status": "finished",
+      "review": "🎮 Avis Metal Gear Solid (1998)\n\nUn vieux jeu PS1 ? Non. Un vrai film interactif d’espionnage qui t’explose encore la tête en 2025.\n\n🌍 Histoire & narration\n\nMGS1, c’est un scénario de complot nucléaire, de manipulations génétiques et de trahisons qui se mélange à des thèmes bien plus profonds : loyauté, libre arbitre, sens de la guerre. Oui, parfois c’est confus, t’as l’impression que Kojima balance 20 infos random à la seconde… mais le jeu retombe toujours sur ses pattes. Tout ce qui est balancé en mode mystère finit par avoir du sens, et ça, c’est une dinguerie pour un jeu de 1998.\nLes cinématiques et dialogues codec ? Pas chiants du tout. Ça sert de pause, ça raconte des trucs de fou, ça te donne envie d’écouter comme si t’étais au ciné. Clairement, MGS1 transpire le cinéma d’action hollywoodien des années 80/90, mais avec derrière une profondeur que t’attendrais pas.\n\n🐍 Snake comme protagoniste\n\nSolid Snake, c’est le cliché du héros badass des années 90 : humour noir, voix grave, attitude blasée. Mais ça fonctionne. Il est charismatique, attachant et malgré son côté nanar, il soulève quand même des thématiques profondes. T’as envie de le suivre jusqu’au bout, même quand il fait ses vannes improbables.\n\n⚔️ Les boss fights\n\nChaque boss est une masterclass de mise en scène et d’identité. Psycho Mantis te lit dans ta carte mémoire (bon, moins cool quand t’es en émulateur PC 😅), Sniper Wolf t’attrape au cœur par son background, Grey Fox c’est du pur moment culte.\nMais… les combats contre Liquid ? Clairement une purge. Le duel à mains nues est mal dosé, lourd et frustrant. La séquence en jeep encore pire : trop scriptée, pas équitable, zéro fun. C’est dommage que la fin se conclue sur les deux combats les plus ratés, quand tout le reste était ouf.\n\n👀 Gameplay & infiltration\n\nL’infiltration est efficace et même encore fun aujourd’hui. Mais rigide de ouf. Les contrôles sont datés et surtout : c’est un système boule de neige. Tu fais une erreur, et t’as quasi aucune chance de t’en sortir. Ça rend le jeu parfois injustement punitif. Les éliminations silencieuses ? Catastrophe. Si t’effleures la hitbox, le garde te capte et alerte tout le monde. Le backtracking est aussi relou et te casse un peu le rythme. Mais malgré ça, une fois que tu prends le pli, c’est un pur régal.\n\n🎬 Ambiance & mise en scène\n\nMGS1, c’est un vrai film interactif. Pas interactif par les choix, mais par la mise en scène. T’es spectateur-acteur d’un thriller où tu vis chaque moment. La mise en scène est ouf, la musique sublime certains passages, les dialogues codec transpirent l’écriture cinématographique. Clairement, Kojima voulait être réalisateur, et ça se sent. Mais ce n’est pas juste du spectacle : derrière l’action hollywoodienne, le jeu touche à des sujets lourds (le clonage, l’héritage, la guerre, la morale).\n\n💥 Moments marquants\n\n– Psycho Mantis, culte absolu.\n– La mort de Sniper Wolf.\n– Grey Fox et sa révélation.\n– La trahison et les twists autour de Liquid.\n– La mort de Meryl.\n\nC’est pas juste des moments spectaculaires, ce sont des passages qui te restent en mémoire parce qu’ils sont écrits, mis en scène et ressentis comme des moments de cinéma.\n\n❌ Points négatifs\n\n– Les combats contre Liquid (à mains nues + jeep).\n– Contrôles rigides, surtout pour les actions simples (genre choper une ration au bord et tomber comme un débile).\n– Éliminations discrètes horribles.\n– Le backtracking abusé sur la fin.\n\n🧠 Comparaison avec les JV narratifs modernes\n\nHonnêtement, je m’attendais à un jeu trop daté. Mais non : une fois que tu passes le cap des premières heures et que tu domptes les contrôles, c’est une pépite. Oui, TLOU ou TWD ont une écriture plus moderne, mais MGS1 a ouvert la voie. C’est grâce à lui qu’on a ces jeux-là. Et même aujourd’hui, il m’a accroché émotionnellement et narrativement.\n\n🔥 Conclusion\n\nMetal Gear Solid 1, c’est pas juste un “vieux classique respecté”. C’est un chef-d’œuvre qui reste marquant encore aujourd’hui.\nSi les joueurs arrêtaient de se dire “c’est vieux donc c’est nul”, ils découvriraient un jeu qui explose encore 90% des productions modernes en termes de narration et de mise en scène. Un remake fidèle ferait un carnage aujourd’hui.\n\n⚖️ En résumé :\n\n✅ Scénario brillant et dense, façon film d’espionnage hollywoodien.\n✅ Snake charismatique malgré son côté cliché.\n✅ Boss fights mémorables (sauf Liquid).\n✅ Ambiance cinématographique culte.\n✅ Encore accrocheur malgré l’âge.\n❌ Contrôles rigides et punitifs.\n❌ Boss fights finaux ratés.\n❌ Backtracking frustrant.\n\n👉 MGS1, c’est une légende vivante.",
+      "ratingStars": 4.5,
+      "reviewSafe": "🎮 Avis Metal Gear Solid (1998)\n\nUn vieux jeu PS1 ? Non. Plutôt un vrai film interactif d’espionnage qui, même en 2025, a encore de quoi exploser la tête.\n\n🌍 Histoire & narration\nMGS1, c’est un scénario dense de complots et de manipulations, qui aborde en filigrane des thèmes bien plus profonds : loyauté, libre arbitre, sens de la guerre. Oui, parfois ça part dans tous les sens, mais tout finit par avoir du sens. Pour un jeu de 1998, la maîtrise est bluffante.\nLes cinématiques et dialogues ne sont pas là pour remplir : ce sont des moments de mise en scène puissants, qui te donnent envie de rester scotché comme devant un film d’action des années 80/90… mais avec une profondeur que tu n’attendrais pas.\n\n🐍 Snake comme protagoniste\nSolid Snake, c’est le cliché du héros badass des années 90 : voix grave, humour noir, attitude blasée. Mais ça marche. Il est charismatique, attachant et porte l’histoire avec un mélange de sérieux et de dérision qui le rend culte.\n\n⚔️ Les boss fights\nChaque affrontement est iconique, unique dans son identité et sa mise en scène. Certains restent parmi les moments les plus marquants du jeu vidéo. Mais la fin souffre clairement de combats moins inspirés, qui cassent un peu le rythme d’une progression jusque-là magistrale.\n\n👀 Gameplay & infiltration\nL’infiltration est efficace et fun, mais très rigide. Les contrôles datent, et le système punit sévèrement la moindre erreur. Ajoute à ça des mécaniques pas toujours précises et un backtracking lourd en fin de parcours… ça peut frustrer. Mais une fois que tu prends le pli, ça reste un régal.\n\n🎬 Ambiance & mise en scène\nMGS1, c’est du pur cinéma interactif. Chaque scène est pensée comme un moment de film, la musique sublime les passages clés, et la mise en scène n’a rien à envier à de grosses productions. Derrière le spectacle d’action, le jeu touche à des thématiques lourdes et surprenantes pour son époque.\n\n❌ Points négatifs\n– Contrôles rigides et frustrants sur certaines actions.\n– Quelques combats finaux en-dessous du reste.\n– Backtracking fatigant.\n\n🧠 Comparaison avec les JV narratifs modernes\nOn pourrait croire qu’il a trop vieilli, mais non : une fois que tu t’adaptes, c’est une pépite. Certes, les jeux modernes comme TLOU ou TWD ont affiné la narration, mais sans MGS1, ils n’existeraient pas. Même aujourd’hui, il accroche émotionnellement et narrativement.\n\n🔥 Conclusion\nMetal Gear Solid 1 n’est pas juste un vieux classique respecté par nostalgie. C’est un chef-d’œuvre qui, encore aujourd’hui, surpasse la majorité des jeux modernes en termes de narration et de mise en scène. Un remake fidèle ferait un carnage.\n\n⚖️ En résumé :\n✅ Scénario brillant et dense.\n✅ Snake charismatique malgré son côté cliché.\n✅ Boss fights marquants.\n✅ Ambiance cinématographique culte.\n✅ Encore accrocheur malgré l’âge.\n❌ Contrôles rigides et punitifs.\n❌ Combats finaux décevants.\n❌ Backtracking frustrant.\n\n👉 MGS1, c’est une légende vivante."
+    },
+    {
+      "id": "d4lk4q34ydcmeqnb8kh",
+      "createdAt": "2025-08-25T04:57:18.881Z",
+      "updatedAt": "2025-08-25T04:57:18.881Z",
+      "progress": null,
+      "rating": null,
+      "notes": "",
+      "cover": "https://cdn2.unrealengine.com/Diesel%2Fproductv2%2Flego-batman-2%2FEGS_WB_LEGO_Batman_2_G1_1920x1080_19_0911-1920x1080-2dd4f86dcc1882caa2a0b82f31eedff7fec1ac2b.jpg",
+      "link": null,
+      "linkLabel": "VOD",
+      "tags": [
+        "LEGO",
+        "Action",
+        "Aventure",
+        "Monde ouvert",
+        "Superhéros",
+        "Solo",
+        "Humour",
+        "Comédie",
+        "Casual",
+        "Bande-dessinée",
+        "Narratif"
+      ],
+      "title": "LEGO Batman 2: DC Super Heroes",
+      "platform": "PC",
+      "status": "planned",
+      "review": "",
+      "ratingStars": null,
+      "reviewSafe": ""
+    },
+    {
+      "id": "z5xi1ormwkmmeqncqxn",
+      "createdAt": "2025-08-25T04:58:29.339Z",
+      "updatedAt": "2025-08-25T05:02:26.958Z",
+      "progress": null,
+      "rating": null,
+      "notes": "",
+      "cover": "https://store-images.s-microsoft.com/image/apps.35828.64262041090618072.97940a7d-67f7-47fc-b298-066b1e05a4b8.5412c9ae-4c3c-4bd4-87d1-5a254080105c?q=90&w=480&h=270",
+      "link": null,
+      "linkLabel": "VOD",
+      "tags": [
+        "LEGO",
+        "Aventure",
+        "Action",
+        "Superhéros",
+        "Humour",
+        "Espace",
+        "Comédie",
+        "Solo",
+        "Bande-dessinée",
+        "Narratif"
+      ],
+      "title": "LEGO Batman 3: Beyond Gotham",
+      "platform": "PC",
+      "status": "planned",
+      "review": "",
+      "ratingStars": null,
+      "reviewSafe": ""
+    },
+    {
+      "id": "jtlyqktfsn7meqneaz8",
+      "createdAt": "2025-08-25T04:59:41.972Z",
+      "updatedAt": "2025-08-25T04:59:41.972Z",
+      "progress": null,
+      "rating": null,
+      "notes": "",
+      "cover": "https://store-images.s-microsoft.com/image/apps.20858.68850728623624216.6e2867fc-0ab8-4f68-98cc-b59c6d10b278.101bf701-5ed8-4afb-81f4-c27b083fa872?q=90&w=480&h=270",
+      "link": null,
+      "linkLabel": "VOD",
+      "tags": [
+        "LEGO",
+        "Action",
+        "Aventure",
+        "Protagoniste détestable",
+        "Monde ouvert",
+        "Superhéros",
+        "Personnages personnalisable",
+        "Humour",
+        "Bande dessinée",
+        "Solo",
+        "Comédie"
+      ],
+      "title": "LEGO DC Super-Villains",
+      "platform": "PC",
+      "status": "planned",
+      "review": "",
+      "ratingStars": null,
+      "reviewSafe": ""
+    },
+    {
+      "id": "bqkmpsfdaameqnh9aq",
+      "createdAt": "2025-08-25T05:01:59.762Z",
+      "updatedAt": "2025-08-26T02:29:56.125Z",
+      "progress": null,
+      "rating": null,
+      "notes": "",
+      "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2215200/a07a9a6c0c9c1225f5b260b4f29fe40e6f099f6b/header.jpg?t=1755722207",
+      "link": null,
+      "linkLabel": "VOD",
+      "tags": [
+        "LEGO",
+        "Plateforme 3D",
+        "Bande dessinée",
+        "Action",
+        "Aventure",
+        "Monde ouvert",
+        "Humour",
+        "Superhéros",
+        "Parodie",
+        "Narratif",
+        "Combat",
+        "Solo"
+      ],
+      "title": "LEGO Batman: Legacy of the Dark Knight",
+      "platform": "PC",
+      "status": "planned",
+      "review": "",
+      "ratingStars": null,
+      "reviewSafe": ""
+    },
+    {
+      "id": "juzos145himervr5v0",
+      "createdAt": "2025-08-26T01:41:24.972Z",
+      "updatedAt": "2025-08-28T23:13:28.444Z",
+      "progress": 100,
+      "rating": 7,
+      "notes": "",
+      "review": "🌍 Histoire & narration\n\nMGS2 mise sur l’ambition : un récit plus dense, plus politique, qui veut frapper fort… mais qui perd un peu de saveur par rapport au charme du premier. Là où MGS1 assumait son côté nanar/humour noir tout en gardant de la profondeur, celui-ci se veut plus sérieux, parfois trop. Résultat : le rythme met plus de temps à se lancer, certains passages deviennent confus, et si tu rates une info, t’es vite largué. Ça reste fascinant, mais moins clair et moins percutant.\n\n🐍 Snake vs Raiden\n\nLe switch de Snake à Raiden ne m'a pas trop dérangé. Snake reste présent et joue un rôle important, mais cette fois tu sens que le héros que tu contrôles (Raiden) est davantage spectateur de l’histoire, tandis que les vrais moteurs narratifs sont les autres persos. Même pour Snake et sa team, ils étaient aussi majeurs dans l'histoire mais plus secondaire également je trouve.\n\n⚔️ Les boss fights\n\nComparés à MGS1, c’est un peu le jour et la nuit. Ici, les combats sont plus équitables, moins frustrants, mieux dosés côté difficulté. Mais… ils perdent en originalité. Fatman, Vamp, Fortune, Solidus : tous sympas, mais aucun n’a l’impact d’un Psycho Mantis ou d’un Sniper Wolf. Et si les combats sont moins punitifs, ils en deviennent aussi trop simples : soins à gogo, patterns faciles à lire… même le boss final que j'ai one-try. C'est fun mais mille fois moins marquant.\n\n👀 Gameplay & infiltration\n\nÉnorme amélioration dans la fluidité : cacher les cadavres, mouvements plus souples, IA plus crédible (radios à casser, gardes plus intelligents). Mais les défauts de MGS1 persistent : système trop boule de neige. Une erreur = l’armée entière débarque, et la seule vraie option c’est d’attendre… trop longtemps. Les gardes spawnent parfois quasiment sur toi à cause de la caméra fixe, ce qui rend certaines situations injustes.\nMention spéciale (et pas dans le bon sens) : les phases de nage et de “plateforme” sont catastrophiques. Contrôles raides, level design à chier et à vomir sérieux, c'est le gameplay qui casse le rythme et qui m'a donné envie d'ALT+F4 plus d'une fois.\n\n🎬 Ambiance & mise en scène\n\nToujours ce côté “film interactif”, mais moins immersif que dans MGS1. L’histoire reste solide, mais demande tellement d’attention que certains passages perdent en intensité. Dans MGS1, t’avais souvent des moments “absolute cinema” avec frissons. Ici, c’est plus rare, même si quelques scènes marquent (Emma & Otacon, les révélations finales). La mise en scène est plus ambitieuse, mais elle disperse plus qu’elle n’ancre.\n\n❌ Points négatifs\n\n– Histoire confuse et trop dense.\n– Raiden moins marquant que Snake.\n– Boss fights funs mais trop simples et pas assez originaux.\n– Phases de plateforme/natation horriblement nul à chier.\n– Toujours ce système “boule de neige” en infiltration.\n\n🔄 Comparaison avec MGS1\n\nMGS1 > MGS2.\nLe premier avait une histoire plus accrocheuse, des boss cultes, une difficulté qui reposait plus sur ton skill tout autant que les mécaniques. MGS2 est plus fluide, moins frustrant, mais aussi moins intense. C’est comme si Kojima avait voulu être plus sérieux et ambitieux… au risque de perdre un peu l’âme nanar qui faisait la force du 1.\n\n🔥 Conclusion\n\nMetal Gear Solid 2, c’est une expérience confuse mais fascinante.\nC’est un bon jeu, \"techniquement\" meilleur que le premier, mais narrativement moins impactant. Là où MGS1 donnait cette impression d’assister à un film culte en jouant, MGS2 t’embarque dans un récit dense, parfois trop, qui te laisse autant admiratif que paumé.\n\n👉 Au final, une suite respectable, audacieuse, mais moins marquante.\n\n⚖️ En résumé :\n\n✅ Ambition scénaristique plus grande.\n✅ Gameplay plus fluide, IA améliorée.\n✅ Boss fights plus équilibrés, moins frustrants.\n✅ Moments marquants (Emma, Colonel, fin).\n❌ Histoire confuse, trop sérieuse.\n❌ Raiden moins marquant que Snake.\n❌ Boss pas assez originaux.\n❌ Phases natation/plateforme catastrophiques.\n❌ Toujours le côté “boule de neige” frustrant en infiltration.",
+      "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2131640/header.jpg?t=1737564625",
+      "link": "https://www.youtube.com/playlist?list=PLKn0YIxb2VjR4hh8DvQVEWPKIy-EUckeg",
+      "linkLabel": "VOD | 14h49",
+      "tags": [
+        "Action",
+        "Infiltration",
+        "Aventure",
+        "Exploration",
+        "Narratif",
+        "Cinématographique",
+        "Militaire",
+        "Tactique",
+        "Guerre",
+        "Solo",
+        "Drame",
+        "Violence",
+        "Tanks",
+        "Culte"
+      ],
+      "title": "METAL GEAR SOLID 2: Sons of Liberty",
+      "platform": "PC",
+      "status": "finished",
+      "ratingStars": 3.5,
+      "reviewSafe": "🌍 Histoire & narration\nMGS2 mise sur l’ambition : un récit dense, plus politique, qui veut frapper fort… mais qui perd un peu du charme du premier. Là où MGS1 assumait son côté nanar avec humour noir et profondeur, celui-ci se veut plus sérieux, parfois trop. Le rythme met plus de temps à se lancer, certains passages deviennent confus, et si tu rates une info, tu peux vite être largué. Ça reste fascinant, mais moins clair et moins percutant.\n\n🐍 Snake vs Raiden\nLe changement de protagoniste ne dérange pas tant que ça, mais il donne une impression différente : le héros que tu contrôles semble plus spectateur que véritable moteur de l’histoire. Les personnages secondaires portent davantage la narration, même Snake paraît plus en retrait.\n\n⚔️ Les boss fights\nPlus équilibrés et mieux dosés que dans le premier, mais moins mémorables. C’est fun, mais trop simple et manquant d’originalité : aucun affrontement n’a le même impact que les boss cultes de MGS1.\n\n👀 Gameplay & infiltration\nLa fluidité est bien meilleure : cacher les corps, IA plus crédible, mouvements plus souples. Mais les défauts persistent : le système “boule de neige” reste frustrant, une erreur et tout s’écroule. Certaines séquences de gameplay spécifiques (notamment plateforme/natation) sont catastrophiques et cassent le rythme.\n\n🎬 Ambiance & mise en scène\nOn retrouve le côté “film interactif”, mais avec moins de moments iconiques. L’ambition est grande, la mise en scène impressionnante, mais plus dispersée que marquante. L’intensité et le frisson cinématographique du premier se font plus rares, même si quelques scènes frappent encore fort.\n\n❌ Points négatifs\n– Récit confus et trop dense.\n– Protagoniste moins marquant.\n– Boss funs mais peu originaux.\n– Phases de gameplay ratées.\n– Toujours ce système “boule de neige” en infiltration.\n\n🔄 Comparaison avec MGS1\nMGS1 reste supérieur. Plus accrocheur narrativement, plus marquant dans ses boss et ses moments cultes. MGS2 est plus fluide, moins frustrant, mais aussi moins intense et moins iconique. L’ambition est là, mais elle dilue un peu l’âme qui faisait la force du premier.\n\n🔥 Conclusion\nMetal Gear Solid 2 est une expérience confuse mais fascinante. Techniquement plus abouti, mais narrativement moins marquant. Une suite audacieuse, respectable, mais qui reste dans l’ombre du premier.\n\n⚖️ En résumé :\n✅ Ambition scénaristique plus grande.\n✅ Gameplay plus fluide, IA améliorée.\n✅ Boss mieux équilibrés.\n✅ Quelques scènes marquantes.\n❌ Récit confus et trop sérieux.\n❌ Protagoniste moins marquant.\n❌ Boss trop classiques.\n❌ Phases de gameplay ratées.\n❌ Infiltration toujours frustrante.\n\n👉 Une suite ambitieuse, mais moins inoubliable."
+    },
+    {
+      "id": "1nbvkaxwadjmervsysx",
+      "createdAt": "2025-08-26T01:42:49.137Z",
+      "updatedAt": "2025-08-28T23:13:35.556Z",
+      "progress": 27,
+      "rating": null,
+      "notes": "",
+      "review": "",
+      "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2417610/05c97cbcd0cfc27c8ed6c7fc6d81e0995aa2a7d4/header.jpg?t=1755846087",
+      "link": "https://www.youtube.com/playlist?list=PLKn0YIxb2VjSADh7NQcENNHPIUSr4acOZ",
+      "linkLabel": "VOD",
+      "tags": [
+        "Infiltration",
+        "Action",
+        "Cinématographique",
+        "Narratif",
+        "Guerre",
+        "Remake",
+        "Militaire",
+        "Aventure",
+        "Solo",
+        "Tactique",
+        "Survie",
+        "Aventure",
+        "Drame",
+        "Violence",
+        "Exploration",
+        "Tanks"
+      ],
+      "title": "METAL GEAR SOLID Δ: SNAKE EATER",
+      "platform": "PC",
+      "status": "playing",
+      "ratingStars": null,
+      "reviewSafe": ""
     }
-    function setStarRow(row, value){
-      const v=Math.max(0,Math.min(5,Number(value)||0));
-      for(let i=0;i<5;i++){
-        const fill=Math.max(0,Math.min(1,v - i));
-        row._fills[i].setAttribute("width", String(fill*24));
-      }
-      row.title = v ? (v+' / 5') : 'Pas de note';
-    }
-    function getRatingStars(g){
-      if(typeof g.ratingStars==='number') return g.ratingStars;
-      if(typeof g.rating==='number') return g.rating/2;
-      return null;
-    }
-
-    /* ====== Durée ====== */
-    function parseDurationToSeconds(label){
-      if(!label) return null;
-      const s = String(label).toLowerCase();
-      let m = s.match(/(\d+)\s*h\s*(\d{1,2})(?:\s*m(?:in)?)?/);
-      if(m){ const h=parseInt(m[1],10), min=parseInt(m[2],10)||0; return h*3600+min*60; }
-      m = s.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
-      if(m){ const h=parseInt(m[1],10), min=parseInt(m[2],10), sec=parseInt(m[3]||'0',10); return h*3600+min*60+sec; }
-      m = s.match(/(\d{1,3})\s*m(?:in)?/);
-      if(m){ const min=parseInt(m[1],10); return min*60; }
-      return null;
-    }
-
-    /* ====== Prefs tri ====== */
-    function savePrefs(){ localStorage.setItem(LS_PREFS, JSON.stringify({ sortBy, sortDir })); }
-    function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(LS_PREFS)||'null') } catch { return null } }
-
-    /* ====== Groupes progression ====== */
-    function progressGroupRank(g){
-      if(g.status==='playing') return 0;
-      if(g.status==='finished') return 1;
-      return 2;
-    }
-
-    /* ====== Avis ====== */
-    function openReview(g, mode='full'){
-      revTitle.textContent = g.title || 'Avis';
-      const metaParts = [];
-      if(g.platform) metaParts.push(escapeHtml(g.platform));
-      if(g.status) metaParts.push(escapeHtml(statusLabel(g.status)));
-      const rs=getRatingStars(g);
-      if(typeof rs==='number') metaParts.push(`${rs}★/5`);
-      if(typeof g.progress==='number') metaParts.push(`${g.progress}%`);
-      metaParts.push(mode==='safe'?'Version sans spoiler':'Version complète');
-      revMeta.innerHTML = metaParts.join(' • ');
-
-      const content = (mode==='safe' ? (g.reviewSafe||'') : (g.review||'')) || '(Aucun avis pour le moment)';
-      revContent.textContent = content;
-
-      reviewModal.setAttribute('open',''); reviewModal.setAttribute('aria-hidden','false');
-    }
-    function closeReview(){ reviewModal.removeAttribute('open'); reviewModal.setAttribute('aria-hidden','true'); }
-
-    let pendingReviewGame=null;
-    function openReviewChoice(g){
-      pendingReviewGame=g;
-      const hasSafe=!!(g.reviewSafe && g.reviewSafe.trim());
-      revChoiceSafe.disabled = !hasSafe;
-      revChoiceNoSafe.style.display = hasSafe ? 'none' : 'block';
-      reviewChoiceModal.setAttribute('open',''); reviewChoiceModal.setAttribute('aria-hidden','false');
-    }
-    function closeReviewChoice(){
-      reviewChoiceModal.removeAttribute('open'); reviewChoiceModal.setAttribute('aria-hidden','true');
-    }
-
-    /* ====== Filtre + tri ====== */
-    function applyFilters(){
-      const sTerm=deburr(searchTerm);
-      filtered=games.filter(g=>{
-        if(selectedStatuses.size>0 && !selectedStatuses.has(g.status)) return false;
-        if(selectedPlatform && g.platform!==selectedPlatform) return false;
-        if(selectedTags.size>0){
-          const tagsSet=new Set((g.tags||[]).map(t=>String(t).toLowerCase()));
-          for(const t of selectedTags){ if(!tagsSet.has(t)) return false; }
-        }
-        if(sTerm){
-          const hay=deburr([g.title,g.platform,(g.tags||[]).join(' '),g.notes,g.review,g.reviewSafe,String(g.rating??''),String(g.ratingStars??'')].join(' '));
-          if(!hay.includes(sTerm)) return false;
-        }
-        return true;
-      });
-
-      const dir=(sortDir==='asc')?1:-1;
-
-      switch(sortBy){
-        case 'alpha': filtered.sort((a,b)=>dir*a.title.localeCompare(b.title)); break;
-        case 'updated': filtered.sort((a,b)=>dir*(new Date(a.updatedAt)-new Date(b.updatedAt))); break;
-        case 'rating': {
-          filtered.sort((a,b)=>{
-            const ar = (typeof a.ratingStars==='number') ? a.ratingStars : (typeof a.rating==='number' ? a.rating/2 : null);
-            const br = (typeof b.ratingStars==='number') ? b.ratingStars : (typeof b.rating==='number' ? b.rating/2 : null);
-            const aHas = ar!=null, bHas = br!=null;
-            if(aHas!==bHas) return aHas? -1 : 1;
-            if(!aHas) return 0;
-            return dir*(ar - br);
-          });
-          break;
-        }
-        case 'status':
-          filtered.sort((a,b)=> dir*((STATUS_WEIGHT[a.status]??99)-(STATUS_WEIGHT[b.status]??99)) || a.title.localeCompare(b.title));
-          break;
-        case 'duration':
-          filtered.sort((a,b)=>{
-            const da=parseDurationToSeconds(a.linkLabel||'');
-            const db=parseDurationToSeconds(b.linkLabel||'');
-            const aMissing=(da==null), bMissing=(db==null);
-            if(aMissing && bMissing) return 0;
-            if(aMissing) return 1;
-            if(bMissing) return -1;
-            return dir*(da-db);
-          });
-          break;
-        case 'progress':
-          filtered.sort((a,b)=>{
-            const ga=progressGroupRank(a), gb=progressGroupRank(b);
-            if(ga!==gb) return ga-gb;
-            const aHas=typeof a.progress==='number', bHas=typeof b.progress==='number';
-            if(aHas!==bHas) return aHas? -1 : 1;
-            if(!aHas && !bHas) return 0;
-            return dir*(a.progress - b.progress);
-          });
-          break;
-      }
-      render();
-    }
-
-    /* ====== Tags overflow ====== */
-    function setupBadgesOverflow(container, inner, btn){
-      inner.style.flexWrap='nowrap'; inner.style.overflow='hidden'; inner.style.width='auto';
-      const need = inner.scrollWidth > inner.clientWidth + 4;
-      if (need){
-        container.dataset.expanded='false'; btn.style.display='inline-block'; btn.textContent='Plus';
-        const pad=(btn.offsetWidth||48)+8; container.style.setProperty('--fade-pad', pad+'px');
-      } else { container.dataset.expanded='true'; btn.style.display='none'; container.style.setProperty('--fade-pad','0px'); }
-    }
-    function toggleBadges(container, inner, btn){
-      const isOpen = container.dataset.expanded==='true';
-      if (isOpen){
-        container.dataset.expanded='false'; inner.style.flexWrap='nowrap'; inner.style.overflow='hidden'; inner.style.width='auto'; btn.textContent='Plus';
-      } else {
-        container.dataset.expanded='true'; inner.style.flexWrap='wrap'; inner.style.overflow='visible'; inner.style.width='100%'; btn.textContent='Moins';
-      }
-    }
-
-    /* ====== Rendu ====== */
-    function render(){
-      grid.innerHTML='';
-      if(filtered.length===0){ emptyEl.hidden=false; return }
-      emptyEl.hidden=true;
-      const frag=document.createDocumentFragment();
-      const measureJobs=[];
-
-      for(const g of filtered){
-        const card=document.createElement('div'); card.className='card panel';
-
-        if(g.cover){
-          const wrap=document.createElement('div'); wrap.className='cover-wrap';
-          const img=document.createElement('img'); img.src=g.cover; img.alt=''; img.loading='lazy';
-          wrap.appendChild(img); card.appendChild(wrap);
-        }
-
-        const inner=document.createElement('div'); inner.className='inner';
-        const titleEl=document.createElement('div'); titleEl.className='title'; titleEl.textContent=g.title;
-        inner.appendChild(titleEl);
-
-        const subtitle=document.createElement('div'); subtitle.className='subtitle';
-        const left=document.createElement('span'); left.textContent=`${g.platform||''} • ${statusLabel(g.status)}`;
-        subtitle.appendChild(left);
-
-        const rs=getRatingStars(g);
-        if(rs!=null){
-          const sep=document.createElement('span'); sep.textContent='•'; sep.style.opacity='.5'; subtitle.appendChild(sep);
-          const stars=buildStarRow(rs,'sm'); subtitle.appendChild(stars);
-        }
-        inner.appendChild(subtitle);
-
-        // Tags
-        const badgesWrap=document.createElement('div'); badgesWrap.className='badges';
-        const innerBadges=document.createElement('div'); innerBadges.className='badgesInner';
-        if(g.tags?.length){
-          for(const t of g.tags){
-            const b=document.createElement('span'); b.className='badge'; b.textContent=t;
-            if(selectedTags.has(String(t).toLowerCase())) b.classList.add('selected');
-            b.onclick=()=>toggleTagFilter(t);
-            innerBadges.appendChild(b);
-          }
-        }
-        const moreBtn=document.createElement('button'); moreBtn.className='moreBtn'; moreBtn.type='button'; moreBtn.textContent='Plus';
-        moreBtn.onclick=()=> toggleBadges(badgesWrap, innerBadges, moreBtn);
-        badgesWrap.appendChild(innerBadges); badgesWrap.appendChild(moreBtn);
-        inner.appendChild(badgesWrap);
-
-        // Progression
-        if(typeof g.progress==='number'){
-          const wrap=document.createElement('div'); wrap.className='progress';
-          const bar=document.createElement('span'); bar.style.width=Math.max(0,Math.min(100,g.progress))+'%';
-          wrap.appendChild(bar); inner.appendChild(wrap);
-        }
-
-        // Liens (VOD + Voir l'avis)
-        const links=document.createElement('div'); links.className='links';
-        if(g.link){
-          const a=document.createElement('a'); a.className='linkbtn vod'; a.href=g.link; a.target='_blank'; a.rel='noopener';
-          a.innerHTML=`<span class="play">▶</span><span>${g.linkLabel||'VOD'}</span>`;
-          links.appendChild(a);
-        }
-        if( (g.review && g.review.trim()) || (g.reviewSafe && g.reviewSafe.trim()) ){
-          const r=document.createElement('button'); r.className='linkbtn review'; r.type='button'; r.textContent="Voir l'avis";
-          r.onclick=()=>openReviewChoice(g);
-          links.appendChild(r);
-        }
-        if(links.children.length>0) inner.appendChild(links);
-
-        // Notes (extrait)
-        if(g.notes){
-          const p=document.createElement('p'); p.style.marginTop='10px'; p.style.color='var(--muted)'; p.textContent=g.notes;
-          inner.appendChild(p);
-        }
-
-        // Actions admin
-        if(ADMIN_ENABLED){
-          const actions=document.createElement('div'); actions.className='actions';
-          const editBtn=document.createElement('button'); editBtn.className='ghost'; editBtn.textContent='✏️ Modifier'; editBtn.onclick=()=>openModal(g.id);
-          actions.appendChild(editBtn); inner.appendChild(actions);
-        }
-
-        card.appendChild(inner); frag.appendChild(card);
-        measureJobs.push(()=>setupBadgesOverflow(badgesWrap, innerBadges, moreBtn));
-      }
-      grid.appendChild(frag);
-      requestAnimationFrame(()=>{ measureJobs.forEach(fn=>fn()); });
-    }
-
-    // Recompute badges on resize
-    window.addEventListener('resize', ()=>{
-      document.querySelectorAll('.badges').forEach(bw=>{
-        const inner=bw.querySelector('.badgesInner'); const btn=bw.querySelector('.moreBtn');
-        if(inner&&btn) setupBadgesOverflow(bw, inner, btn);
-      });
-    });
-
-    // UI statuts
-    function buildStatusUI(){
-      chipsWrap.innerHTML='';
-      for(const s of STATUS){
-        const chip=document.createElement('button');
-        chip.className='chip'; chip.type='button'; chip.textContent=s.label; chip.dataset.id=s.id; chip.dataset.active='false';
-        chip.onclick=()=>{ if(selectedStatuses.has(s.id))selectedStatuses.delete(s.id); else selectedStatuses.add(s.id); chip.dataset.active=selectedStatuses.has(s.id)?'true':'false'; applyFilters(); };
-        chipsWrap.appendChild(chip);
-      }
-      fStatus.innerHTML=STATUS.map(s=>`<option value="${s.id}">${s.label}</option>`).join('');
-    }
-
-    function toggleTagFilter(tag){const key=String(tag).toLowerCase(); if(selectedTags.has(key)) selectedTags.delete(key); else selectedTags.add(key); applyFilters();}
-
-    /* ====== STAR PICKER (modale) ====== */
-    let pickerRow=null;
-    function buildRatingPicker(initial=0){
-      const wrap=$('ratingPickerWrap'); wrap.innerHTML='';
-      const row=buildStarRow(initial,'lg'); pickerRow=row;
-      const hit=document.createElement('div'); hit.className='hit';
-      for(let i=1;i<=10;i++){
-        const btn=document.createElement('button');
-        btn.addEventListener('mouseenter',()=>{ setStarRow(row, i*0.5); $('ratingHint').textContent=(i*0.5)+' / 5'; });
-        btn.addEventListener('click',()=>{ fRating.value=String(i*0.5); setStarRow(row, i*0.5); $('ratingHint').textContent=(i*0.5)+' / 5'; });
-        hit.appendChild(btn);
-      }
-      wrap.appendChild(row); wrap.appendChild(hit);
-      const v=Number(fRating.value||initial)||0; setStarRow(row,v); $('ratingHint').textContent=v? (v+' / 5') : '(aucune)';
-      wrap.addEventListener('mouseleave',()=>{ const v=Number(fRating.value||0); setStarRow(row,v); $('ratingHint').textContent=v? (v+' / 5') : '(aucune)'; });
-    }
-
-    /* ====== Admin: modal jeu ====== */
-    function openModal(id=null){
-      if(!ADMIN_ENABLED) return;
-      editingId=id;
-      modal.setAttribute('open',''); modal.setAttribute('aria-hidden','false');
-      if(id){
-        const g=games.find(x=>x.id===id);
-        $('modalTitle').textContent='Modifier un jeu'; deleteBtn.hidden=false; fillForm(g);
-      } else {
-        $('modalTitle').textContent='Ajouter un jeu'; deleteBtn.hidden=true; clearForm();
-      }
-      const initValue = id ? (getRatingStars(games.find(x=>x.id===id))||0) : 0;
-      buildRatingPicker(initValue);
-    }
-    function closeModal(){ modal.removeAttribute('open'); modal.setAttribute('aria-hidden','true'); }
-
-    function clearForm(){
-      fTitle.value=''; fPlatform.value=''; fStatus.value=(STATUS[0]?.id||'planned');
-      fProgress.value=''; fTags.value=''; fRating.value=''; fNotes.value='';
-      fReview.value=''; fReviewSafe.value='';
-      fLink.value=''; fLinkLabel.value='VOD'; fCover.value='';
-    }
-    function fillForm(g){
-      fTitle.value=g.title; fPlatform.value=g.platform; fStatus.value=g.status;
-      fProgress.value=(g.progress??''); fTags.value=(g.tags||[]).join(', ');
-      const rs=getRatingStars(g)||''; fRating.value=rs;
-      fNotes.value=g.notes||''; fReview.value=g.review||''; fReviewSafe.value=g.reviewSafe||'';
-      fLink.value=g.link??''; fLinkLabel.value=g.linkLabel||'VOD'; fCover.value=g.cover??'';
-    }
-    function readForm(){
-      const rs = fRating.value===''? null : Number(fRating.value);
-      return {
-        title:fTitle.value.trim(),
-        platform:fPlatform.value.trim(),
-        status:fStatus.value,
-        progress:fProgress.value===''?null:Math.max(0,Math.min(100,Number(fProgress.value))),
-        tags:fTags.value.split(',').map(s=>s.trim()).filter(Boolean),
-        ratingStars: rs,
-        rating: rs==null? null : rs*2, // compat /10
-        notes:fNotes.value.trim(),
-        review:fReview.value.trim(),
-        reviewSafe:fReviewSafe.value.trim(),
-        link:fLink.value.trim()||null,
-        linkLabel:fLinkLabel.value.trim()||'VOD',
-        cover:fCover.value.trim()||null
-      }
-    }
-
-    function upsertGame(){
-      if(!ADMIN_ENABLED) return;
-      const data=readForm();
-      if(!data.title){alert('Titre obligatoire');return}
-      if(!data.platform){alert('Plateforme obligatoire');return}
-      if(editingId){
-        const idx=games.findIndex(g=>g.id===editingId);
-        if(idx>-1){games[idx]={...games[idx],...data,updatedAt:nowIso()}}
-      } else {
-        games.push({id:uid(),createdAt:nowIso(),updatedAt:nowIso(),progress:null,rating:null,ratingStars:null,notes:'',review:'',reviewSafe:'',cover:null,link:null,linkLabel:'VOD',tags:[],...data});
-      }
-      saveLS(); computePlatformsSelect(); applyFilters(); setupTwitch(); closeModal();
-    }
-
-    function deleteGame(){
-      if(!ADMIN_ENABLED) return;
-      if(!editingId)return;
-      if(!confirm('Supprimer ce jeu ?'))return;
-      games=games.filter(g=>g.id!==editingId);
-      saveLS(); applyFilters(); closeModal();
-    }
-
-    /* ====== Export / Copier / Import ====== */
-    function bundleJSON(){
-      return JSON.stringify({settings:{...settings,customStatuses:STATUS},games}, null, 2);
-    }
-
-    function exportJSON(){
-      const blob=new Blob([bundleJSON()],{type:'application/json'});
-      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='games_bundle.json'; a.click(); URL.revokeObjectURL(a.href);
-    }
-
-    async function copyJSON(){
-      const text=bundleJSON();
-      try{
-        if(navigator.clipboard && window.isSecureContext){
-          await navigator.clipboard.writeText(text);
-        }else{
-          const ta=document.createElement('textarea');
-          ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
-          document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-        }
-        copyBtn.textContent='Copié ✓'; copyBtn.disabled=true;
-        setTimeout(()=>{ copyBtn.textContent='Copier le JSON'; copyBtn.disabled=false; },1400);
-      }catch(e){
-        alert('Impossible de copier le JSON : '+e.message);
-      }
-    }
-
-    function importJSON(file){
-      if(!ADMIN_ENABLED) return;
-      const reader=new FileReader();
-      reader.onload=()=>{try{
-        const data=JSON.parse(reader.result);
-        if(Array.isArray(data)){games=data;}
-        else if(data&&Array.isArray(data.games)){
-          games=data.games;
-          if(data.settings){
-            settings={...settings,...data.settings};
-            if(Array.isArray(data.settings.customStatuses)){STATUS=data.settings.customStatuses; rebuildStatusWeight();}
-          } else if(Array.isArray(data.customStatuses)){STATUS=data.customStatuses; rebuildStatusWeight();}
-        } else {throw new Error('JSON invalide')}
-        games = games.map(g => ({
-          ...g,
-          review: (g.review ?? ''),
-          reviewSafe: (g.reviewSafe ?? ''),
-          ratingStars: (typeof g.ratingStars==='number'? g.ratingStars : (typeof g.rating==='number'? g.rating/2 : null))
-        }));
-        saveLS(); computePlatformsSelect(); buildStatusUI(); applyFilters(); setupTwitch(); closeModal();
-      }catch(e){alert('Import impossible : '+e.message)}};
-      reader.readAsText(file);
-    }
-
-    /* ====== Twitch ====== */
-    let liveTimer=null;
-    function setLiveUI(live){
-      livePill.className='pill'+(live?' live':'');
-      liveText.textContent=live?'En direct':'Hors ligne';
-      mobileTwitchBtn.textContent=live?'Twitch (LIVE)':'Twitch';
-    }
-
-    async function fetchLiveHelix(channel, clientId, token){
-      try{
-        const res = await fetch(`https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(channel)}`, {
-          headers: { 'Client-ID': clientId, 'Authorization': `Bearer ${token}` }
-        });
-        if(!res.ok) throw new Error('Helix error');
-        const data=await res.json();
-        return Array.isArray(data.data) && data.data.length>0;
-      }catch{ return null } // null = inconnu (erreur)
-    }
-    async function fetchLiveFallback(channel){
-      try{
-        const res=await fetch(`https://decapi.me/twitch/uptime/${encodeURIComponent(channel)}`, {cache:'no-store'});
-        if(!res.ok) throw new Error('decapi error');
-        const txt=await res.text();
-        const offline = /offline/i.test(txt);
-        if(offline) return false;
-        const live = /(live|uptime|has been live)/i.test(txt);
-        return live ? true : false;
-      }catch{ return null }
-    }
-
-    async function updateLive(){
-      const channel=(settings.twitchChannel||'').trim();
-      if(!settings.showTwitch || !channel){ setLiveUI(false); return; }
-
-      if(settings.isLive==='live'){ setLiveUI(true); return; }
-      if(settings.isLive==='offline'){ setLiveUI(false); return; }
-
-      // Auto
-      let live=null;
-      if(settings.twitchClientId && settings.twitchToken){
-        live = await fetchLiveHelix(channel, settings.twitchClientId, settings.twitchToken);
-      }
-      if(live===null){
-        live = await fetchLiveFallback(channel);
-      }
-      if(live===null){
-        // indéterminé -> ne rien changer
-        return;
-      }
-      setLiveUI(!!live);
-    }
-
-    function setupTwitch(){
-      const show=!!settings.showTwitch; const channel=(settings.twitchChannel||'').trim(); const parent=encodeURIComponent(location.hostname||'localhost'); const twitchUrl=`https://www.twitch.tv/${channel}`;
-      if(!show||!channel){twitchPanel.hidden=true; mobileTwitchBtn.style.display='none'; if(liveTimer) clearInterval(liveTimer); return;}
-      twitchPanel.hidden=false; twitchLink.href=twitchUrl; twitchTitle.textContent=channel?`@${channel}`:''; mobileTwitchBtn.href=twitchUrl;
-
-      // Embed
-      twitchEmbed.innerHTML=''; const ifr=document.createElement('iframe'); ifr.allow='autoplay; fullscreen; picture-in-picture'; ifr.frameBorder='0'; ifr.width='100%'; ifr.height='100%'; ifr.src=`https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=${parent}&muted=true`; twitchEmbed.appendChild(ifr);
-      twitchChat.innerHTML=''; const chat=document.createElement('iframe'); chat.frameBorder='0'; chat.width='100%'; chat.height='100%'; chat.src=`https://www.twitch.tv/embed/${encodeURIComponent(channel)}/chat?parent=${parent}`; twitchChat.appendChild(chat);
-
-      // Auto live polling
-      if(liveTimer) clearInterval(liveTimer);
-      updateLive();
-      liveTimer=setInterval(updateLive, 60000); // 60s
-    }
-
-    /* ====== Param helpers ====== */
-    function statusesToText(arr) { return arr.map(s => `${s.id}=${s.label}`).join('\n'); }
-    function parseStatuses(text) {
-      const out = [];
-      for (const line of text.split(/\r?\n/)) {
-        const m = line.trim(); if (!m) continue;
-        const [id, ...labelParts] = m.split('=');
-        const idClean=(id||'').trim(); const label=(labelParts.join('=')||'').trim();
-        if(!idClean||!label) continue; out.push({id:idClean,label});
-      }
-      return out.length?out:null;
-    }
-    function openSettingsModal(){
-      if(!ADMIN_ENABLED) return;
-      $('sTwitch').value=settings.twitchChannel||'';
-      $('sShowTwitch').value=settings.showTwitch?'yes':'no';
-      $('sIsLive').value=settings.isLive||'auto';
-      $('sClientId').value=settings.twitchClientId||'';
-      $('sToken').value=settings.twitchToken||'';
-      $('sStatuses').value=statusesToText(STATUS);
-      $('settingsModal').setAttribute('open',''); $('settingsModal').setAttribute('aria-hidden','false');
-    }
-    function closeSettingsModal(){ $('settingsModal').removeAttribute('open'); $('settingsModal').setAttribute('aria-hidden','true'); }
-    function saveSettings(){
-      if(!ADMIN_ENABLED) return;
-      settings.twitchChannel=$('sTwitch').value.trim()||settings.twitchChannel;
-      settings.showTwitch=($('sShowTwitch').value==='yes');
-      settings.isLive=$('sIsLive').value;
-      settings.twitchClientId=$('sClientId').value.trim();
-      settings.twitchToken=$('sToken').value.trim();
-      const parsed=parseStatuses($('sStatuses').value); if(parsed){ STATUS=parsed; rebuildStatusWeight(); }
-      saveLS(); buildStatusUI(); applyFilters(); setupTwitch(); closeSettingsModal();
-    }
-
-    /* ====== Données d'exemple ====== */
-    function initSample(){return[
-      {id:uid(),title:'Batman: Arkham City',platform:'PC',status:'replaying',progress:35,tags:['action','Batman'],ratingStars:4.5,rating:9,notes:'Reprise en hard mode.',reviewSafe:'Quelques faiblesses de rythme, mais une boucle de gameplay encore super efficace.',review:'Un classique qui tient encore bien la route. Les combats sont toujours top, quelques longueurs au milieu et la cam n’aide pas dans certains couloirs.',link:'',linkLabel:'VOD | 1h37',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'The Last of Us Part I',platform:'PC',status:'finished',progress:100,tags:['narratif'],ratingStars:5,rating:10,notes:'Coup de cœur.',reviewSafe:'Une histoire forte et émouvante, servie par une réalisation irréprochable.',review:'Histoire et rythme impeccables. La scène du **spoiler** fonctionne toujours autant, et le final est percutant.',link:'',linkLabel:'VOD | 2h05',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Red Dead Redemption 2',platform:'PC',status:'planned',progress:null,tags:['open-world'],ratingStars:null,rating:null,notes:'Prévu pour stream.',reviewSafe:'',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Days Gone',platform:'PC',status:'unfinished',progress:52,tags:['zombies'],ratingStars:3,rating:6,notes:'Hésite à reprendre.',reviewSafe:'Bon défouloir mais répétitif.',review:'Bons gunfights, répétitif sur la durée.',link:'',linkLabel:'VOD | 45:12',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Metal Gear Solid',platform:'PS1',status:'playing',progress:18,tags:['infiltration','classique'],ratingStars:null,rating:null,notes:'Découverte.',reviewSafe:'',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-    ]}
-
-    /* ====== Bundle JSON embarqué (optionnel) ====== */
-    async function loadBundle() {
-      try {
-        const res = await fetch('games_bundle.json?ts=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) throw new Error('no json');
-        const data = await res.json();
-        if (Array.isArray(data)) return { games: data, settings: null };
-        if (data && Array.isArray(data.games)) return data;
-      } catch (e) {}
-      return null;
-    }
-
-    /* ====== INIT ====== */
-    async function init(){
-      if(ADMIN_ENABLED){fab.hidden=false; settingsFab.hidden=false}
-
-      const bundle = await loadBundle();
-      const lsG = loadGames();
-      const lsS = loadSettings();
-
-      if (bundle) {
-        games = bundle.games;
-        if (bundle.settings) {
-          settings = { ...settings, ...bundle.settings };
-          if (Array.isArray(bundle.settings.customStatuses)) { STATUS = bundle.settings.customStatuses; rebuildStatusWeight(); }
-        }
-      } else {
-        games = (lsG && Array.isArray(lsG)) ? lsG : initSample();
-        if (lsS) {
-          settings = { ...settings, ...lsS };
-          if (Array.isArray(lsS.customStatuses)) { STATUS = lsS.customStatuses; rebuildStatusWeight(); }
-        }
-      }
-
-      // compat anciennes sauvegardes
-      games = games.map(g => ({
-        ...g,
-        review: (g.review ?? ''),
-        reviewSafe: (g.reviewSafe ?? ''),
-        ratingStars: (typeof g.ratingStars==='number' ? g.ratingStars : (typeof g.rating==='number' ? g.rating/2 : null))
-      }));
-
-      const prefs = loadPrefs();
-      if(prefs){ sortBy = prefs.sortBy || sortBy; sortDir = prefs.sortDir || sortDir; }
-      sortSelect.value = sortBy;
-      sortDirInput.checked = (sortDir==='asc');
-
-      buildStatusUI(); computePlatformsSelect(); applyFilters(); setupTwitch();
-
-      // Events
-      searchInput.addEventListener('input',e=>{searchTerm=e.target.value; applyFilters()});
-      platformSelect.addEventListener('change',e=>{selectedPlatform=e.target.value; applyFilters()});
-      sortSelect.addEventListener('change', e=>{
-        sortBy = e.target.value;
-        if(sortBy==='alpha' || sortBy==='status' || sortBy==='progress'){ sortDir='asc'; sortDirInput.checked=true; }
-        else { sortDir='desc'; sortDirInput.checked=false; }
-        applyFilters(); savePrefs();
-      });
-      sortDirInput.addEventListener('change', e=>{ sortDir = e.target.checked ? 'asc' : 'desc'; applyFilters(); savePrefs(); });
-
-      clearFiltersBtn.onclick=()=>{
-        selectedStatuses.clear(); [...chipsWrap.children].forEach(ch=>ch.dataset.active='false');
-        selectedPlatform=''; platformSelect.value='';
-        sortBy='status'; sortSelect.value='status';
-        sortDir='asc'; sortDirInput.checked=true;
-        searchTerm=''; searchInput.value='';
-        selectedTags.clear();
-        applyFilters(); savePrefs();
-      };
-
-      // Admin
-      fab.onclick=()=>openModal();
-      settingsFab.onclick=()=>openSettingsModal();
-      closeBtn.onclick=()=>closeModal();
-      saveBtn.onclick=()=>upsertGame();
-      newBtn.onclick=()=>{editingId=null; clearForm(); modalTitle.textContent='Ajouter un jeu'; deleteBtn.hidden=true; buildRatingPicker(0);};
-      deleteBtn.onclick=()=>deleteGame();
-      exportBtn.onclick=()=>exportJSON();
-      copyBtn.onclick=()=>copyJSON();
-      importBtn.onclick=()=>fileInput.click();
-      fileInput.onchange=()=>{const f=fileInput.files?.[0]; if(f) importJSON(f)};
-
-      // Paramètres
-      $('sCloseBtn').onclick=()=>closeSettingsModal();
-      $('sSaveBtn').onclick=()=>saveSettings();
-
-      // Raccourci admin (easter egg)
-      let seq=''; document.addEventListener('keydown',e=>{
-        if((e.ctrlKey&&e.altKey&&e.key.toLowerCase()==='a')&&ADMIN_ENABLED){openModal()}
-        seq+=e.key.toLowerCase(); if(seq.length>7) seq=seq.slice(-7);
-        if(seq.endsWith('scotch')&&ADMIN_ENABLED){openSettingsModal(); seq=''}
-      });
-
-      // Twitch minimize
-      minimizeTwitch.onclick=()=>{const hidden=twitchEmbed.style.display==='none'; twitchEmbed.style.display=hidden?'block':'none'; minimizeTwitch.textContent=hidden?'Réduire':'Agrandir'};
-
-      // Modale Avis
-      revCloseBtn.onclick = closeReview;
-      reviewModal.addEventListener('click', (e)=>{ if(e.target===reviewModal) closeReview(); });
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') { closeReview(); closeReviewChoice(); } });
-
-      revChoiceClose.onclick = closeReviewChoice;
-      reviewChoiceModal.addEventListener('click', (e)=>{ if(e.target===reviewChoiceModal) closeReviewChoice(); });
-      revChoiceSafe.onclick = ()=>{ if(pendingReviewGame){ closeReviewChoice(); openReview(pendingReviewGame,'safe'); } };
-      revChoiceFull.onclick = ()=>{ if(pendingReviewGame){ closeReviewChoice(); openReview(pendingReviewGame,'full'); } };
-    }
-    document.addEventListener('DOMContentLoaded',init);
-  </script>
-</body>
-</html>
+  ]
+}
