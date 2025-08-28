@@ -3,6 +3,8 @@
     "twitchChannel": "ScotchyTAZ",
     "showTwitch": true,
     "isLive": "auto",
+    "twitchClientId": "",
+    "twitchToken": "",
     "customStatuses": [
       {
         "id": "playing",
@@ -34,7 +36,7 @@
     {
       "id": "yhisfxnkx2ameqlb0l5",
       "createdAt": "2025-08-25T04:01:09.305Z",
-      "updatedAt": "2025-08-28T05:00:48.427Z",
+      "updatedAt": "2025-08-28T23:00:27.324Z",
       "progress": 100,
       "rating": 10,
       "notes": "",
@@ -59,12 +61,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "Un jeu qui prend son temps, parfois trop, mais qui sait récompenser ta patience. L’histoire est une claque, pleine de retournements et de personnages ultra travaillés. Arthur Morgan, c’est clairement l’un des meilleurs persos de JV que j’ai vus : on le suit de chien loyal de Dutch à un homme qui ouvre enfin les yeux, son arc de rédemption est magistral.\n\nL’open world ? Une masterclass. Pas juste une carte immense, mais un monde qui vit : PNJ crédibles, évènements aléatoires, missions secondaires qui ont un vrai sens. Chaque trajet devenait une aventure. Le gameplay par contre… efficace mais sans éclat, ça reste du Rockstar pur jus, ça fait le taf sans révolution.\n\nMoments cultes : Hosea, Dutch, Arthur… et un épilogue qui m’a paru de trop avec John. Techniquement c’est une pépite, une vraie fresque vidéoludique, mais pas forcément “le plus beau jeu de l’histoire” comme certains le hurlent.\n\n⚠️ Défauts : un démarrage BEAUCOUP trop lent, quelques lourdeurs, et des longueurs pas toujours justifiées.\n\n🎵 Bande-son, ambiance, immersion ? Rien à redire, c’est au top.\n\n👉 RDR2 est un chef-d’œuvre, un jeu que j’oublierai jamais, mais pas le meilleur de la décennie.",
-      "ratingStars": 5
+      "ratingStars": 5,
+      "reviewSafe": "Un jeu qui prend son temps, parfois même un peu trop, mais qui finit toujours par récompenser la patience avec une histoire marquante et des personnages d’une richesse rare. L’open world est une masterclass : vivant, crédible, regorgeant de détails qui transforment chaque trajet en véritable aventure.\n\nLe gameplay reste efficace sans révolutionner le genre, du pur travail d’orfèvre qui fait ce qu’il doit. Techniquement, c’est une claque visuelle et sonore, avec une immersion difficile à égaler.\n\n⚠️ Défauts : un début trop lent, quelques lourdeurs et certaines longueurs qui cassent parfois le rythme.\n\n👉 Un chef-d’œuvre inoubliable, mais pas pour autant “le meilleur jeu de la décennie” comme on l’entend souvent."
     },
     {
       "id": "b5qkzmk32wmeqlrg0z",
       "createdAt": "2025-08-25T04:13:55.811Z",
-      "updatedAt": "2025-08-28T04:59:00.424Z",
+      "updatedAt": "2025-08-28T23:01:29.512Z",
       "progress": 100,
       "rating": 8,
       "notes": "",
@@ -86,12 +89,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "C’est rare un jeu coopératif qui donne autant envie de tendre la manette à un pote et de dire : \"Viens, on vit un truc.\" Split Fiction, c’est un peu ça. Une aventure à deux, en ligne ou sur le canapé, sans prise de tête, mais avec beaucoup de cœur.\nL’ADN Hazelight est bien là : gameplay asymétrique, narration en duo, transitions fluides… Et même si on avance souvent en mode \"instinct pur\" sans trop se parler ni réfléchir, bah on s’éclate. L’expérience coule, littéralement.\n\nL’univers Sci-Fi met un peu de temps à faire son nid, mais finit par s’imposer avec une vraie esthétique. Et visuellement ? Claques sur claques. Mention spéciale pour la dernière ligne droite et son boss final, qui m’a laissé bouche bée.\n\nLe jeu ose. Il se réinvente en permanence. Pas une minute d’ennui. C’est accessible même pour les joueurs occasionnels (à condition d’y aller à la manette, parce que le clavier-souris, c’est pas trop ça).\nLa relation entre les deux persos ? Un peu cliché, mais fonctionne. Ce qui fonctionne moins par contre, c’est le doublage français : à fuir. Vraiment. Passez en VO et vous verrez la différence.\nLe scénario se devine un peu trop tôt, mais reste efficace. Et alors la BO… wow. Chaque note est bien placée, chaque montée musicale donne envie de jouer à fond.\n\nBref, c’est pas parfait, mais c’est généreux, honnête, et surtout hyper fun. Une pépite coop comme on en voit trop peu.\nUn must-play.",
-      "ratingStars": 4
+      "ratingStars": 4,
+      "reviewSafe": "C’est rare un jeu coop qui donne autant envie de tendre la manette à un pote et de dire : \"Viens, on vit un truc.\" Split Fiction, c’est exactement ça. Une aventure à deux, en ligne ou sur le canapé, simple d’accès mais pleine de cœur.\n\nOn retrouve bien l’ADN Hazelight : gameplay asymétrique, narration en duo, transitions fluides. Ça se joue souvent à l’instinct, sans réfléchir, et pourtant ça marche : l’expérience coule toute seule et l’amusement est constant.\n\nL’univers Sci-Fi prend son temps à s’installer, mais finit par séduire par son esthétique. Visuellement, c’est une claque quasi permanente. Et le jeu n’a pas peur de se réinventer, offrant un rythme varié sans jamais laisser place à l’ennui. Accessible aux joueurs occasionnels (à condition de jouer à la manette), il mise sur l’originalité et l’inventivité.\n\nLe scénario est prévisible mais efficace, les personnages un peu clichés mais attachants. Le vrai gros bémol, c’est le doublage français : à éviter absolument. En VO, l’immersion est bien meilleure. Côté musique, par contre, c’est une réussite totale : chaque morceau tombe au bon moment et amplifie l’expérience.\n\n👉 Pas parfait, mais généreux, honnête, et surtout hyper fun. Une pépite coopérative, et clairement un must-play."
     },
     {
       "id": "1i042qkft7dhmeqlzsj2",
       "createdAt": "2025-08-25T04:20:25.262Z",
-      "updatedAt": "2025-08-28T05:00:56.612Z",
+      "updatedAt": "2025-08-28T23:01:43.782Z",
       "progress": 100,
       "rating": 8,
       "notes": "⚠️ La VOD n'est pas complète à cause d'une erreur de ma part.",
@@ -119,12 +123,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "Une histoire marquante, poignante et immersive, qui parvient à nous faire ressentir avec justesse les émotions des personnages. L’écriture est excellente, avec une relation centrale entre Joel et Ellie qui évolue de façon marquante… même si, personnellement, je déteste Joel et j’espère que c’est voulu.\n\nLe gameplay, lui, oscille entre moments brillants et frustrations. Quand il fonctionne, il est ultra-immersif, mais certains bugs et un système de difficulté maladroit plombent un peu l’expérience. Plutôt que de proposer un vrai challenge intelligent, le mode Survivant se contente d’appauvrir les ressources et de gonfler les vagues d’ennemis, ce qui finit par sembler artificiel.\n\nL’ambiance et la direction artistique sont magistrales : chaque environnement est un plaisir à contempler, porté par un sound design et une bande-son d’exception. Le rythme du jeu est parfaitement maîtrisé, et même si les personnages secondaires sont un peu en retrait, ils jouent leur rôle efficacement.\n\nMon principal reproche ? L’existence de dialogues secondaires qui influencent l’évolution des personnages mais sont bien trop faciles à rater. Ce choix casse un peu la fluidité de la narration et donne une impression de progression irrégulière dans la relation entre Joel et Ellie.\n\nMalgré ces défauts, The Last of Us Part I reste un chef-d’œuvre du jeu narratif, à la fois intense et mémorable.",
-      "ratingStars": 4
+      "ratingStars": 4,
+      "reviewSafe": "Une histoire marquante, poignante et immersive, qui transmet avec justesse les émotions des personnages. L’écriture est excellente, portée par une relation centrale qui évolue de manière marquante et qui donne toute sa force au récit.\n\nCôté gameplay, on oscille entre moments brillants et frustrations. Quand tout fonctionne, l’immersion est totale. Mais certains bugs et un système de difficulté qui mise davantage sur la rareté des ressources et la multiplication des ennemis que sur un vrai challenge intelligent peuvent casser le rythme.\n\nL’ambiance et la direction artistique sont magistrales : chaque décor est une claque visuelle, sublimée par un sound design et une bande-son exceptionnels. Le rythme global est parfaitement tenu, et même si les personnages secondaires manquent parfois de présence, ils soutiennent efficacement l’histoire.\n\nMon vrai reproche ? Des dialogues secondaires qui influencent subtilement la progression, mais trop faciles à manquer. Ça casse un peu la fluidité narrative et donne parfois une impression d’évolution inégale.\n\n👉 Malgré ces défauts, The Last of Us Part I reste un chef-d’œuvre du jeu narratif, à la fois intense et inoubliable."
     },
     {
       "id": "ls1wg2tim8omeqm2rwe",
       "createdAt": "2025-08-25T04:22:44.414Z",
-      "updatedAt": "2025-08-28T05:00:50.716Z",
+      "updatedAt": "2025-08-28T23:00:48.680Z",
       "progress": 100,
       "rating": 10,
       "notes": "",
@@ -151,12 +156,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "\"Et si la vengeance ne valait rien d'autre qu'un vide ? Pas un trou noir dramatique, juste... le silence après le bruit.\"\n\nJ’ai vécu ce jeu comme une claque douce-amère. Pas une surprise brutale, mais une évidence inévitable : Joel devait mourir. Et il l’a fait, dans une scène aussi cruelle que logique, car il incarnait depuis le début cette frontière floue entre amour et monstruosité. Sa mort n’est pas une trahison, c’est une conséquence.\n\nEt c’est là que le jeu devient brillant : en me forçant à incarner Abby, en me demandant \"et si tu avais tort ?\". Et très vite, j’ai compris. Non seulement je n’ai pas détesté Abby, je l’ai adorée. C’est l’un des personnages les plus humains et touchants que The Last of Us ait jamais proposés. Là où Joel se consumait dans l’égoïsme, Abby s’ouvre à l’autre, à Lev, à un monde qui ne tourne plus autour de sa douleur. Le parallèle avec Ellie est glaçant : Ellie perd tout ce qu’Abby réussit à sauver. Et pourtant, aucune n’en sort victorieuse. Elles sont les deux visages d’un même fantôme.\n\nDina, Jesse, Lev... tous les personnages secondaires sonnent justes, portés par une écriture sobre mais redoutablement efficace. Mention spéciale à Dina, cette \"anti-Joel\" discrète, pleine d’amour et de lucidité. Elle est peut-être la seule à vraiment voir clair dans tout ça.\n\nCôté gameplay, j’ai trouvé un équilibre presque parfait : exploration, infiltration, tension constante. Deux ou trois scènes un peu longues, mais noyées dans un flot de moments mémorables. Le sound design et la direction artistique frôlent la perfection : chaque lieu est un tableau, chaque bruit, un avertissement. Pas un bug ou un ralentissement ne m’a sorti de cette immersion absolue. Un exploit.\n\nLa peur, la colère, la tristesse, la beauté. Le jeu m’a fait traverser tout ça, souvent dans un simple regard, une ambiance, une lumière filtrée à travers des feuilles. Forêt, neige, pluie, ruines, plage… The Last of Us Part II n’est pas seulement un jeu post-apo. C’est une traversée émotionnelle, un pèlerinage intérieur.\n\nJe ne pense pas qu’Ellie ait gagné quoi que ce soit. Ni Abby. Mais moi, oui. J’ai gagné un morceau de vérité sur ce que veut dire être humain, certainement un très beau jeu.",
-      "ratingStars": 5
+      "ratingStars": 5,
+      "reviewSafe": "\"Et si la vengeance ne valait rien d’autre qu’un vide ? Pas un trou noir dramatique, juste… le silence après le bruit.\"\n\nCe jeu est une claque douce-amère. Pas une surprise brutale, mais une évidence qui s’impose comme une fatalité. C’est dans cette douleur qu’il devient brillant : il renverse nos certitudes, nous met face à nos contradictions, et ose nous demander \"et si tu avais tort ?\".\n\nLes personnages sont d’une humanité rare, profonds, nuancés, parfois contradictoires, mais toujours justes. Aucun n’est réduit à un rôle simple : ils vivent, ils souffrent, ils aiment, et l’écriture parvient à rendre chacun d’eux inoubliable.\n\nLe gameplay trouve un équilibre presque parfait entre exploration, tension et infiltration. Quelques longueurs existent, mais elles s’effacent devant la richesse des moments marquants. Techniquement, c’est un bijou : un sound design chirurgical, une direction artistique à couper le souffle, et une immersion totale.\n\nLa peur, la colère, la tristesse, la beauté. Ce jeu fait traverser tout ça, souvent sans un mot, juste par un regard, une lumière, une ambiance. C’est bien plus qu’un simple jeu post-apocalyptique : c’est un voyage intérieur, une traversée émotionnelle.\n\n👉 Un chef-d’œuvre qui ne laisse pas indemne, et qui m’a offert un morceau de vérité sur ce que veut dire être humain."
     },
     {
       "id": "m8xxyztzv0dmeqm5wfb",
       "createdAt": "2025-08-25T04:25:10.247Z",
-      "updatedAt": "2025-08-28T05:01:01.230Z",
+      "updatedAt": "2025-08-28T23:03:28.426Z",
       "progress": 100,
       "rating": 5,
       "notes": "",
@@ -180,12 +186,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "Un bon DLC, mais pas un indispensable. Left Behind fait ce qu’il a à faire : étoffer un peu plus Ellie, montrer un peu de son passé, et offrir quelques moments touchants. Mais si The Last of Us est une claque, ce DLC, lui, reste dans l’ombre.\n\nL’histoire fonctionne bien. Elle est loin d’être aussi marquante que celle du jeu principal, mais elle reste plus touchante que ce à quoi on pourrait s’attendre d’un simple DLC. On ressort satisfait sur ce point, sans pour autant être profondément marqué. Riley est un bon personnage, une amie crédible, et la relation entre les deux est bien développée, sans en faire trop.\n\nLe gameplay, lui, ne se renouvelle pas du tout. C’est The Last of Us, en plus court, avec ses qualités… et ses défauts. Et comme dans le jeu principal, Naughty Dog ne peut pas s’empêcher d’infliger des vagues d’ennemis inutiles à la fin, qui n’apportent rien si ce n’est de la frustration. Ça sent l’extension de durée artificielle, et ça fait plus soupirer qu’autre chose.\n\nL’alternance entre les moments calmes et les phases d’action est correcte, mais sans être transcendante. Ça fait le job, sans jamais atteindre les sommets émotionnels du jeu principal. L’ambiance sonore, en revanche, est toujours au top. Naughty Dog sait créer des atmosphères et Left Behind ne fait pas exception.\n\nFinalement, c’est un DLC sympa mais clairement secondaire. Il offre un peu de lore, mais rien de vital, surtout qu’Ellie en spoil déjà l’issue dans le jeu principal. On y découvre malgré tout quelques nouvelles séquences intéressantes, mais rien qui change la donne.\n\nUn bon petit bonus, mais pas de quoi bouleverser l’expérience globale.",
-      "ratingStars": 2.5
+      "ratingStars": 2.5,
+      "reviewSafe": "Un bon DLC, mais pas un indispensable. Il fait ce qu’il doit : approfondir un peu plus le personnage principal, explorer une partie de son passé et offrir quelques moments touchants. Mais là où le jeu de base est une claque, cette extension reste dans son ombre.\n\nL’histoire fonctionne bien, touchante à sa manière, mais loin d’atteindre l’intensité du récit principal. On en ressort satisfait, sans pour autant être profondément marqué. La relation mise en avant est crédible et bien développée, sans en faire trop.\n\nCôté gameplay, rien de nouveau : c’est la même formule, en plus court, avec ses qualités… et ses défauts. Comme souvent, quelques vagues d’ennemis ajoutées pour rallonger artificiellement l’expérience créent plus de frustration que d’intérêt. L’alternance entre moments calmes et action reste correcte, mais n’atteint jamais les sommets émotionnels du jeu principal.\n\nL’ambiance sonore, en revanche, est irréprochable, toujours immersive et parfaitement maîtrisée.\n\n👉 En bref : un DLC sympa, agréable à parcourir, mais clairement secondaire. Un petit bonus qui enrichit sans jamais bouleverser l’expérience globale."
     },
     {
       "id": "hkyib469duemeqm8vfc",
       "createdAt": "2025-08-25T04:27:28.920Z",
-      "updatedAt": "2025-08-28T05:01:09.090Z",
+      "updatedAt": "2025-08-28T23:03:41.472Z",
       "progress": 100,
       "rating": 5,
       "notes": "",
@@ -215,12 +222,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "Until Dawn, c’est un peu comme une soirée film d’horreur entre potes où chacun prend une manette et essaie de sauver tout le monde… ou au moins de buter Emily. L’histoire est captivante, rythmée sans longueur, et s’amuse avec tous les clichés du slasher, mais d’une façon qui fonctionne bien. Les dialogues sont volontairement caricaturaux, ce qui donne parfois un côté humoristique qui ne jure pas avec l’ambiance horrifique. D’ailleurs, niveau horreur, c’est surtout les jumpscares qui font le taf. L’ambiance, elle, ne m’a pas spécialement oppressé, et au bout d’un moment, la peur s’estompe pour laisser place à un jeu narratif où on traverse des couloirs en espérant que personne ne meure bêtement.\n\nEt ça, c’est là où Until Dawn me frustre. Parce que oui, c’est bien sympa de faire des choix, mais j’ai jamais su si ça avait un vrai impact ou si c’était du bluff à la Telltale. Tout le monde peut mourir, tout le monde peut survivre, mais encore faut-il que le jeu t’explique correctement comment éviter les catastrophes… Parce que perdre des personnages à cause d’une ampoule qui explose une baraque, c’est pas du \"choix difficile\", c’est juste mal amené et ultra frustrant. T’as beau jouer intelligemment, si le jeu décide de te piéger avec une explication foireuse, t’es foutu.\n\nLes QTE font le taf, même si j’ai trouvé ça plus gadget qu’autre chose (surtout le système de ne pas bouger avec la manette Xbox). Par contre, les phases d’exploration sont vraiment limitées. C’est du couloir, et ça se ressent. On est loin d’un jeu qui te laisse fouiller ou te perdre. Heureusement, les séquences avec le Dr. Hill sont excellentes, et j’aurais adoré en avoir plus. C’est là qu’il y avait un vrai potentiel pour rentrer dans la psyché du joueur et du jeu.\n\nTechniquement, le jeu n’est pas parfait non plus. Entre les shaders à refaire à chaque lancement, les freezes aux changements de scènes, et les animations parfois douteuses, ça casse un peu l’immersion. Les bruitages ne sont pas toujours bien mixés, et certaines voix semblent sortir de nulle part.\n\nAu final, Until Dawn est une expérience divertissante, surtout si on aime les slashers et les choix narratifs, mais il lui manque un vrai attachement aux personnages et une meilleure gestion des conséquences pour vraiment marquer le joueur. Je le recommanderais quand même, surtout à ceux qui découvrent le genre, mais Detroit: Become Human ou The Walking Dead de Telltale font un bien meilleur travail pour créer de l’émotion et de l’implication.",
-      "ratingStars": 2.5
+      "ratingStars": 2.5,
+      "reviewSafe": "Until Dawn, c’est comme une soirée film d’horreur interactive entre potes : une histoire captivante, rythmée, qui joue à fond avec les clichés du slasher mais d’une façon qui fonctionne. Les dialogues sont caricaturaux mais assumés, ajoutant parfois une touche humoristique qui ne détonne pas avec l’ambiance horrifique. Niveau peur, le jeu mise surtout sur les jumpscares. L’oppression, elle, s’essouffle vite pour laisser place à un jeu narratif où on avance surtout en espérant sauver tout le monde.\n\nEt c’est là que le jeu frustre : les choix semblent importants, mais leur impact paraît parfois artificiel. Tout le monde peut survivre ou mourir, mais certaines issues sont si mal amenées qu’elles paraissent injustes. Plutôt que des décisions difficiles, ça ressemble à des pièges mal expliqués.\n\nLes QTE font le job sans briller, les phases d’exploration sont limitées à des couloirs, mais quelques séquences plus psychologiques viennent relever l’expérience. Techniquement, l’ensemble est correct mais entaché de bugs, de freezes et de mixages sonores approximatifs.\n\n👉 Au final, Until Dawn reste divertissant, surtout pour les amateurs de slashers et de choix narratifs. Mais il manque d’attachement aux personnages et d’une meilleure gestion des conséquences pour marquer durablement. Sympa, mais pas du niveau des meilleures expériences narratives du genre."
     },
     {
       "id": "inpo55cww29meqmaaky",
       "createdAt": "2025-08-25T04:28:35.218Z",
-      "updatedAt": "2025-08-28T05:30:15.248Z",
+      "updatedAt": "2025-08-28T23:03:16.229Z",
       "progress": 100,
       "rating": 6,
       "notes": "",
@@ -248,12 +256,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "Dès le début, l’histoire m’a accroché sans moments vraiment faibles ou de longueurs. On est direct plongé dans l’ascension de Tommy Angelo, un type ordinaire qui devient un pilier du crime organisé. Ça fonctionne bien, mais j’aurais aimé qu’on creuse plus sa psychologie. Il grimpe les échelons, oui, mais mentalement, il n’évolue pas tant que ça. J’aurais voulu sentir davantage son conflit intérieur, son rapport à la violence, ses doutes. Là, il est surtout un témoin du destin qui l’attend, et on aurait pu aller plus loin dans sa tête.\n\nLe casting de personnages est bon, mais un peu trop dense d’un coup. Trop de noms à retenir en peu de temps, ce qui m’a parfois perdu dans les premières heures. Cela dit, la relation entre Tommy, Paulie et Sam fonctionne bien. Pas assez longue pour que je m’attache profondément à eux, mais suffisamment pour que la mort de Paulie me fasse chier quand même. C’est là que le jeu fait bien son taf : on ne s’attache pas forcément aux personnages comme dans un The Last of Us, mais quand un des nôtres tombe, ça pique.\n\nL’ambiance, par contre, est une masterclass. Les musiques sont dingues, la ville de Lost Heaven est immersive, avec une reconstitution historique franchement réussie. Mais… en y regardant de plus près, il manque du détail. Les rues sont trop propres, trop vides. Peu de déchets, pas assez de vie urbaine. Et c’est frustrant, parce qu’on sent que tout est là pour nous plonger dans les années 30, mais ça manque juste d’un peu plus de bordel pour que ça fasse vraiment vivant.\n\nLe gameplay est solide. Gunfights sympas avec un bon feeling des armes, même si jouer à la manette était plus confortable parce que le clavier/souris, c’était une horreur. La conduite des véhicules est plutôt cool, même si ça dépend de la caisse qu’on chope. Une fois qu’on trouve une bonne bagnole, ça devient vraiment plaisant. Le jeu est linéaire, et ça ne m’a pas dérangé parce qu’il ne traîne pas en longueur. Il répète un peu ses mécaniques, mais vu qu’il est court, ça passe. Par contre, les touches clavier sont catastrophiques, et les contrôles manette sont parfois surprenants.\n\nCôté technique, c’est propre, pas de bugs majeurs, mais le sound design, lui, est parfois aux fraises. Genre entendre un mec parler comme s’il était collé à mon oreille alors qu’il est à 15 mètres ou dans une bagnole fermée… ça casse l’immersion. Autre détail frustrant : les dialogues qui se coupent tout seuls. T’écoutes un perso parler, et bim, un chargement ou une autre ligne de dialogue le coupe net.\n\nLa fin, elle, est marquante, mais le dernier acte aurait mérité plus de transition. On passe de la mort de Sam à la vieillesse et la fin de Tommy un peu trop vite. Ça méritait un meilleur enchaînement pour que le poids du temps se ressente davantage.\n\nEn résumé, Mafia: Definitive Edition est un bon jeu, bien écrit, immersif, mais qui manque de profondeur psychologique et de finesse dans ses détails pour atteindre l’excellence. J’ai passé un bon moment, mais ce n’est pas un chef-d’œuvre. Une expérience solide qui méritait juste un peu plus de peaufinage.",
-      "ratingStars": 3
+      "ratingStars": 3,
+      "reviewSafe": "Dès le début, l’histoire accroche sans réelles longueurs. On suit l’ascension d’un homme ordinaire plongé dans le crime organisé, et si le récit fonctionne bien, il manque un vrai travail sur sa psychologie. On aurait aimé sentir davantage son conflit intérieur, ses doutes, son rapport à la violence.\n\nLe casting est solide mais un peu trop dense d’un coup, ce qui peut perdre dans les premières heures. Les relations entre les personnages clés fonctionnent, mais manquent de temps pour devenir vraiment profondes. L’attachement existe, mais reste limité.\n\nL’ambiance, en revanche, est une masterclass : musiques incroyables, ville immersive, reconstitution historique réussie. Mais les rues sont trop propres, trop vides, pas assez vivantes. Tout est là pour plonger dans les années 30, mais il manque ce petit chaos urbain qui aurait donné plus de réalisme.\n\nLe gameplay est efficace : gunfights plaisants, conduite agréable une fois la bonne voiture trouvée. Le jeu est linéaire et court, mais ça joue en sa faveur en évitant les longueurs. En revanche, les contrôles clavier/manette sont parfois catastrophiques ou mal pensés.\n\nTechniquement, c’est propre, sans bugs majeurs, mais le sound design déçoit avec des dialogues mal mixés ou coupés brutalement, ce qui casse l’immersion. La fin est marquante, mais la transition vers le dernier acte est trop brusque pour vraiment en ressentir le poids.\n\n👉 Mafia: Definitive Edition est un jeu solide, bien écrit et immersif, mais qui manque de profondeur psychologique et de détails pour atteindre l’excellence. Une expérience réussie, mais pas un chef-d’œuvre."
     },
     {
       "id": "3np8w0nzza5meqme6xd",
       "createdAt": "2025-08-25T04:31:37.105Z",
-      "updatedAt": "2025-08-28T05:29:53.150Z",
+      "updatedAt": "2025-08-28T23:04:03.525Z",
       "progress": 100,
       "rating": 5,
       "notes": "",
@@ -279,12 +288,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "David Cage voulait nous faire ressentir des émotions fortes. Mission accomplie : j’ai ressenti de la frustration, de l’ennui, et un soupçon d’irritation.\n\nHeavy Rain, c’est un jeu qui démarre lentement, mais pas désagréablement. Le quotidien paisible du début fait son taf : on s’installe dans la routine, on incarne un père de famille, on vit des instants simples… puis le drame. Jusque-là, ça fonctionne. Mais dès que le jeu entre dans le vif du sujet, tout commence à s’effondrer comme un château de cartes sous une pluie battante.\n\nLe scénario ? Il essaie d’être un thriller haletant, mais se prend les pieds dans le tapis. La révélation finale tombe à plat, les motivations du tueur sonnent creux, et surtout, on sent que la seule vraie intention, c’était de créer un twist choc plutôt qu’une histoire cohérente. Ajoutez à ça des personnages qui prennent systématiquement les pires décisions possibles, des dialogues mal doublés en VF, et des moments qui traînent en longueur… et on se retrouve à lutter contre l’ennui plus que contre la tension.\n\nLe gameplay ? Si on peut appeler ça du gameplay. Les QTE sont omniprésents et rarement bien pensés. Ceux où il faut être lent ? Horrible. Ceux où il faut bouger la souris au point de sortir du tapis ? Une blague. Ceux qui sont buggés sur manette Xbox ? Trop nombreux. À certains moments, j’avais l’impression que le jeu faisait tout pour me mettre des bâtons dans les roues, et pas de la bonne manière. Pire encore, les choix ne semblent pas avoir de vrai poids. J’ai essayé de refuser certaines actions, et le jeu m’a simplement forcé à les faire. Une illusion de liberté.\n\nL’ambiance aurait pu sauver le tout, mais même là, ça coince. Les musiques ne marquent pas, la mise en scène est plombée par des effets de bordure façon bande dessinée qui cassent totalement l’immersion, et certaines séquences s’étirent au point de donner envie de ragequit. Il y a quelques scènes qui fonctionnent émotionnellement, notamment sur la fin, mais elles sont noyées dans un océan de maladresses et de longueurs.\n\nGraphiquement, le jeu s’en sort encore aujourd’hui, mais tout ce qui gravite autour est trop bancal pour en profiter pleinement. Entre les bugs d’animation, les contrôles rigides et la VF pas toujours convaincante, difficile de vraiment s’immerger.\n\nEn résumé, Heavy Rain a des ambitions, mais elles sont portées par un gameplay pénible, un scénario qui force le drame au détriment de la logique, et des personnages aux décisions absurdes. David Cage a fait beaucoup mieux par la suite, et avec le recul, Heavy Rain ressemble plus à une ébauche maladroite qu’à un chef-d’œuvre narratif.",
-      "ratingStars": 2.5
+      "ratingStars": 2.5,
+      "reviewSafe": "Heavy Rain voulait être une claque émotionnelle, mais m’a surtout laissé frustration et ennui. Le jeu démarre bien, avec un quotidien paisible qui installe l’ambiance, mais dès que l’intrigue prend de l’ampleur, tout s’effondre. Le scénario cherche le grand frisson du thriller, mais se perd dans ses propres ficelles, et l’envie de choquer prend le pas sur la cohérence. Les personnages multiplient les décisions absurdes, les dialogues ne convainquent pas, et le rythme traîne en longueur.\n\nLe gameplay se résume à des QTE omniprésents et souvent mal pensés : imprécis, frustrants, parfois même buggés. On a l’impression d’une illusion de choix plus que d’une vraie liberté, ce qui casse totalement l’implication.\n\nCôté ambiance, rien ne parvient à rattraper les maladresses. La mise en scène est plombée par des effets artificiels, les musiques ne marquent pas, et certaines séquences s’étirent inutilement. Graphiquement, ça tient encore la route, mais les animations, les contrôles rigides et la VF bancale cassent l’immersion.\n\n👉 Heavy Rain avait de l’ambition, mais entre scénario bancal, gameplay laborieux et mise en scène maladroite, il ressemble plus à une ébauche ratée qu’à un vrai chef-d’œuvre narratif."
     },
     {
       "id": "b88jukgycn4meqmghfh",
       "createdAt": "2025-08-25T04:33:24.029Z",
-      "updatedAt": "2025-08-28T04:59:12.015Z",
+      "updatedAt": "2025-08-28T23:02:27.438Z",
       "progress": 100,
       "rating": 7,
       "notes": "",
@@ -310,12 +320,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "Une aventure narrative intense, qui jongle entre moments poignants et quelques frustrations techniques (par exemple la limite de FPS, et les contrôles). L’histoire fonctionne bien, portée par des personnages attachants et des scènes qui parviennent à toucher sans trop en faire. Certaines séquences sont particulièrement marquantes, avec une vraie montée en émotion à mesure que l’on avance.\n\nLe choix d’une narration découper en plusieurs morceaux et qui jongle avec des avants/après peut surprendre au début, mais il finit par s’imposer comme une bonne idée, ajoutant du rythme et une certaine tension à l’ensemble. Quant au gameplay, il est à la fois simple et parfois maladroit : répétitif sans être ennuyant, mais plombé par des contrôles rigides qui rendent certaines actions plus frustrantes que nécessaire, comme passer par un trou de porte.\n\nL’ambiance est immersive, bien que moins marquante que dans d’autres jeux narratifs du même genre. On n’est pas dans un monde qui cherche à en mettre plein la vue, mais plutôt dans une histoire qui mise sur ses personnages et leur évolution.\n\nSi certains passages manquent d’originalité ou auraient mérité plus de profondeur (surtout, j'aurais aimer plus d'enquêtes et mieux réaliser), l’expérience reste globalement réussie. Ce n’est peut-être pas le plus grand jeu d",
-      "ratingStars": 3.5
+      "ratingStars": 3.5,
+      "reviewSafe": "Une aventure narrative intense, qui alterne entre moments poignants et frustrations techniques (limite de FPS, contrôles rigides). L’histoire fonctionne bien, soutenue par des personnages attachants et des scènes qui marquent sans tomber dans l’excès. Certaines séquences offrent même une vraie montée en émotion à mesure que l’on progresse.\n\nLa narration découpée, jouant sur les avants/après, peut surprendre au début, mais finit par donner du rythme et de la tension. Le gameplay est simple, parfois répétitif, mais rarement ennuyant. Ce sont surtout les contrôles un peu lourds qui rendent certaines actions inutilement frustrantes.\n\nL’ambiance est immersive, même si elle manque un peu de force face à d’autres références du genre. Ici, ce ne sont pas les décors qui impressionnent, mais bien les personnages et leur évolution.\n\nCertains passages manquent d’originalité ou auraient mérité plus de profondeur (notamment les phases d’enquête), mais l’expérience reste globalement réussie. 👉 Pas le plus grand jeu narratif, mais un récit solide et marquant."
     },
     {
       "id": "3kah6pnlextmeqmjdkm",
       "createdAt": "2025-08-25T04:35:38.998Z",
-      "updatedAt": "2025-08-28T04:58:52.285Z",
+      "updatedAt": "2025-08-28T23:04:30.575Z",
       "progress": 100,
       "rating": 4,
       "notes": "",
@@ -347,12 +358,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "Mouthwashing est un jeu d’horreur qui mise tout sur son ambiance rétro PS1 et ses effets visuels stylisés… mais qui, narrativement, m’a laissé sur ma faim. L’histoire n’est pas mauvaise en soi, mais sa compréhension repose trop sur le fait de le finir d’une traite. Le découper en plusieurs sessions rend le tout inutilement confus, et ça devrait être dit clairement dès le départ.\n\nCôté gameplay, c’est limité. Aucun réel impact narratif, et le seul \"boss fight\" est une catastrophe : ne pas bouger pour survivre, c’est littéralement le concept le moins engageant possible. Les personnages ne m’ont pas marqué, probablement parce que je n’ai pas réussi à m’immerger pleinement, mais c’est un point qui aurait pu être mieux travaillé.\n\nHeureusement, la DA sauve une partie de l’expérience. Le mélange entre graphismes PS1, effets de lumière modernes et faux crashs en guise de transitions est une excellente idée. L’ambiance n’est pas pesante comme un Silent Hill, mais elle reste prenante visuellement. La fin, elle, relève un peu l’ensemble en donnant à réfléchir sur les motivations des personnages.\n\nAu final, Mouthwashing n’est pas mauvais, mais il ne fait pas partie des incontournables du genre. Il brille par son esthétique, mais son rythme, son manque d’impact narratif et ses mécaniques maladroites l’empêchent d’atteindre le sommet des jeux horrifiques indés.",
-      "ratingStars": 2
+      "ratingStars": 2,
+      "reviewSafe": "Mouthwashing est un jeu d’horreur qui mise avant tout sur son ambiance rétro PS1 et ses effets visuels stylisés. L’esthétique est réussie, mais narrativement, l’expérience reste en demi-teinte : l’histoire n’est pas mauvaise, mais sa compréhension repose trop sur le fait de la vivre d’une seule traite, ce qui la rend inutilement confuse si on la coupe en plusieurs sessions.\n\nLe gameplay est limité, sans réel impact narratif, et certaines mécaniques manquent d’engagement, ce qui casse l’immersion. Les personnages, eux, peinent à marquer, en partie parce que l’implication n’est pas totale.\n\nHeureusement, la direction artistique rattrape une partie du tout : graphismes rétro combinés à des effets de lumière modernes, transitions façon faux crashs… l’idée est brillante et donne une vraie identité visuelle. L’ambiance n’atteint pas le niveau oppressant d’un Silent Hill, mais reste prenante. La conclusion, enfin, relève un peu l’expérience en amenant une réflexion intéressante.\n\n👉 Au final, Mouthwashing n’est pas un mauvais jeu, mais il n’a pas l’impact des incontournables du genre. Une esthétique marquée qui mérite d’être saluée, mais un récit et des mécaniques trop maladroits pour atteindre le sommet."
     },
     {
       "id": "aedtveu8e67meqmmb3c",
       "createdAt": "2025-08-25T04:37:55.752Z",
-      "updatedAt": "2025-08-28T05:00:44.968Z",
+      "updatedAt": "2025-08-28T23:01:59.873Z",
       "progress": 100,
       "rating": 8,
       "notes": "",
@@ -385,12 +397,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "The Wolf Among Us est une pépite du jeu narratif. Son ambiance néo-noir est impeccable, servie par une direction artistique sublime et un mystère captivant du début à la fin. L’histoire est bien rythmée, dévoilant ses secrets sans précipitation, et même si j’ai parfois eu du mal à tout suivre en streamant en même temps, l’intrigue reste marquante.\n\nBigby Wolf est un excellent protagoniste, mais son évolution m’a semblé un peu figée. À l’inverse, les personnages secondaires sont mémorables, avec des personnalités marquées qui restent en tête bien après avoir terminé le jeu. Les choix paraissent lourds de conséquences, mais connaissant Telltale, difficile de dire si l’impact est réel ou juste bien maquillé.\n\nSi le jeu avait été un peu plus long et proposait plus de QTE variés, il aurait frôlé la perfection. Malgré ça, il reste l’un des meilleurs Telltale, juste derrière The Walking Dead pour moi. Une enquête immersive et stylée qui mérite largement d’être vécue.",
-      "ratingStars": 4
+      "ratingStars": 4,
+      "reviewSafe": "The Wolf Among Us est une pépite du jeu narratif. Son ambiance néo-noir est impeccable, sublimée par une direction artistique marquante et un mystère captivant du début à la fin. L’histoire se déroule avec un rythme maîtrisé, dévoilant ses secrets sans se précipiter, et même en ayant parfois du mal à tout suivre, on reste accroché.\n\nLe protagoniste est charismatique et marquant, mais son évolution paraît parfois figée. À l’inverse, les personnages secondaires sont mémorables, avec des personnalités fortes qui restent en tête bien après la fin. Les choix paraissent lourds de conséquences, même si, fidèle à la recette Telltale, il est parfois difficile de juger de leur véritable impact.\n\nUn peu plus de variété dans les QTE et une durée de vie plus longue auraient pu en faire un quasi sans-faute. Malgré ça, c’est l’un des meilleurs Telltale, juste derrière The Walking Dead pour moi. Une enquête immersive, stylée et incontournable."
     },
     {
       "id": "ujod4wo1cg8meqmp772",
       "createdAt": "2025-08-25T04:40:10.670Z",
-      "updatedAt": "2025-08-28T04:59:15.916Z",
+      "updatedAt": "2025-08-28T23:02:43.798Z",
       "progress": 100,
       "rating": 7,
       "notes": "",
@@ -418,12 +431,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "Il y a des jeux qui te marquent par leur histoire, d’autres par leur gameplay, et puis il y a ceux qui te laissent une impression plus insidieuse, une empreinte étrange qui ne s’efface pas tout de suite. Silent Hill 2, c’est ça. Un jeu qui hante sans qu’on sache trop pourquoi.\n\nCe qui frappe d’abord, c’est l’ambiance. C’est lourd, pesant, suffocant. Le son y joue un rôle énorme : la musique, les bruits lointains, les silences... tout est parfait.\n\nIl y a des scènes qui, même si on les oublie vite en surface, laissent une sensation étrange, un malaise diffus qui s’accroche.\n\nLes décors et le level design sont aussi à saluer. Tout est beau, mais d’une beauté dérangeante, crasseuse, réaliste. Chaque lieu semble avoir une histoire, une âme, et cette sensation d’exploration immersive est réussie de bout en bout. Les notes et documents disséminés un peu partout sont aussi maîtrisés à la perfection : ni trop nombreux, ni trop absents, toujours bien écrits, toujours intéressants. Ce n’est jamais du lore pour du lore, ça enrichit vraiment l’expérience.\n\nMais si l’enrobage est magistral, le gameplay, lui, est une autre histoire. Il ne se réinvente jamais et tourne vite en boucle : taper des monstres, courir, ouvrir des portes, se soigner… et répéter. Heureusement, les énigmes viennent casser cette routine. Elles sont toutes différentes, parfois brillantes, parfois tordues, parfois nuls et apportent ce qu’il faut de variété pour maintenir l’intérêt. En revanche, les combats de boss sont vraiment mauvais. Peu intéressants, mécaniquement plats, ils ressemblent plus à des sacs de PV qu’à de vrais affrontements marquants.\n\nL’histoire est forte, elle touche, mais difficile d’avoir de l’empathie pour James. Trop bête, trop passif, trop détaché… Impossible de s’y attacher, et c’est peut-être voulu. Un peu comme Joel dans The Last of Us Part 1, il est intéressant sur le papier, mais compliqué à apprécier vraiment.\n\nEt l’horreur dans tout ça ? Le jeu ne cherche pas à faire sursauter à tout prix. Il y a bien quelques jumpscares, mais c’est surtout une tension psychologique constante. On n’est pas terrifié en permanence, mais on n’est jamais serein non plus.\n\nCe qui différencie vraiment Silent Hill 2 des autres jeux d’horreur, c’est sa narration. Pas juste dans l’histoire qu’il raconte, mais dans la façon dont il la raconte. Le jeu ne te dit rien directement, il te fait ressentir, il te pousse à comprendre par toi-même. Il ne prend pas le joueur par la main et, à la fin, il te laisse avec plus de questions que de réponses.\n\nUn jeu marquant ? Oui. Un jeu parfait ? Clairement pas. Mais un jeu qui mérite d’être vécu, rien que pour l’expérience unique qu’il propose.\n\nPar contre, il vaut définitivement pas 70€ mais plus 30€.",
-      "ratingStars": 3.5
+      "ratingStars": 3.5,
+      "reviewSafe": "Il y a des jeux qui te marquent par leur histoire, d’autres par leur gameplay, et puis il y a ceux qui laissent une empreinte plus étrange, qui continue de hanter longtemps après. Silent Hill 2, c’est ça. Une expérience qui dérange sans qu’on sache vraiment pourquoi.\n\nL’ambiance est suffocante : musique, sons lointains, silences… tout est pensé pour peser sur le joueur. Les décors sont superbes dans leur laideur crasseuse, réalistes et dérangeants, chaque lieu semblant avoir une histoire. Les documents disséminés sont parfaitement dosés et enrichissent vraiment l’immersion, sans jamais tomber dans le remplissage gratuit.\n\nMais si l’atmosphère est magistrale, le gameplay est plus répétitif : courir, frapper, ouvrir des portes, se soigner… et recommencer. Heureusement, les énigmes viennent varier le rythme, certaines brillantes, d’autres moins, mais toujours utiles pour relancer l’intérêt. Les affrontements, en revanche, manquent cruellement de profondeur et se résument souvent à encaisser et frapper.\n\nL’histoire est forte, marquante, mais difficile d’éprouver de l’attachement pour le protagoniste, volontairement détaché et passif. On observe plus qu’on ne s’identifie, ce qui crée une distance troublante.\n\nL’horreur, ici, n’est pas faite de sursauts faciles : elle est psychologique, diffuse, constante. On n’est pas terrifié, mais jamais en sécurité non plus. Et la narration fait toute la différence : elle ne dicte rien, elle suggère, elle pousse à ressentir et à interpréter, laissant plus de questions que de réponses.\n\n👉 Pas un jeu parfait, mais une œuvre marquante et unique, à vivre au moins une fois. Même si, soyons honnêtes, son vrai prix devrait tourner autour de 30€ plutôt que 70€."
     },
     {
       "id": "o2f2wz2uwtmeqmrqd7",
       "createdAt": "2025-08-25T04:42:08.827Z",
-      "updatedAt": "2025-08-28T04:58:56.543Z",
+      "updatedAt": "2025-08-28T23:04:56.472Z",
       "progress": 100,
       "rating": 2,
       "notes": "",
@@ -452,12 +466,13 @@
       "platform": "PC",
       "status": "finished",
       "review": "Un walking simulator qui fait le boulot… pour ceux qui arrivent à accrocher. Moi, j’ai surtout vu un enchaînement de séquences absurdes, servies avec une narration qui me forçait constamment à regarder là où elle voulait, au lieu de me laisser apprécier les décors.\n\nL’histoire ? Pas touchante. Impossible de s’attacher à des personnages déjà morts qu’on n’a jamais connus. À peine le temps de comprendre qui ils sont qu’on passe à autre chose. C’est trop court pour provoquer une vraie connexion émotionnelle, et ça se ressent. Certains passages m’ont même plus fait rire qu’autre chose, avec des musiques et des mises en scène qui donnent parfois l’impression que le jeu est un troll assumé (coucou la BD horrifique et sa musique sortie de nulle part).\n\nLe gameplay est varié, et c’est sûrement son plus grand atout : chaque séquence a son identité propre, certaines sont originales, mais traînent trop en longueur et deviennent répétitives. L’immersion est présente par moments, mais cassée par des contrôles trop lents et des séquences où on galère juste à bouger correctement (le bateau avec le monstre, une horreur).\n\nL’ambiance globale ne m’a pas marqué. Pas désagréable, mais rien qui me donne envie d’y repenser une fois le jeu terminé. La fin ? Déjà oubliée. Comme tout le reste du jeu, en fait.\n\nUn indé narratif qui a ses adeptes, mais qui, pour moi, restera dans la catégorie des expériences qui ne laissent aucune trace.\n\nLe jeu devrait être gratuit, il vaut pas 18,49€ et encore moins 4€ (le prix auquel je l'ai eu).",
-      "ratingStars": 1
+      "ratingStars": 1,
+      "reviewSafe": "Un walking simulator qui fait le job… si on arrive à accrocher. De mon côté, j’ai surtout vu un enchaînement de séquences déconnectées, portées par une narration qui force constamment le regard au lieu de laisser apprécier les environnements.\n\nL’histoire ne m’a pas touché : difficile de créer une connexion émotionnelle quand on n’a pas le temps de connaître les personnages. Les séquences s’enchaînent trop vite pour qu’un attachement s’installe, et certaines mises en scène frôlent même le ridicule avec leurs choix de musique ou de présentation.\n\nLe gameplay varie d’une scène à l’autre et c’est sans doute son meilleur atout : chaque passage a sa propre identité, parfois originale, mais souvent trop long ou répétitif. L’immersion est brisée par des contrôles lents et peu agréables.\n\nL’ambiance globale n’a rien de marquant. Pas désagréable, mais rien qui reste une fois le jeu terminé. La conclusion, elle aussi, s’oublie aussitôt vue.\n\n👉 Un jeu narratif indé qui peut séduire certains, mais qui, pour moi, n’a laissé aucune trace. Et clairement, il ne vaut pas son prix."
     },
     {
       "id": "wlvbsoe74omeqmv87u",
       "createdAt": "2025-08-25T04:44:51.930Z",
-      "updatedAt": "2025-08-26T01:25:47.932Z",
+      "updatedAt": "2025-08-28T23:05:18.981Z",
       "progress": 50,
       "rating": null,
       "notes": "",
@@ -487,7 +502,8 @@
       "platform": "PC",
       "status": "abandoned",
       "review": "Trop cool mais malheureusement pas trop mon style de jeu je crois bien :/",
-      "ratingStars": null
+      "ratingStars": null,
+      "reviewSafe": "Trop cool mais malheureusement pas trop mon style de jeu je crois bien :/"
     },
     {
       "id": "gybsknyd71qmeqmzmc3",
@@ -523,12 +539,13 @@
       "platform": "PC",
       "status": "unfinished",
       "review": "",
-      "ratingStars": null
+      "ratingStars": null,
+      "reviewSafe": ""
     },
     {
       "id": "fhlc8k2aa1meqn2dt1",
       "createdAt": "2025-08-25T04:50:25.765Z",
-      "updatedAt": "2025-08-26T01:23:06.464Z",
+      "updatedAt": "2025-08-28T23:04:43.437Z",
       "progress": 10,
       "rating": 3,
       "notes": "",
@@ -557,7 +574,8 @@
       "platform": "PC",
       "status": "abandoned",
       "review": "Quand j’ai lancé Dishonored, j’ai vu un concept cool sur le papier : un jeu d’infiltration avec des pouvoirs surnaturels. Sur le papier, ça devait être génial, mais en réalité, l’exécution m’a laissé un goût amer. Le système de pouvoirs est censé offrir des possibilités infinies, mais en pratique, changer de pouvoir devient vite une galère avec des contrôles peu intuitifs. Changer entre les différents pouvoirs, et parfois même activer les bons au bon moment, était tout sauf fluide. Cela brisait le rythme du jeu et donnait l'impression que tout était trop rigide et forcé.\n\nLe côté infiltration aurait pu être sympa, mais les ennemis sont soit trop incompétents, soit trop omniprésents. Le système de détection est un désastre : parfois, on peut se faufiler devant eux sans qu’ils réagissent, et parfois ils te repèrent instantanément sans raison. Tout ça rend l’expérience beaucoup plus frustrante que prévue, et le sentiment de liberté que le jeu voulait offrir devient vite un cauchemar de répétitions.\n\nEn fin de compte, Dishonored m’a paru plus un exercice de style qu’une véritable aventure immersive. Au lieu de me donner une expérience marquante, je me suis retrouvé dans une série de missions répétitives avec un sentiment de « déjà-vu » à chaque tournant. Et au final, aucun personnage ou élément n’a réussi à sortir du lot.",
-      "ratingStars": 1.5
+      "ratingStars": 1.5,
+      "reviewSafe": "Dishonored part d’un concept prometteur : un jeu d’infiltration porté par des pouvoirs surnaturels. Sur le papier, c’est excitant, mais dans la pratique, l’exécution laisse un goût amer. Les pouvoirs censés offrir une grande liberté deviennent vite contraignants à utiliser : la gestion et l’activation manquent de fluidité, ce qui brise le rythme et donne une impression de rigidité constante.\n\nLe côté infiltration aurait pu séduire, mais le système de détection est bancal : parfois trop permissif, parfois injustement punitif. On oscille entre des gardes aveugles et des réactions instantanées incompréhensibles, ce qui rend l’expérience frustrante et éloigne du sentiment de liberté promis.\n\nAu final, Dishonored ressemble plus à un exercice de style qu’à une aventure immersive. Les missions finissent par se ressembler, et l’ensemble donne une impression de répétition. Aucun personnage ou élément narratif ne parvient vraiment à marquer.\n\n👉 Une idée séduisante en théorie, mais qui échoue à devenir l’expérience marquante qu’elle voulait être."
     },
     {
       "id": "e1olv38vtpumeqn3piu",
@@ -588,12 +606,13 @@
       "platform": "PC",
       "status": "playing",
       "review": "",
-      "ratingStars": null
+      "ratingStars": null,
+      "reviewSafe": ""
     },
     {
       "id": "nhuuy39bo0qmeqn86co",
       "createdAt": "2025-08-25T04:54:56.040Z",
-      "updatedAt": "2025-08-28T05:00:53.364Z",
+      "updatedAt": "2025-08-28T23:01:10.966Z",
       "progress": 100,
       "rating": 9,
       "notes": "",
@@ -622,7 +641,8 @@
       "platform": "PC",
       "status": "finished",
       "review": "🎮 Avis Metal Gear Solid (1998)\n\nUn vieux jeu PS1 ? Non. Un vrai film interactif d’espionnage qui t’explose encore la tête en 2025.\n\n🌍 Histoire & narration\n\nMGS1, c’est un scénario de complot nucléaire, de manipulations génétiques et de trahisons qui se mélange à des thèmes bien plus profonds : loyauté, libre arbitre, sens de la guerre. Oui, parfois c’est confus, t’as l’impression que Kojima balance 20 infos random à la seconde… mais le jeu retombe toujours sur ses pattes. Tout ce qui est balancé en mode mystère finit par avoir du sens, et ça, c’est une dinguerie pour un jeu de 1998.\nLes cinématiques et dialogues codec ? Pas chiants du tout. Ça sert de pause, ça raconte des trucs de fou, ça te donne envie d’écouter comme si t’étais au ciné. Clairement, MGS1 transpire le cinéma d’action hollywoodien des années 80/90, mais avec derrière une profondeur que t’attendrais pas.\n\n🐍 Snake comme protagoniste\n\nSolid Snake, c’est le cliché du héros badass des années 90 : humour noir, voix grave, attitude blasée. Mais ça fonctionne. Il est charismatique, attachant et malgré son côté nanar, il soulève quand même des thématiques profondes. T’as envie de le suivre jusqu’au bout, même quand il fait ses vannes improbables.\n\n⚔️ Les boss fights\n\nChaque boss est une masterclass de mise en scène et d’identité. Psycho Mantis te lit dans ta carte mémoire (bon, moins cool quand t’es en émulateur PC 😅), Sniper Wolf t’attrape au cœur par son background, Grey Fox c’est du pur moment culte.\nMais… les combats contre Liquid ? Clairement une purge. Le duel à mains nues est mal dosé, lourd et frustrant. La séquence en jeep encore pire : trop scriptée, pas équitable, zéro fun. C’est dommage que la fin se conclue sur les deux combats les plus ratés, quand tout le reste était ouf.\n\n👀 Gameplay & infiltration\n\nL’infiltration est efficace et même encore fun aujourd’hui. Mais rigide de ouf. Les contrôles sont datés et surtout : c’est un système boule de neige. Tu fais une erreur, et t’as quasi aucune chance de t’en sortir. Ça rend le jeu parfois injustement punitif. Les éliminations silencieuses ? Catastrophe. Si t’effleures la hitbox, le garde te capte et alerte tout le monde. Le backtracking est aussi relou et te casse un peu le rythme. Mais malgré ça, une fois que tu prends le pli, c’est un pur régal.\n\n🎬 Ambiance & mise en scène\n\nMGS1, c’est un vrai film interactif. Pas interactif par les choix, mais par la mise en scène. T’es spectateur-acteur d’un thriller où tu vis chaque moment. La mise en scène est ouf, la musique sublime certains passages, les dialogues codec transpirent l’écriture cinématographique. Clairement, Kojima voulait être réalisateur, et ça se sent. Mais ce n’est pas juste du spectacle : derrière l’action hollywoodienne, le jeu touche à des sujets lourds (le clonage, l’héritage, la guerre, la morale).\n\n💥 Moments marquants\n\n– Psycho Mantis, culte absolu.\n– La mort de Sniper Wolf.\n– Grey Fox et sa révélation.\n– La trahison et les twists autour de Liquid.\n– La mort de Meryl.\n\nC’est pas juste des moments spectaculaires, ce sont des passages qui te restent en mémoire parce qu’ils sont écrits, mis en scène et ressentis comme des moments de cinéma.\n\n❌ Points négatifs\n\n– Les combats contre Liquid (à mains nues + jeep).\n– Contrôles rigides, surtout pour les actions simples (genre choper une ration au bord et tomber comme un débile).\n– Éliminations discrètes horribles.\n– Le backtracking abusé sur la fin.\n\n🧠 Comparaison avec les JV narratifs modernes\n\nHonnêtement, je m’attendais à un jeu trop daté. Mais non : une fois que tu passes le cap des premières heures et que tu domptes les contrôles, c’est une pépite. Oui, TLOU ou TWD ont une écriture plus moderne, mais MGS1 a ouvert la voie. C’est grâce à lui qu’on a ces jeux-là. Et même aujourd’hui, il m’a accroché émotionnellement et narrativement.\n\n🔥 Conclusion\n\nMetal Gear Solid 1, c’est pas juste un “vieux classique respecté”. C’est un chef-d’œuvre qui reste marquant encore aujourd’hui.\nSi les joueurs arrêtaient de se dire “c’est vieux donc c’est nul”, ils découvriraient un jeu qui explose encore 90% des productions modernes en termes de narration et de mise en scène. Un remake fidèle ferait un carnage aujourd’hui.\n\n⚖️ En résumé :\n\n✅ Scénario brillant et dense, façon film d’espionnage hollywoodien.\n✅ Snake charismatique malgré son côté cliché.\n✅ Boss fights mémorables (sauf Liquid).\n✅ Ambiance cinématographique culte.\n✅ Encore accrocheur malgré l’âge.\n❌ Contrôles rigides et punitifs.\n❌ Boss fights finaux ratés.\n❌ Backtracking frustrant.\n\n👉 MGS1, c’est une légende vivante.",
-      "ratingStars": 4.5
+      "ratingStars": 4.5,
+      "reviewSafe": "🎮 Avis Metal Gear Solid (1998)\n\nUn vieux jeu PS1 ? Non. Plutôt un vrai film interactif d’espionnage qui, même en 2025, a encore de quoi exploser la tête.\n\n🌍 Histoire & narration\nMGS1, c’est un scénario dense de complots et de manipulations, qui aborde en filigrane des thèmes bien plus profonds : loyauté, libre arbitre, sens de la guerre. Oui, parfois ça part dans tous les sens, mais tout finit par avoir du sens. Pour un jeu de 1998, la maîtrise est bluffante.\nLes cinématiques et dialogues ne sont pas là pour remplir : ce sont des moments de mise en scène puissants, qui te donnent envie de rester scotché comme devant un film d’action des années 80/90… mais avec une profondeur que tu n’attendrais pas.\n\n🐍 Snake comme protagoniste\nSolid Snake, c’est le cliché du héros badass des années 90 : voix grave, humour noir, attitude blasée. Mais ça marche. Il est charismatique, attachant et porte l’histoire avec un mélange de sérieux et de dérision qui le rend culte.\n\n⚔️ Les boss fights\nChaque affrontement est iconique, unique dans son identité et sa mise en scène. Certains restent parmi les moments les plus marquants du jeu vidéo. Mais la fin souffre clairement de combats moins inspirés, qui cassent un peu le rythme d’une progression jusque-là magistrale.\n\n👀 Gameplay & infiltration\nL’infiltration est efficace et fun, mais très rigide. Les contrôles datent, et le système punit sévèrement la moindre erreur. Ajoute à ça des mécaniques pas toujours précises et un backtracking lourd en fin de parcours… ça peut frustrer. Mais une fois que tu prends le pli, ça reste un régal.\n\n🎬 Ambiance & mise en scène\nMGS1, c’est du pur cinéma interactif. Chaque scène est pensée comme un moment de film, la musique sublime les passages clés, et la mise en scène n’a rien à envier à de grosses productions. Derrière le spectacle d’action, le jeu touche à des thématiques lourdes et surprenantes pour son époque.\n\n❌ Points négatifs\n– Contrôles rigides et frustrants sur certaines actions.\n– Quelques combats finaux en-dessous du reste.\n– Backtracking fatigant.\n\n🧠 Comparaison avec les JV narratifs modernes\nOn pourrait croire qu’il a trop vieilli, mais non : une fois que tu t’adaptes, c’est une pépite. Certes, les jeux modernes comme TLOU ou TWD ont affiné la narration, mais sans MGS1, ils n’existeraient pas. Même aujourd’hui, il accroche émotionnellement et narrativement.\n\n🔥 Conclusion\nMetal Gear Solid 1 n’est pas juste un vieux classique respecté par nostalgie. C’est un chef-d’œuvre qui, encore aujourd’hui, surpasse la majorité des jeux modernes en termes de narration et de mise en scène. Un remake fidèle ferait un carnage.\n\n⚖️ En résumé :\n✅ Scénario brillant et dense.\n✅ Snake charismatique malgré son côté cliché.\n✅ Boss fights marquants.\n✅ Ambiance cinématographique culte.\n✅ Encore accrocheur malgré l’âge.\n❌ Contrôles rigides et punitifs.\n❌ Combats finaux décevants.\n❌ Backtracking frustrant.\n\n👉 MGS1, c’est une légende vivante."
     },
     {
       "id": "d4lk4q34ydcmeqnb8kh",
@@ -651,7 +671,8 @@
       "platform": "PC",
       "status": "planned",
       "review": "",
-      "ratingStars": null
+      "ratingStars": null,
+      "reviewSafe": ""
     },
     {
       "id": "z5xi1ormwkmmeqncqxn",
@@ -679,7 +700,8 @@
       "platform": "PC",
       "status": "planned",
       "review": "",
-      "ratingStars": null
+      "ratingStars": null,
+      "reviewSafe": ""
     },
     {
       "id": "jtlyqktfsn7meqneaz8",
@@ -708,7 +730,8 @@
       "platform": "PC",
       "status": "planned",
       "review": "",
-      "ratingStars": null
+      "ratingStars": null,
+      "reviewSafe": ""
     },
     {
       "id": "bqkmpsfdaameqnh9aq",
@@ -738,19 +761,20 @@
       "platform": "PC",
       "status": "planned",
       "review": "",
-      "ratingStars": null
+      "ratingStars": null,
+      "reviewSafe": ""
     },
     {
       "id": "juzos145himervr5v0",
       "createdAt": "2025-08-26T01:41:24.972Z",
-      "updatedAt": "2025-08-28T05:30:58.082Z",
+      "updatedAt": "2025-08-28T23:13:28.444Z",
       "progress": 100,
       "rating": 7,
       "notes": "",
       "review": "🌍 Histoire & narration\n\nMGS2 mise sur l’ambition : un récit plus dense, plus politique, qui veut frapper fort… mais qui perd un peu de saveur par rapport au charme du premier. Là où MGS1 assumait son côté nanar/humour noir tout en gardant de la profondeur, celui-ci se veut plus sérieux, parfois trop. Résultat : le rythme met plus de temps à se lancer, certains passages deviennent confus, et si tu rates une info, t’es vite largué. Ça reste fascinant, mais moins clair et moins percutant.\n\n🐍 Snake vs Raiden\n\nLe switch de Snake à Raiden ne m'a pas trop dérangé. Snake reste présent et joue un rôle important, mais cette fois tu sens que le héros que tu contrôles (Raiden) est davantage spectateur de l’histoire, tandis que les vrais moteurs narratifs sont les autres persos. Même pour Snake et sa team, ils étaient aussi majeurs dans l'histoire mais plus secondaire également je trouve.\n\n⚔️ Les boss fights\n\nComparés à MGS1, c’est un peu le jour et la nuit. Ici, les combats sont plus équitables, moins frustrants, mieux dosés côté difficulté. Mais… ils perdent en originalité. Fatman, Vamp, Fortune, Solidus : tous sympas, mais aucun n’a l’impact d’un Psycho Mantis ou d’un Sniper Wolf. Et si les combats sont moins punitifs, ils en deviennent aussi trop simples : soins à gogo, patterns faciles à lire… même le boss final que j'ai one-try. C'est fun mais mille fois moins marquant.\n\n👀 Gameplay & infiltration\n\nÉnorme amélioration dans la fluidité : cacher les cadavres, mouvements plus souples, IA plus crédible (radios à casser, gardes plus intelligents). Mais les défauts de MGS1 persistent : système trop boule de neige. Une erreur = l’armée entière débarque, et la seule vraie option c’est d’attendre… trop longtemps. Les gardes spawnent parfois quasiment sur toi à cause de la caméra fixe, ce qui rend certaines situations injustes.\nMention spéciale (et pas dans le bon sens) : les phases de nage et de “plateforme” sont catastrophiques. Contrôles raides, level design à chier et à vomir sérieux, c'est le gameplay qui casse le rythme et qui m'a donné envie d'ALT+F4 plus d'une fois.\n\n🎬 Ambiance & mise en scène\n\nToujours ce côté “film interactif”, mais moins immersif que dans MGS1. L’histoire reste solide, mais demande tellement d’attention que certains passages perdent en intensité. Dans MGS1, t’avais souvent des moments “absolute cinema” avec frissons. Ici, c’est plus rare, même si quelques scènes marquent (Emma & Otacon, les révélations finales). La mise en scène est plus ambitieuse, mais elle disperse plus qu’elle n’ancre.\n\n❌ Points négatifs\n\n– Histoire confuse et trop dense.\n– Raiden moins marquant que Snake.\n– Boss fights funs mais trop simples et pas assez originaux.\n– Phases de plateforme/natation horriblement nul à chier.\n– Toujours ce système “boule de neige” en infiltration.\n\n🔄 Comparaison avec MGS1\n\nMGS1 > MGS2.\nLe premier avait une histoire plus accrocheuse, des boss cultes, une difficulté qui reposait plus sur ton skill tout autant que les mécaniques. MGS2 est plus fluide, moins frustrant, mais aussi moins intense. C’est comme si Kojima avait voulu être plus sérieux et ambitieux… au risque de perdre un peu l’âme nanar qui faisait la force du 1.\n\n🔥 Conclusion\n\nMetal Gear Solid 2, c’est une expérience confuse mais fascinante.\nC’est un bon jeu, \"techniquement\" meilleur que le premier, mais narrativement moins impactant. Là où MGS1 donnait cette impression d’assister à un film culte en jouant, MGS2 t’embarque dans un récit dense, parfois trop, qui te laisse autant admiratif que paumé.\n\n👉 Au final, une suite respectable, audacieuse, mais moins marquante.\n\n⚖️ En résumé :\n\n✅ Ambition scénaristique plus grande.\n✅ Gameplay plus fluide, IA améliorée.\n✅ Boss fights plus équilibrés, moins frustrants.\n✅ Moments marquants (Emma, Colonel, fin).\n❌ Histoire confuse, trop sérieuse.\n❌ Raiden moins marquant que Snake.\n❌ Boss pas assez originaux.\n❌ Phases natation/plateforme catastrophiques.\n❌ Toujours le côté “boule de neige” frustrant en infiltration.",
       "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2131640/header.jpg?t=1737564625",
-      "link": null,
-      "linkLabel": "VOD",
+      "link": "https://www.youtube.com/playlist?list=PLKn0YIxb2VjR4hh8DvQVEWPKIy-EUckeg",
+      "linkLabel": "VOD | 14h49",
       "tags": [
         "Action",
         "Infiltration",
@@ -770,18 +794,19 @@
       "title": "METAL GEAR SOLID 2: Sons of Liberty",
       "platform": "PC",
       "status": "finished",
-      "ratingStars": 3.5
+      "ratingStars": 3.5,
+      "reviewSafe": "🌍 Histoire & narration\nMGS2 mise sur l’ambition : un récit dense, plus politique, qui veut frapper fort… mais qui perd un peu du charme du premier. Là où MGS1 assumait son côté nanar avec humour noir et profondeur, celui-ci se veut plus sérieux, parfois trop. Le rythme met plus de temps à se lancer, certains passages deviennent confus, et si tu rates une info, tu peux vite être largué. Ça reste fascinant, mais moins clair et moins percutant.\n\n🐍 Snake vs Raiden\nLe changement de protagoniste ne dérange pas tant que ça, mais il donne une impression différente : le héros que tu contrôles semble plus spectateur que véritable moteur de l’histoire. Les personnages secondaires portent davantage la narration, même Snake paraît plus en retrait.\n\n⚔️ Les boss fights\nPlus équilibrés et mieux dosés que dans le premier, mais moins mémorables. C’est fun, mais trop simple et manquant d’originalité : aucun affrontement n’a le même impact que les boss cultes de MGS1.\n\n👀 Gameplay & infiltration\nLa fluidité est bien meilleure : cacher les corps, IA plus crédible, mouvements plus souples. Mais les défauts persistent : le système “boule de neige” reste frustrant, une erreur et tout s’écroule. Certaines séquences de gameplay spécifiques (notamment plateforme/natation) sont catastrophiques et cassent le rythme.\n\n🎬 Ambiance & mise en scène\nOn retrouve le côté “film interactif”, mais avec moins de moments iconiques. L’ambition est grande, la mise en scène impressionnante, mais plus dispersée que marquante. L’intensité et le frisson cinématographique du premier se font plus rares, même si quelques scènes frappent encore fort.\n\n❌ Points négatifs\n– Récit confus et trop dense.\n– Protagoniste moins marquant.\n– Boss funs mais peu originaux.\n– Phases de gameplay ratées.\n– Toujours ce système “boule de neige” en infiltration.\n\n🔄 Comparaison avec MGS1\nMGS1 reste supérieur. Plus accrocheur narrativement, plus marquant dans ses boss et ses moments cultes. MGS2 est plus fluide, moins frustrant, mais aussi moins intense et moins iconique. L’ambition est là, mais elle dilue un peu l’âme qui faisait la force du premier.\n\n🔥 Conclusion\nMetal Gear Solid 2 est une expérience confuse mais fascinante. Techniquement plus abouti, mais narrativement moins marquant. Une suite audacieuse, respectable, mais qui reste dans l’ombre du premier.\n\n⚖️ En résumé :\n✅ Ambition scénaristique plus grande.\n✅ Gameplay plus fluide, IA améliorée.\n✅ Boss mieux équilibrés.\n✅ Quelques scènes marquantes.\n❌ Récit confus et trop sérieux.\n❌ Protagoniste moins marquant.\n❌ Boss trop classiques.\n❌ Phases de gameplay ratées.\n❌ Infiltration toujours frustrante.\n\n👉 Une suite ambitieuse, mais moins inoubliable."
     },
     {
       "id": "1nbvkaxwadjmervsysx",
       "createdAt": "2025-08-26T01:42:49.137Z",
-      "updatedAt": "2025-08-28T05:31:02.303Z",
-      "progress": 23,
+      "updatedAt": "2025-08-28T23:13:35.556Z",
+      "progress": 27,
       "rating": null,
       "notes": "",
       "review": "",
       "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2417610/05c97cbcd0cfc27c8ed6c7fc6d81e0995aa2a7d4/header.jpg?t=1755846087",
-      "link": null,
+      "link": "https://www.youtube.com/playlist?list=PLKn0YIxb2VjSADh7NQcENNHPIUSr4acOZ",
       "linkLabel": "VOD",
       "tags": [
         "Infiltration",
@@ -804,7 +829,8 @@
       "title": "METAL GEAR SOLID Δ: SNAKE EATER",
       "platform": "PC",
       "status": "playing",
-      "ratingStars": null
+      "ratingStars": null,
+      "reviewSafe": ""
     }
   ]
 }
