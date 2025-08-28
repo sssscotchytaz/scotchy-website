@@ -51,7 +51,7 @@
     .card{position:relative;overflow:hidden}
     .card .inner{padding:16px}
     .title{font-weight:700;letter-spacing:.2px}
-    .subtitle{color:var(--muted);font-size:.9rem}
+    .subtitle{color:var(--muted);font-size:.9rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
     .cover-wrap{width:100%;aspect-ratio:16/6;background:#0b0e12}
     .cover-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -60,9 +60,7 @@
     .linkbtn{font-size:.82rem;padding:7px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#0c0f14;text-decoration:none;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
     .linkbtn.vod{border:none;background:linear-gradient(180deg,rgba(124,147,255,.25),rgba(124,147,255,.12));box-shadow:inset 0 0 0 1px rgba(124,147,255,.45)}
     .linkbtn .play{font-size:.85rem}
-    .linkbtn.review{
-      border:none;background:linear-gradient(180deg,rgba(61,220,151,.25),rgba(61,220,151,.12));box-shadow:inset 0 0 0 1px rgba(61,220,151,.45)
-    }
+    .linkbtn.review{border:none;background:linear-gradient(180deg,rgba(61,220,151,.25),rgba(61,220,151,.12));box-shadow:inset 0 0 0 1px rgba(61,220,151,.45)}
 
     /* Tags 1 ligne + Plus/Moins */
     .badges{position:relative;display:flex;align-items:flex-start;gap:8px;margin-top:10px;--fade-pad:56px}
@@ -96,27 +94,19 @@
     .fab[hidden]{display:none}
     .fab-secondary{right:86px;bottom:20px;width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(118,224,194,.25),rgba(118,224,194,.08));border:1px solid rgba(118,224,194,.45)}
 
-    /* ==== Modales scrollables SANS casser le layout ==== */
+    /* ==== Modales scrollables ==== */
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:30;padding:12px}
     .modal[open]{display:grid}
     .dialog{
-      width:min(840px,94vw);
-      background:var(--panel);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      max-height:90vh;display:flex;flex-direction:column;
+      width:min(840px,94vw);background:var(--panel);border:1px solid rgba(255,255,255,.1);
+      border-radius:var(--radius);box-shadow:var(--shadow);max-height:90vh;display:flex;flex-direction:column;
     }
     .dialog .head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
-    .dialog .body{
-      padding:16px 18px;display:grid;gap:12px;grid-template-columns:1fr;
-      flex:1 1 auto;overflow:auto; /* ← scroll si contenu grand */
-    }
+    .dialog .body{padding:16px 18px;display:grid;gap:12px;grid-template-columns:1fr;flex:1 1 auto;overflow:auto}
     @media(min-width:720px){.dialog .body{grid-template-columns:1fr 1fr}}
     .dialog label{font-size:.85rem;color:var(--muted)}
     .dialog input,.dialog select,.dialog textarea{
-      width:100%;padding:10px 12px;border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);background:#0c0f14;color:inherit;outline:none;resize:vertical
+      width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0c0f14;color:inherit;outline:none;resize:vertical
     }
     .dialog .row-2{grid-column:1 / -1}
     .dialog .foot{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-top:1px solid rgba(255,255,255,.08)}
@@ -137,6 +127,24 @@
     @media(max-width:1279px){.twitch-fab{display:block}}
 
     .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+    /* ====== ÉTOILES (SVG, remplissage précis) ====== */
+    .star-row{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
+    .star-row.sm svg{width:22px;height:22px}     /* cartes */
+    .star-row.lg svg{width:30px;height:30px}     /* picker */
+    .star-row svg{display:block}
+    .star-svg .bg{fill:rgba(255,255,255,.28)}
+    .star-svg .fill{fill:var(--brand-2)}
+    .star-svg{shape-rendering:geometricPrecision}
+    .star-row, .star-row *{pointer-events:none}  /* affichage non interactif */
+
+    .star-input{display:flex;align-items:center;gap:10px}
+    .star-input .stars-wrap{position:relative;display:inline-block}
+    .star-input .hit{
+      position:absolute;inset:0;display:grid;grid-template-columns:repeat(10,1fr);cursor:pointer
+    }
+    .star-input .hit button{all:unset;cursor:pointer}
+    .star-input .hint{color:var(--muted);font-size:.9rem}
   </style>
 </head>
 <body>
@@ -213,12 +221,23 @@
         <div><label for="fStatus">Statut</label><select id="fStatus"></select></div>
         <div><label for="fProgress">Progression (%)</label><input id="fProgress" type="number" min="0" max="100" step="1" placeholder="laisser vide si non pertinent" /></div>
         <div><label for="fTags">Tags</label><input id="fTags" placeholder="action, narratif, GOTY… (clic sur un tag pour filtrer)" /></div>
-        <div><label for="fRating">Note perso (/10)</label><input id="fRating" type="number" min="0" max="10" step="0.5" /></div>
-        <div class="row-2"><label for="fNotes">Notes</label><textarea id="fNotes" rows="4" placeholder="Pensées rapides, où j'en suis, etc."></textarea></div>
-        <div class="row-2"><label for="fReview">Avis (long)</label><textarea id="fReview" rows="6" placeholder="Écris ton avis complet ici…"></textarea></div>
+
+        <!-- Note étoiles -->
+        <div class="row-2">
+          <label>Note</label>
+          <div class="star-input">
+            <div class="stars-wrap" id="ratingPickerWrap"></div>
+            <span id="ratingHint" class="hint">(aucune)</span>
+          </div>
+          <input id="fRating" type="hidden" />
+        </div>
+
         <div><label for="fLink">Lien externe</label><input id="fLink" placeholder="https://… (facultatif)" /></div>
         <div><label for="fLinkLabel">Texte du lien</label><input id="fLinkLabel" placeholder="VOD, Test, Review… (par défaut : VOD)" /></div>
         <div><label for="fCover">Image (URL)</label><input id="fCover" placeholder="https://… (facultatif) — recommandé : 1200×450 px (bannière)" /></div>
+
+        <div class="row-2"><label for="fNotes">Notes</label><textarea id="fNotes" rows="4" placeholder="Pensées rapides, où j'en suis, etc."></textarea></div>
+        <div class="row-2"><label for="fReview">Avis (long)</label><textarea id="fReview" rows="6" placeholder="Écris ton avis complet ici…"></textarea></div>
       </div>
       <div class="foot">
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
@@ -240,9 +259,7 @@
     <div class="dialog">
       <div class="head">
         <strong>Paramètres</strong>
-        <div>
-          <button id="sCloseBtn" class="ghost" title="Fermer">Fermer</button>
-        </div>
+        <div><button id="sCloseBtn" class="ghost" title="Fermer">Fermer</button></div>
       </div>
       <div class="body">
         <div><label for="sTwitch">Chaîne Twitch</label><input id="sTwitch" placeholder="ex: ScotchyTAZ" /></div>
@@ -265,9 +282,7 @@ finished=Terminé"></textarea>
       </div>
       <div class="foot">
         <div style="display:flex;gap:8px"></div>
-        <div style="display:flex; gap:8px">
-          <button id="sSaveBtn" class="btn">Enregistrer</button>
-        </div>
+        <div style="display:flex; gap:8px"><button id="sSaveBtn" class="btn">Enregistrer</button></div>
       </div>
     </div>
   </div>
@@ -296,13 +311,10 @@ finished=Terminé"></textarea>
       {id:'abandoned',label:'Abandonné'},
       {id:'finished',label:'Terminé'},
     ];
-    let STATUS_WEIGHT={};
-    function rebuildStatusWeight(){ STATUS_WEIGHT={}; STATUS.forEach((s,i)=>STATUS_WEIGHT[s.id]=i); }
+    let STATUS_WEIGHT={}; function rebuildStatusWeight(){ STATUS_WEIGHT={}; STATUS.forEach((s,i)=>STATUS_WEIGHT[s.id]=i); }
     rebuildStatusWeight();
 
-    const LS_KEY='gamesDataV3';
-    const LS_SETTINGS='gamesSettingsV2';
-    const LS_PREFS='gamesPrefsV1';
+    const LS_KEY='gamesDataV3', LS_SETTINGS='gamesSettingsV2', LS_PREFS='gamesPrefsV1';
     const ADMIN_ENABLED=(location.hostname==='localhost'||location.hostname==='127.0.0.1');
 
     let games=[],filtered=[];
@@ -310,7 +322,6 @@ finished=Terminé"></textarea>
     let editingId=null;
     let settings={twitchChannel:'ScotchyTAZ',showTwitch:true,isLive:'auto', customStatuses:null};
 
-    // Refs
     const $=id=>document.getElementById(id);
     const grid=$('grid'), emptyEl=$('empty'), searchInput=$('search'), chipsWrap=$('statusChips');
     const platformSelect=$('platformSelect'), sortSelect=$('sortSelect'), sortDirInput=$('sortDir'), clearFiltersBtn=$('clearFilters');
@@ -335,7 +346,58 @@ finished=Terminé"></textarea>
 
     function toNum(v){return(typeof v==='number'&&!Number.isNaN(v))?v:-1}
 
-    // Durée (depuis linkLabel)
+    // ----- SVG ETOILES -----
+    const SVG_NS="http://www.w3.org/2000/svg";
+    const STAR_PATH="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z";
+
+    function createSvgStar(fillRatio){
+      const svg=document.createElementNS(SVG_NS,"svg");
+      svg.setAttribute("viewBox","0 0 24 24");
+      svg.classList.add("star-svg");
+      const bg=document.createElementNS(SVG_NS,"path");
+      bg.setAttribute("d",STAR_PATH); bg.setAttribute("class","bg");
+      svg.appendChild(bg);
+      const defs=document.createElementNS(SVG_NS,"defs");
+      const clip=document.createElementNS(SVG_NS,"clipPath");
+      const clipId="clip-"+Math.random().toString(36).slice(2);
+      clip.setAttribute("id",clipId);
+      const clipShape=document.createElementNS(SVG_NS,"path");
+      clipShape.setAttribute("d",STAR_PATH);
+      clip.appendChild(clipShape); defs.appendChild(clip); svg.appendChild(defs);
+      const fill=document.createElementNS(SVG_NS,"rect");
+      fill.setAttribute("x","0"); fill.setAttribute("y","0"); fill.setAttribute("height","24");
+      fill.setAttribute("class","fill"); fill.setAttribute("clip-path",`url(#${clipId})`);
+      svg.appendChild(fill);
+      fill.setAttribute("width", String(Math.max(0,Math.min(1,fillRatio))*24));
+      return { svg, rectFill: fill };
+    }
+    function buildStarRow(value=0, size='sm'){
+      const row=document.createElement('span');
+      row.className='star-row '+(size==='lg'?'lg':'sm');
+      row._fills=[];
+      for(let i=0;i<5;i++){
+        const {svg,rectFill}=createSvgStar(0);
+        row._fills.push(rectFill);
+        row.appendChild(svg);
+      }
+      setStarRow(row, value);
+      return row;
+    }
+    function setStarRow(row, value){
+      const v=Math.max(0,Math.min(5,Number(value)||0));
+      for(let i=0;i<5;i++){
+        const fill=Math.max(0,Math.min(1,v - i));
+        row._fills[i].setAttribute("width", String(fill*24));
+      }
+      row.title = v ? (v+' / 5') : 'Pas de note';
+    }
+    function getRatingStars(g){
+      if(typeof g.ratingStars==='number') return g.ratingStars;
+      if(typeof g.rating==='number') return g.rating/2;
+      return null;
+    }
+
+    // ----- Durée (depuis linkLabel) -----
     function parseDurationToSeconds(label){
       if(!label) return null;
       const s = String(label).toLowerCase();
@@ -348,7 +410,7 @@ finished=Terminé"></textarea>
       return null;
     }
 
-    // Prefs tri
+    // ----- Prefs tri -----
     function savePrefs(){ localStorage.setItem(LS_PREFS, JSON.stringify({ sortBy, sortDir })); }
     function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(LS_PREFS)||'null') } catch { return null } }
 
@@ -359,13 +421,14 @@ finished=Terminé"></textarea>
       return 2;
     }
 
-    // Modale Avis
+    // ----- Modale Avis -----
     function openReview(g){
       revTitle.textContent = g.title || 'Avis';
       const metaParts = [];
       if(g.platform) metaParts.push(escapeHtml(g.platform));
       if(g.status) metaParts.push(escapeHtml(statusLabel(g.status)));
-      if(typeof g.rating==='number') metaParts.push(`${g.rating}/10`);
+      const rs=getRatingStars(g);
+      if(typeof rs==='number') metaParts.push(`${rs}★/5`);
       if(typeof g.progress==='number') metaParts.push(`${g.progress}%`);
       revMeta.innerHTML = metaParts.join(' • ');
       revContent.textContent = g.review || '(Aucun avis pour le moment)';
@@ -373,7 +436,7 @@ finished=Terminé"></textarea>
     }
     function closeReview(){ reviewModal.removeAttribute('open'); reviewModal.setAttribute('aria-hidden','true'); }
 
-    // Filtre + tri
+    // ----- Filtre + tri -----
     function applyFilters(){
       const sTerm=deburr(searchTerm);
       filtered=games.filter(g=>{
@@ -384,7 +447,7 @@ finished=Terminé"></textarea>
           for(const t of selectedTags){ if(!tagsSet.has(t)) return false; }
         }
         if(sTerm){
-          const hay=deburr([g.title,g.platform,(g.tags||[]).join(' '),g.notes,g.review,String(g.rating??'')].join(' '));
+          const hay=deburr([g.title,g.platform,(g.tags||[]).join(' '),g.notes,g.review,String(g.rating??''),String(g.ratingStars??'')].join(' '));
           if(!hay.includes(sTerm)) return false;
         }
         return true;
@@ -399,15 +462,17 @@ finished=Terminé"></textarea>
         case 'updated':
           filtered.sort((a,b)=>dir*(new Date(a.updatedAt)-new Date(b.updatedAt))); break;
 
-        case 'rating':
+        case 'rating': {
           filtered.sort((a,b)=>{
-            const aHas = typeof a.rating==='number' && !Number.isNaN(a.rating);
-            const bHas = typeof b.rating==='number' && !Number.isNaN(b.rating);
-            if(aHas!==bHas) return aHas? -1 : 1;   // → toujours ceux AVEC note en premier
-            if(!aHas && !bHas) return 0;
-            return dir*(a.rating - b.rating);
+            const ar = (typeof a.ratingStars==='number') ? a.ratingStars : (typeof a.rating==='number' ? a.rating/2 : null);
+            const br = (typeof b.ratingStars==='number') ? b.ratingStars : (typeof b.rating==='number' ? b.rating/2 : null);
+            const aHas = ar!=null, bHas = br!=null;
+            if(aHas!==bHas) return aHas? -1 : 1; // toujours ceux AVEC note en premier
+            if(!aHas) return 0;
+            return dir*(ar - br);
           });
           break;
+        }
 
         case 'status':
           filtered.sort((a,b)=> dir*((STATUS_WEIGHT[a.status]??99)-(STATUS_WEIGHT[b.status]??99)) || a.title.localeCompare(b.title));
@@ -432,22 +497,21 @@ finished=Terminé"></textarea>
             const aHas=typeof a.progress==='number', bHas=typeof b.progress==='number';
             if(aHas!==bHas) return aHas? -1 : 1;   // sans progression en bas du groupe
             if(!aHas && !bHas) return 0;
-            return dir*(a.progress - b.progress);
+            return dir*(a.progress - b.progress);   // asc par défaut : peu → beaucoup
           });
           break;
       }
       render();
     }
 
+    // ----- Tags overflow -----
     function setupBadgesOverflow(container, inner, btn){
       inner.style.flexWrap='nowrap'; inner.style.overflow='hidden'; inner.style.width='auto';
       const need = inner.scrollWidth > inner.clientWidth + 4;
       if (need){
         container.dataset.expanded='false'; btn.style.display='inline-block'; btn.textContent='Plus';
         const pad=(btn.offsetWidth||48)+8; container.style.setProperty('--fade-pad', pad+'px');
-      } else {
-        container.dataset.expanded='true'; btn.style.display='none'; container.style.setProperty('--fade-pad','0px');
-      }
+      } else { container.dataset.expanded='true'; btn.style.display='none'; container.style.setProperty('--fade-pad','0px'); }
     }
     function toggleBadges(container, inner, btn){
       const isOpen = container.dataset.expanded==='true';
@@ -458,6 +522,7 @@ finished=Terminé"></textarea>
       }
     }
 
+    // ----- Rendu cartes -----
     function render(){
       grid.innerHTML='';
       if(filtered.length===0){ emptyEl.hidden=false; return }
@@ -475,7 +540,22 @@ finished=Terminé"></textarea>
         }
 
         const inner=document.createElement('div'); inner.className='inner';
-        inner.innerHTML=`<div class="title">${escapeHtml(g.title)}</div><div class="subtitle">${escapeHtml(g.platform)} • ${statusLabel(g.status)}${g.rating!=null?` • ${g.rating}/10`:''}</div>`;
+        const titleEl=document.createElement('div'); titleEl.className='title'; titleEl.textContent=g.title;
+        inner.appendChild(titleEl);
+
+        const subtitle=document.createElement('div'); subtitle.className='subtitle';
+        const left=document.createElement('span'); left.textContent=`${g.platform||''} • ${statusLabel(g.status)}`;
+        subtitle.appendChild(left);
+
+        const rs=getRatingStars(g);
+        if(rs!=null){
+          const sep=document.createElement('span'); sep.textContent='•';
+          sep.style.opacity='.5';
+          subtitle.appendChild(sep);
+          const stars=buildStarRow(rs,'sm');
+          subtitle.appendChild(stars);
+        }
+        inner.appendChild(subtitle);
 
         // Tags
         const badgesWrap=document.createElement('div'); badgesWrap.className='badges';
@@ -556,6 +636,25 @@ finished=Terminé"></textarea>
 
     function toggleTagFilter(tag){const key=String(tag).toLowerCase(); if(selectedTags.has(key)) selectedTags.delete(key); else selectedTags.add(key); applyFilters();}
 
+    // ====== STAR PICKER (modale) ======
+    let pickerRow=null;
+    function buildRatingPicker(initial=0){
+      const wrap=$('ratingPickerWrap'); wrap.innerHTML='';
+      const row=buildStarRow(initial,'lg'); pickerRow=row;
+      const hit=document.createElement('div'); hit.className='hit';
+      for(let i=1;i<=10;i++){
+        const btn=document.createElement('button');
+        btn.addEventListener('mouseenter',()=>{ setStarRow(row, i*0.5); $('ratingHint').textContent=(i*0.5)+' / 5'; });
+        btn.addEventListener('click',()=>{ fRating.value=String(i*0.5); setStarRow(row, i*0.5); $('ratingHint').textContent=(i*0.5)+' / 5'; });
+        hit.appendChild(btn);
+      }
+      wrap.appendChild(row); wrap.appendChild(hit);
+      // init hint
+      const v=Number(fRating.value||initial)||0; setStarRow(row,v); $('ratingHint').textContent=v? (v+' / 5') : '(aucune)';
+      // reset preview on mouseleave
+      wrap.addEventListener('mouseleave',()=>{ const v=Number(fRating.value||0); setStarRow(row,v); $('ratingHint').textContent=v? (v+' / 5') : '(aucune)'; });
+    }
+
     // ---- Admin: modal jeu
     function openModal(id=null){
       if(!ADMIN_ENABLED) return;
@@ -567,6 +666,9 @@ finished=Terminé"></textarea>
       } else {
         $('modalTitle').textContent='Ajouter un jeu'; deleteBtn.hidden=true; clearForm();
       }
+      // construire/maj le picker
+      const initValue = id ? (getRatingStars(games.find(x=>x.id===id))||0) : 0;
+      buildRatingPicker(initValue);
     }
     function closeModal(){ modal.removeAttribute('open'); modal.setAttribute('aria-hidden','true'); }
 
@@ -578,22 +680,27 @@ finished=Terminé"></textarea>
     function fillForm(g){
       fTitle.value=g.title; fPlatform.value=g.platform; fStatus.value=g.status;
       fProgress.value=(g.progress??''); fTags.value=(g.tags||[]).join(', ');
-      fRating.value=(g.rating??''); fNotes.value=g.notes||''; fReview.value=g.review||'';
+      const rs=getRatingStars(g)||''; fRating.value=rs;
+      fNotes.value=g.notes||''; fReview.value=g.review||'';
       fLink.value=g.link??''; fLinkLabel.value=g.linkLabel||'VOD'; fCover.value=g.cover??'';
     }
-    function readForm(){ return {
-      title:fTitle.value.trim(),
-      platform:fPlatform.value.trim(),
-      status:fStatus.value,
-      progress:fProgress.value===''?null:Math.max(0,Math.min(100,Number(fProgress.value))),
-      tags:fTags.value.split(',').map(s=>s.trim()).filter(Boolean),
-      rating:fRating.value===''?null:Number(fRating.value),
-      notes:fNotes.value.trim(),
-      review:fReview.value.trim(),
-      link:fLink.value.trim()||null,
-      linkLabel:fLinkLabel.value.trim()||'VOD',
-      cover:fCover.value.trim()||null
-    } }
+    function readForm(){ 
+      const rs = fRating.value===''? null : Number(fRating.value);
+      return {
+        title:fTitle.value.trim(),
+        platform:fPlatform.value.trim(),
+        status:fStatus.value,
+        progress:fProgress.value===''?null:Math.max(0,Math.min(100,Number(fProgress.value))),
+        tags:fTags.value.split(',').map(s=>s.trim()).filter(Boolean),
+        ratingStars: rs,
+        rating: rs==null? null : rs*2, // compat /10
+        notes:fNotes.value.trim(),
+        review:fReview.value.trim(),
+        link:fLink.value.trim()||null,
+        linkLabel:fLinkLabel.value.trim()||'VOD',
+        cover:fCover.value.trim()||null
+      } 
+    }
 
     function upsertGame(){
       if(!ADMIN_ENABLED) return;
@@ -604,7 +711,7 @@ finished=Terminé"></textarea>
         const idx=games.findIndex(g=>g.id===editingId);
         if(idx>-1){games[idx]={...games[idx],...data,updatedAt:nowIso()}}
       } else {
-        games.push({id:uid(),createdAt:nowIso(),updatedAt:nowIso(),progress:null,rating:null,notes:'',review:'',cover:null,link:null,linkLabel:'VOD',tags:[],...data});
+        games.push({id:uid(),createdAt:nowIso(),updatedAt:nowIso(),progress:null,rating:null,ratingStars:null,notes:'',review:'',cover:null,link:null,linkLabel:'VOD',tags:[],...data});
       }
       saveLS(); computePlatformsSelect(); applyFilters(); setupTwitch(); closeModal();
     }
@@ -636,7 +743,7 @@ finished=Terminé"></textarea>
             if(Array.isArray(data.settings.customStatuses)){STATUS=data.settings.customStatuses; rebuildStatusWeight();}
           } else if(Array.isArray(data.customStatuses)){STATUS=data.customStatuses; rebuildStatusWeight();}
         } else {throw new Error('JSON invalide')}
-        games = games.map(g => ({ ...g, review: (g.review ?? '') })); // compat
+        games = games.map(g => ({ ...g, review: (g.review ?? ''), ratingStars: (typeof g.ratingStars==='number'? g.ratingStars : (typeof g.rating==='number'? g.rating/2 : null)) })); // compat
         saveLS(); computePlatformsSelect(); buildStatusUI(); applyFilters(); setupTwitch(); closeModal();
       }catch(e){alert('Import impossible : '+e.message)}};
       reader.readAsText(file);
@@ -680,11 +787,11 @@ finished=Terminé"></textarea>
 
     // Données d'exemple
     function initSample(){return[
-      {id:uid(),title:'Batman: Arkham City',platform:'PC',status:'replaying',progress:35,tags:['action','Batman'],rating:9.5,notes:'Reprise en hard mode.',review:'Un classique qui tient encore bien la route.',link:'',linkLabel:'VOD | 1h37',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'The Last of Us Part I',platform:'PC',status:'finished',progress:100,tags:['narratif'],rating:10,notes:'Coup de cœur.',review:'Histoire et rythme impeccables.',link:'',linkLabel:'VOD | 2h05',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Red Dead Redemption 2',platform:'PC',status:'planned',progress:null,tags:['open-world'],rating:null,notes:'Prévu pour stream.',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Days Gone',platform:'PC',status:'unfinished',progress:52,tags:['zombies'],rating:6,notes:'Hésite à reprendre.',review:'Bons gunfights, répétitif sur la durée.',link:'',linkLabel:'VOD | 45:12',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Metal Gear Solid',platform:'PS1',status:'playing',progress:18,tags:['infiltration','classique'],rating:null,notes:'Découverte.',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Batman: Arkham City',platform:'PC',status:'replaying',progress:35,tags:['action','Batman'],ratingStars:4.5,rating:9,notes:'Reprise en hard mode.',review:'Un classique qui tient encore bien la route.',link:'',linkLabel:'VOD | 1h37',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'The Last of Us Part I',platform:'PC',status:'finished',progress:100,tags:['narratif'],ratingStars:5,rating:10,notes:'Coup de cœur.',review:'Histoire et rythme impeccables.',link:'',linkLabel:'VOD | 2h05',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Red Dead Redemption 2',platform:'PC',status:'planned',progress:null,tags:['open-world'],ratingStars:null,rating:null,notes:'Prévu pour stream.',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Days Gone',platform:'PC',status:'unfinished',progress:52,tags:['zombies'],ratingStars:3,rating:6,notes:'Hésite à reprendre.',review:'Bons gunfights, répétitif sur la durée.',link:'',linkLabel:'VOD | 45:12',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Metal Gear Solid',platform:'PS1',status:'playing',progress:18,tags:['infiltration','classique'],ratingStars:null,rating:null,notes:'Découverte.',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
     ]}
 
     // Bundle JSON
@@ -721,7 +828,12 @@ finished=Terminé"></textarea>
         }
       }
 
-      games = games.map(g => ({ ...g, review: (g.review ?? '') })); // compat
+      // compat
+      games = games.map(g => ({ 
+        ...g, 
+        review: (g.review ?? ''), 
+        ratingStars: (typeof g.ratingStars==='number' ? g.ratingStars : (typeof g.rating==='number' ? g.rating/2 : null))
+      }));
 
       const prefs = loadPrefs();
       if(prefs){ sortBy = prefs.sortBy || sortBy; sortDir = prefs.sortDir || sortDir; }
@@ -756,7 +868,7 @@ finished=Terminé"></textarea>
       settingsFab.onclick=()=>openSettingsModal();
       closeBtn.onclick=()=>closeModal();
       saveBtn.onclick=()=>upsertGame();
-      newBtn.onclick=()=>{editingId=null; clearForm(); modalTitle.textContent='Ajouter un jeu'; deleteBtn.hidden=true};
+      newBtn.onclick=()=>{editingId=null; clearForm(); modalTitle.textContent='Ajouter un jeu'; deleteBtn.hidden=true; buildRatingPicker(0);};
       deleteBtn.onclick=()=>deleteGame();
       exportBtn.onclick=()=>exportJSON();
       importBtn.onclick=()=>fileInput.click();
