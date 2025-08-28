@@ -244,6 +244,7 @@
           <button id="settingsBtn" class="ghost" title="Paramètres" style="display:none">⚙ Paramètres</button>
           <button id="importBtn" class="ghost" title="Importer JSON">Importer JSON</button>
           <button id="exportBtn" class="ghost" title="Exporter JSON">Exporter JSON</button>
+          <button id="copyBtn" class="ghost" title="Copier le JSON dans le presse-papiers">Copier le JSON</button>
           <input id="fileInput" type="file" accept="application/json" hidden />
         </div>
         <div style="display:flex; gap:8px">
@@ -327,7 +328,7 @@ finished=Terminé"></textarea>
     const platformSelect=$('platformSelect'), sortSelect=$('sortSelect'), sortDirInput=$('sortDir'), clearFiltersBtn=$('clearFilters');
     const fab=$('fab'), settingsFab=$('settingsFab'), modal=$('modal'), modalTitle=$('modalTitle'), closeBtn=$('closeBtn'), saveBtn=$('saveBtn'), newBtn=$('newBtn'), deleteBtn=$('deleteBtn');
     const fTitle=$('fTitle'), fPlatform=$('fPlatform'), fStatus=$('fStatus'), fProgress=$('fProgress'), fTags=$('fTags'), fRating=$('fRating'), fNotes=$('fNotes'), fReview=$('fReview'), fLink=$('fLink'), fLinkLabel=$('fLinkLabel'), fCover=$('fCover');
-    const exportBtn=$('exportBtn'), importBtn=$('importBtn'), fileInput=$('fileInput');
+    const exportBtn=$('exportBtn'), importBtn=$('importBtn'), fileInput=$('fileInput'), copyBtn=$('copyBtn');
     const twitchPanel=$('twitchPanel'), twitchEmbed=$('twitchEmbed'), twitchChat=$('twitchChat'), twitchLink=$('twitchLink'), twitchTitle=$('twitchTitle'), livePill=$('livePill'), liveText=$('liveText'), minimizeTwitch=$('minimizeTwitch'), mobileTwitchBtn=$('mobileTwitchBtn');
     const reviewModal=$('reviewModal'), revTitle=$('revTitle'), revContent=$('revContent'), revMeta=$('revMeta'), revCloseBtn=$('revCloseBtn');
 
@@ -346,7 +347,7 @@ finished=Terminé"></textarea>
 
     function toNum(v){return(typeof v==='number'&&!Number.isNaN(v))?v:-1}
 
-    // ----- SVG ETOILES -----
+    /* ====== SVG ETOILES ====== */
     const SVG_NS="http://www.w3.org/2000/svg";
     const STAR_PATH="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z";
 
@@ -397,7 +398,7 @@ finished=Terminé"></textarea>
       return null;
     }
 
-    // ----- Durée (depuis linkLabel) -----
+    // Durée (depuis linkLabel)
     function parseDurationToSeconds(label){
       if(!label) return null;
       const s = String(label).toLowerCase();
@@ -410,7 +411,7 @@ finished=Terminé"></textarea>
       return null;
     }
 
-    // ----- Prefs tri -----
+    // Prefs tri
     function savePrefs(){ localStorage.setItem(LS_PREFS, JSON.stringify({ sortBy, sortDir })); }
     function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(LS_PREFS)||'null') } catch { return null } }
 
@@ -421,7 +422,7 @@ finished=Terminé"></textarea>
       return 2;
     }
 
-    // ----- Modale Avis -----
+    // Modale Avis
     function openReview(g){
       revTitle.textContent = g.title || 'Avis';
       const metaParts = [];
@@ -436,7 +437,7 @@ finished=Terminé"></textarea>
     }
     function closeReview(){ reviewModal.removeAttribute('open'); reviewModal.setAttribute('aria-hidden','true'); }
 
-    // ----- Filtre + tri -----
+    // Filtre + tri
     function applyFilters(){
       const sTerm=deburr(searchTerm);
       filtered=games.filter(g=>{
@@ -497,14 +498,14 @@ finished=Terminé"></textarea>
             const aHas=typeof a.progress==='number', bHas=typeof b.progress==='number';
             if(aHas!==bHas) return aHas? -1 : 1;   // sans progression en bas du groupe
             if(!aHas && !bHas) return 0;
-            return dir*(a.progress - b.progress);   // asc par défaut : peu → beaucoup
+            return dir*(a.progress - b.progress);
           });
           break;
       }
       render();
     }
 
-    // ----- Tags overflow -----
+    /* Tags overflow */
     function setupBadgesOverflow(container, inner, btn){
       inner.style.flexWrap='nowrap'; inner.style.overflow='hidden'; inner.style.width='auto';
       const need = inner.scrollWidth > inner.clientWidth + 4;
@@ -522,7 +523,7 @@ finished=Terminé"></textarea>
       }
     }
 
-    // ----- Rendu cartes -----
+    // Rendu cartes
     function render(){
       grid.innerHTML='';
       if(filtered.length===0){ emptyEl.hidden=false; return }
@@ -636,7 +637,7 @@ finished=Terminé"></textarea>
 
     function toggleTagFilter(tag){const key=String(tag).toLowerCase(); if(selectedTags.has(key)) selectedTags.delete(key); else selectedTags.add(key); applyFilters();}
 
-    // ====== STAR PICKER (modale) ======
+    /* ====== STAR PICKER (modale) ====== */
     let pickerRow=null;
     function buildRatingPicker(initial=0){
       const wrap=$('ratingPickerWrap'); wrap.innerHTML='';
@@ -649,9 +650,7 @@ finished=Terminé"></textarea>
         hit.appendChild(btn);
       }
       wrap.appendChild(row); wrap.appendChild(hit);
-      // init hint
       const v=Number(fRating.value||initial)||0; setStarRow(row,v); $('ratingHint').textContent=v? (v+' / 5') : '(aucune)';
-      // reset preview on mouseleave
       wrap.addEventListener('mouseleave',()=>{ const v=Number(fRating.value||0); setStarRow(row,v); $('ratingHint').textContent=v? (v+' / 5') : '(aucune)'; });
     }
 
@@ -666,7 +665,6 @@ finished=Terminé"></textarea>
       } else {
         $('modalTitle').textContent='Ajouter un jeu'; deleteBtn.hidden=true; clearForm();
       }
-      // construire/maj le picker
       const initValue = id ? (getRatingStars(games.find(x=>x.id===id))||0) : 0;
       buildRatingPicker(initValue);
     }
@@ -724,12 +722,33 @@ finished=Terminé"></textarea>
       saveLS(); applyFilters(); closeModal();
     }
 
-    // Import/export
+    // ====== Export / Copier / Import ======
+    function bundleJSON(){
+      return JSON.stringify({settings:{...settings,customStatuses:STATUS},games}, null, 2);
+    }
+
     function exportJSON(){
-      const bundle={settings:{...settings,customStatuses:STATUS},games};
-      const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'});
+      const blob=new Blob([bundleJSON()],{type:'application/json'});
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='games_bundle.json'; a.click(); URL.revokeObjectURL(a.href);
     }
+
+    async function copyJSON(){
+      const text=bundleJSON();
+      try{
+        if(navigator.clipboard && window.isSecureContext){
+          await navigator.clipboard.writeText(text);
+        }else{
+          const ta=document.createElement('textarea');
+          ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
+          document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        }
+        copyBtn.textContent='Copié ✓'; copyBtn.disabled=true;
+        setTimeout(()=>{ copyBtn.textContent='Copier le JSON'; copyBtn.disabled=false; },1400);
+      }catch(e){
+        alert('Impossible de copier le JSON : '+e.message);
+      }
+    }
+
     function importJSON(file){
       if(!ADMIN_ENABLED) return;
       const reader=new FileReader();
@@ -743,7 +762,7 @@ finished=Terminé"></textarea>
             if(Array.isArray(data.settings.customStatuses)){STATUS=data.settings.customStatuses; rebuildStatusWeight();}
           } else if(Array.isArray(data.customStatuses)){STATUS=data.customStatuses; rebuildStatusWeight();}
         } else {throw new Error('JSON invalide')}
-        games = games.map(g => ({ ...g, review: (g.review ?? ''), ratingStars: (typeof g.ratingStars==='number'? g.ratingStars : (typeof g.rating==='number'? g.rating/2 : null)) })); // compat
+        games = games.map(g => ({ ...g, review: (g.review ?? ''), ratingStars: (typeof g.ratingStars==='number'? g.ratingStars : (typeof g.rating==='number'? g.rating/2 : null)) }));
         saveLS(); computePlatformsSelect(); buildStatusUI(); applyFilters(); setupTwitch(); closeModal();
       }catch(e){alert('Import impossible : '+e.message)}};
       reader.readAsText(file);
@@ -871,6 +890,7 @@ finished=Terminé"></textarea>
       newBtn.onclick=()=>{editingId=null; clearForm(); modalTitle.textContent='Ajouter un jeu'; deleteBtn.hidden=true; buildRatingPicker(0);};
       deleteBtn.onclick=()=>deleteGame();
       exportBtn.onclick=()=>exportJSON();
+      copyBtn.onclick=()=>copyJSON();
       importBtn.onclick=()=>fileInput.click();
       fileInput.onchange=()=>{const f=fileInput.files?.[0]; if(f) importJSON(f)};
 
