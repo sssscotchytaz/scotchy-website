@@ -831,6 +831,68 @@
       "status": "playing",
       "ratingStars": null,
       "reviewSafe": ""
+    },
+    {
+      "id": "rbii3w1pi2mf1qii1q",
+      "createdAt": "2025-09-01T23:12:24.542Z",
+      "updatedAt": "2025-09-03T01:10:53.653Z",
+      "progress": 100,
+      "rating": 8,
+      "ratingStars": 4,
+      "notes": "ℹ️ Je l'ai déjà fait plusieurs fois hors-stream !",
+      "review": "",
+      "reviewSafe": "",
+      "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/209000/header.jpg?t=1746562474",
+      "link": "https://www.youtube.com/watch?v=kqqS3WoKYl0&list=PLKn0YIxb2VjSXz-47jA6wXlkUaSNURILz",
+      "linkLabel": "VOD",
+      "tags": [
+        "Action",
+        "Monde ouvert",
+        "Superhéros",
+        "Aventure",
+        "Infiltration",
+        "Solo",
+        "Combat",
+        "Beat Them All",
+        "Bande dessinée",
+        "Détective",
+        "Narratif",
+        "Aventure"
+      ],
+      "title": "Batman: Arkham Origins",
+      "platform": "PC",
+      "status": "finished"
+    },
+    {
+      "id": "c3krzq4dhnmf3a6cuw",
+      "createdAt": "2025-09-03T01:10:36.440Z",
+      "updatedAt": "2025-09-03T01:10:49.380Z",
+      "progress": 0,
+      "rating": null,
+      "ratingStars": null,
+      "notes": "",
+      "review": "",
+      "reviewSafe": "",
+      "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/277830/header.jpg?t=1447360331",
+      "link": "https://www.youtube.com/watch?v=kqqS3WoKYl0&list=PLKn0YIxb2VjSXz-47jA6wXlkUaSNURILz",
+      "linkLabel": "VOD",
+      "tags": [
+        "Action",
+        "Narratif",
+        "Monde ouvert",
+        "Superhéros",
+        "Aventure",
+        "Infiltration",
+        "Solo",
+        "Combat",
+        "Beat Them All",
+        "Bande dessinée",
+        "Détective",
+        "Atmosphère"
+      ],
+      "title": "Batman: Arkham Origins - Cold, Cold Heart",
+      "platform": "PC",
+      "status": "playing"
     }
   ]
 }
