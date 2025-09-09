@@ -61,8 +61,8 @@
     .linkbtn.vod{border:none;background:linear-gradient(180deg,rgba(124,147,255,.25),rgba(124,147,255,.12));box-shadow:inset 0 0 0 1px rgba(124,147,255,.45)}
     .linkbtn .play{font-size:.85rem}
     .linkbtn.review{border:none;background:linear-gradient(180deg,rgba(61,220,151,.25),rgba(61,220,151,.12));box-shadow:inset 0 0 0 1px rgba(61,220,151,.45)}
+    .linkbtn.summary{border:none;background:linear-gradient(180deg,rgba(255,107,107,.18),rgba(255,107,107,.06));box-shadow:inset 0 0 0 1px rgba(255,107,107,.45)}
 
-    /* Tags 1 ligne + Plus/Moins */
     .badges{position:relative;display:flex;align-items:flex-start;gap:8px;margin-top:10px;--fade-pad:56px}
     .badgesInner{display:flex;flex-wrap:nowrap;overflow:hidden;flex:1 1 auto;min-width:0;max-width:100%}
     .badges[data-expanded="false"] .badgesInner{
@@ -94,7 +94,6 @@
     .fab[hidden]{display:none}
     .fab-secondary{right:86px;bottom:20px;width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(118,224,194,.25),rgba(118,224,194,.08));border:1px solid rgba(118,224,194,.45)}
 
-    /* ==== Modales scrollables ==== */
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:30;padding:12px}
     .modal[open]{display:grid}
     .dialog{
@@ -128,7 +127,6 @@
 
     .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-    /* ====== ÉTOILES (SVG, remplissage précis) ====== */
     .star-row{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
     .star-row.sm svg{width:22px;height:22px}
     .star-row.lg svg{width:30px;height:30px}
@@ -143,6 +141,56 @@
     .star-input .hit{position:absolute;inset:0;display:grid;grid-template-columns:repeat(10,1fr);cursor:pointer}
     .star-input .hit button{all:unset;cursor:pointer}
     .star-input .hint{color:var(--muted);font-size:.9rem}
+
+    /* ====== Rendu riche ====== */
+    .rich-content{white-space:pre-wrap; line-height:1.6; overflow-wrap:anywhere;}
+    .rich-img{display:block; margin:12px auto; border-radius:10px; max-width:100%; height:auto;}
+
+    /* ====== Mini barre d'édition ====== */
+    .format-pop{
+  position:fixed;
+  left:-9999px; top:-9999px;           /* pas de inset contrariant */
+  display:flex; gap:6px; padding:6px;
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:var(--shadow);
+  z-index:50;
+  opacity:0; pointer-events:none;      /* vraiment cachée */
+  transition:opacity .12s ease;
+}
+.format-pop[aria-hidden="false"]{ opacity:1; pointer-events:auto }
+    .format-pop button, .format-pop select{
+      background:#0c0f14; border:1px solid rgba(255,255,255,.15); color:inherit;
+      border-radius:10px; padding:6px 10px; cursor:pointer; font-size:.9rem;
+    }
+    .format-pop .sep{width:1px; background:rgba(255,255,255,.15); margin:0 4px}
+
+    /* ====== Panneau image (curseurs) ====== */
+    .image-pop{
+  position:fixed;
+  left:-9999px; top:-9999px;
+  display:grid; gap:8px;
+  min-width:260px; max-width:420px;   /* limite la largeur */
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px; padding:10px; box-shadow:var(--shadow); z-index:49;
+  opacity:0; pointer-events:none; transition:opacity .12s ease;
+}
+.image-pop[aria-hidden="false"]{ opacity:1; pointer-events:auto }
+
+/* Aperçu contenu */
+#imgPrev{
+  max-width:100%;
+  max-height:220px;          /* <<< empêche l’image d’exploser */
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+
+    .image-pop label{font-size:.85rem; color:var(--muted)}
+    .image-pop input[type="range"]{width:100%}
+    .image-pop .row{display:grid; grid-template-columns:72px 1fr; gap:8px; align-items:center}
   </style>
 </head>
 <body>
@@ -200,7 +248,6 @@
   <button id="settingsFab" class="fab fab-secondary" title="Paramètres (localhost)" hidden>🛠️</button>
   <button id="fab" class="fab" title="Administration (localhost)" hidden>⚙️</button>
 
-  <!-- Mobile Twitch quick link -->
   <div class="twitch-fab"><a id="mobileTwitchBtn" class="btn" target="_blank" rel="noopener">Twitch (live)</a></div>
 
   <!-- Modal Jeux (ajout/édition) -->
@@ -220,7 +267,6 @@
         <div><label for="fProgress">Progression (%)</label><input id="fProgress" type="number" min="0" max="100" step="1" placeholder="laisser vide si non pertinent" /></div>
         <div><label for="fTags">Tags</label><input id="fTags" placeholder="action, narratif, GOTY… (clic sur un tag pour filtrer)" /></div>
 
-        <!-- Note étoiles -->
         <div class="row-2">
           <label>Note</label>
           <div class="star-input">
@@ -230,8 +276,10 @@
           <input id="fRating" type="hidden" />
         </div>
 
-        <div class="row-2"><label for="fReviewSafe">Avis sans spoil</label><textarea id="fReviewSafe" rows="4" placeholder="Résumé sans spoiler…"></textarea></div>
-        <div class="row-2"><label for="fReview">Avis complet (peut contenir des spoilers)</label><textarea id="fReview" rows="6" placeholder="Écris ton avis complet ici…"></textarea></div>
+        <!-- Ajout classe rich-editor pour bénéficier des menus -->
+        <div class="row-2"><label for="fReviewSafe">Avis sans spoil</label><textarea id="fReviewSafe" class="rich-editor" rows="4" placeholder="Résumé sans spoiler… (images via URL seule sur une ligne)"></textarea></div>
+        <div class="row-2"><label for="fReview">Avis complet (peut contenir des spoilers)</label><textarea id="fReview" class="rich-editor" rows="6" placeholder="Écris ton avis complet ici… (images via URL seule sur une ligne)"></textarea></div>
+        <div class="row-2"><label for="fSummary">Résumé (spoilers)</label><textarea id="fSummary" class="rich-editor" rows="6" placeholder="Résumé de l’histoire… (images via URL seule sur une ligne)"></textarea></div>
 
         <div><label for="fLink">Lien externe</label><input id="fLink" placeholder="https://… (facultatif)" /></div>
         <div><label for="fLinkLabel">Texte du lien</label><input id="fLinkLabel" placeholder="VOD, Test, Review… (par défaut : VOD)" /></div>
@@ -313,7 +361,7 @@ finished=Terminé"></textarea>
     </div>
   </div>
 
-  <!-- Modal Avis (contenu) -->
+  <!-- Modal Avis -->
   <div id="reviewModal" class="modal" aria-hidden="true">
     <div class="dialog">
       <div class="head">
@@ -322,9 +370,63 @@ finished=Terminé"></textarea>
       </div>
       <div class="body">
         <div class="row-2" id="revMeta" style="color:var(--muted)"></div>
-        <div class="row-2" id="revContent" style="white-space:pre-wrap; line-height:1.6; overflow-wrap:anywhere;"></div>
+        <div class="row-2 rich-content" id="revContent"></div>
       </div>
     </div>
+  </div>
+
+  <!-- Modale Alerte Spoilers (Résumé) -->
+  <div id="summaryWarnModal" class="modal" aria-hidden="true">
+    <div class="dialog" style="width:min(520px,94vw)">
+      <div class="head">
+        <strong>Résumé – Attention spoilers</strong>
+        <button id="sumWarnClose" class="ghost">Retour</button>
+      </div>
+      <div class="body" style="grid-template-columns:1fr">
+        <p style="color:var(--muted);margin:0">
+          Ce résumé raconte l’histoire du jeu. <br/>Il peut contenir des <b>spoilers</b>.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+          <button id="sumWarnBack" class="ghost">Retour</button>
+          <button id="sumWarnRead" class="btn">Lire</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Résumé -->
+  <div id="summaryModal" class="modal" aria-hidden="true">
+    <div class="dialog">
+      <div class="head">
+        <strong id="sumTitle">Résumé</strong>
+        <button id="sumCloseBtn" class="ghost" title="Fermer">Fermer</button>
+      </div>
+      <div class="body">
+        <div class="row-2" id="sumMeta" style="color:var(--muted)"></div>
+        <div class="row-2 rich-content" id="sumContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mini barre d’édition (invisible au chargement) -->
+  <div id="formatPop" class="format-pop" role="toolbar" aria-hidden="true">
+    <button type="button" data-cmd="bold" title="Gras (B)">B</button>
+    <button type="button" data-cmd="italic" title="Italique (I)">I</button>
+    <span class="sep"></span>
+    <select id="sizeSelect" title="Taille">
+      <option value="">Taille</option>
+      <option value="S">S</option>
+      <option value="M">M</option>
+      <option value="L">L</option>
+      <option value="XL">XL</option>
+    </select>
+  </div>
+
+  <!-- Panneau réglages image -->
+  <div id="imagePop" class="image-pop" aria-hidden="true">
+    <div class="row"><label>Largeur (%)</label><input id="imgW" type="range" min="10" max="100" step="1" value="70"></div>
+    <div class="row"><label>Padding (px)</label><input id="imgP" type="range" min="0" max="48" step="1" value="8"></div>
+    <div class="row"><label>Aperçu</label><img id="imgPrev" class="rich-img" alt="" style="max-width:100%"></div>
   </div>
 
   <script>
@@ -355,11 +457,17 @@ finished=Terminé"></textarea>
     const fab=$('fab'), settingsFab=$('settingsFab'), modal=$('modal'), modalTitle=$('modalTitle'), closeBtn=$('closeBtn'), saveBtn=$('saveBtn'), newBtn=$('newBtn'), deleteBtn=$('deleteBtn');
     const fTitle=$('fTitle'), fPlatform=$('fPlatform'), fStatus=$('fStatus'), fProgress=$('fProgress'), fTags=$('fTags'),
           fRating=$('fRating'), fNotes=$('fNotes'), fReview=$('fReview'), fReviewSafe=$('fReviewSafe'),
-          fLink=$('fLink'), fLinkLabel=$('fLinkLabel'), fCover=$('fCover');
+          fLink=$('fLink'), fLinkLabel=$('fLinkLabel'), fCover=$('fCover'), fSummary=$('fSummary');
     const exportBtn=$('exportBtn'), importBtn=$('importBtn'), fileInput=$('fileInput'), copyBtn=$('copyBtn');
     const twitchPanel=$('twitchPanel'), twitchEmbed=$('twitchEmbed'), twitchChat=$('twitchChat'), twitchLink=$('twitchLink'), twitchTitle=$('twitchTitle'), livePill=$('livePill'), liveText=$('liveText'), minimizeTwitch=$('minimizeTwitch'), mobileTwitchBtn=$('mobileTwitchBtn');
     const reviewModal=$('reviewModal'), revTitle=$('revTitle'), revContent=$('revContent'), revMeta=$('revMeta'), revCloseBtn=$('revCloseBtn');
     const reviewChoiceModal=$('reviewChoiceModal'), revChoiceClose=$('revChoiceClose'), revChoiceSafe=$('revChoiceSafe'), revChoiceFull=$('revChoiceFull'), revChoiceNoSafe=$('revChoiceNoSafe');
+
+    const summaryWarnModal=$('summaryWarnModal'), sumWarnClose=$('sumWarnClose'), sumWarnBack=$('sumWarnBack'), sumWarnRead=$('sumWarnRead');
+    const summaryModal=$('summaryModal'), sumTitle=$('sumTitle'), sumMeta=$('sumMeta'), sumContent=$('sumContent'), sumCloseBtn=$('sumCloseBtn');
+
+    const formatPop=$('formatPop'), sizeSelect=$('sizeSelect');
+    const imagePop=$('imagePop'), imgPrev=$('imgPrev'), imgW=$('imgW'), imgP=$('imgP');
 
     const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
     const nowIso=()=>new Date().toISOString();
@@ -442,16 +550,71 @@ finished=Terminé"></textarea>
     function savePrefs(){ localStorage.setItem(LS_PREFS, JSON.stringify({ sortBy, sortDir })); }
     function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(LS_PREFS)||'null') } catch { return null } }
 
-    /* ====== Groupes progression ====== */
     function progressGroupRank(g){
       if(g.status==='playing') return 0;
       if(g.status==='finished') return 1;
       return 2;
     }
 
+    /* ====== Rendu riche (images + mini markdown) ====== */
+    const IMG_LINE_RE = /^\s*(https?:\/\/\S+?\.(?:png|jpe?g|webp|gif|bmp|svg))(?:\s*\[([^\]]*)\])?\s*$/i;
+    function parseParams(str){
+      const out={}; if(!str) return out;
+      for(const part of str.split(/[,\s]+/)){
+        const [k,...vparts]=part.split('=');
+        const key=(k||'').trim().toLowerCase(); if(!key) continue;
+        const val=(vparts.join('=')||'').trim();
+        if(val) out[key]=val;
+      }
+      return out;
+    }
+    function escAttr(s){return String(s).replace(/"/g,'&quot;')}
+
+    function applyInlineFormatting(escaped){
+      // **bold** and *italic*
+      escaped = escaped.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+      escaped = escaped.replace(/\*([^*]+)\*/g,'<i>$1</i>');
+      // [size=S|M|L|XL]...[/size]  (fallback px/%, e.g., [size=18px])
+      escaped = escaped.replace(/\[size=([^\]]+)\]([\s\S]*?)\[\/size\]/g,(_,sz,txt)=>{
+        const map={s:'0.9rem',m:'1rem',l:'1.15rem',xl:'1.35rem'};
+        const key=String(sz).trim().toLowerCase();
+        const val=map[key] || key; // allow "18px" or "120%"
+        return `<span style="font-size:${escAttr(val)}">${txt}</span>`;
+      });
+      return escaped;
+    }
+
+    function renderRichText(text){
+      if(!text) return '(Aucun contenu pour le moment)';
+      const lines=String(text).split(/\r?\n/);
+      const htmlParts=[];
+      for(let line of lines){
+        const m=line.match(IMG_LINE_RE);
+        if(m){
+          const url=m[1];
+          const params=parseParams(m[2]||'');
+          const w=params.w||'';
+          const h=params.h||'';
+          const p=params.p||'';
+          const maxw=params.maxw||'100%';
+          const alt=params.alt? escAttr(params.alt) : 'image';
+          const styles=[];
+          if(w) styles.push(`width:${/^\d+$/.test(w)? w+'px' : w}`);
+          if(h) styles.push(`height:${/^\d+$/.test(h)? h+'px' : h}`);
+          if(p) styles.push(`padding:${/^\d+$/.test(p)? p+'px' : p}`);
+          if(maxw) styles.push(`max-width:${/^\d+$/.test(maxw)? maxw+'px' : maxw}`);
+          htmlParts.push(`<img class="rich-img" src="${escAttr(url)}" alt="${alt}" loading="lazy" style="${styles.join(';')}">`);
+        }else{
+          const safe=escapeHtml(line);
+          htmlParts.push(applyInlineFormatting(safe));
+        }
+      }
+      return htmlParts.join('<br>');
+    }
+
     /* ====== Avis ====== */
     function openReview(g, mode='full'){
-      revTitle.textContent = g.title || 'Avis';
+      $('revTitle').textContent = g.title ? `Avis — ${g.title}` : 'Avis';
       const metaParts = [];
       if(g.platform) metaParts.push(escapeHtml(g.platform));
       if(g.status) metaParts.push(escapeHtml(statusLabel(g.status)));
@@ -459,25 +622,48 @@ finished=Terminé"></textarea>
       if(typeof rs==='number') metaParts.push(`${rs}★/5`);
       if(typeof g.progress==='number') metaParts.push(`${g.progress}%`);
       metaParts.push(mode==='safe'?'Version sans spoiler':'Version complète');
-      revMeta.innerHTML = metaParts.join(' • ');
+      $('revMeta').innerHTML = metaParts.join(' • ');
 
       const content = (mode==='safe' ? (g.reviewSafe||'') : (g.review||'')) || '(Aucun avis pour le moment)';
-      revContent.textContent = content;
+      $('revContent').innerHTML = renderRichText(content);
 
-      reviewModal.setAttribute('open',''); reviewModal.setAttribute('aria-hidden','false');
+      $('reviewModal').setAttribute('open',''); $('reviewModal').setAttribute('aria-hidden','false');
     }
-    function closeReview(){ reviewModal.removeAttribute('open'); reviewModal.setAttribute('aria-hidden','true'); }
+    function closeReview(){ $('reviewModal').removeAttribute('open'); $('reviewModal').setAttribute('aria-hidden','true'); }
 
     let pendingReviewGame=null;
     function openReviewChoice(g){
       pendingReviewGame=g;
       const hasSafe=!!(g.reviewSafe && g.reviewSafe.trim());
-      revChoiceSafe.disabled = !hasSafe;
-      revChoiceNoSafe.style.display = hasSafe ? 'none' : 'block';
-      reviewChoiceModal.setAttribute('open',''); reviewChoiceModal.setAttribute('aria-hidden','false');
+      $('revChoiceSafe').disabled = !hasSafe;
+      $('revChoiceNoSafe').style.display = hasSafe ? 'none' : 'block';
+      $('reviewChoiceModal').setAttribute('open',''); $('reviewChoiceModal').setAttribute('aria-hidden','false');
     }
     function closeReviewChoice(){
-      reviewChoiceModal.removeAttribute('open'); reviewChoiceModal.setAttribute('aria-hidden','true');
+      $('reviewChoiceModal').removeAttribute('open'); $('reviewChoiceModal').setAttribute('aria-hidden','true');
+    }
+
+    /* ====== Résumé ====== */
+    let pendingSummaryGame=null;
+    function openSummaryWarn(g){
+      pendingSummaryGame=g;
+      $('summaryWarnModal').setAttribute('open',''); $('summaryWarnModal').setAttribute('aria-hidden','false');
+    }
+    function closeSummaryWarn(){
+      $('summaryWarnModal').removeAttribute('open'); $('summaryWarnModal').setAttribute('aria-hidden','true');
+    }
+    function openSummary(g){
+      $('sumTitle').textContent = g.title ? `Résumé — ${g.title}` : 'Résumé';
+      const metaParts=[];
+      if(g.platform) metaParts.push(escapeHtml(g.platform));
+      if(g.status) metaParts.push(escapeHtml(statusLabel(g.status)));
+      metaParts.push('Résumé (spoilers)');
+      $('sumMeta').innerHTML = metaParts.join(' • ');
+      $('sumContent').innerHTML = renderRichText(g.summary||'(Aucun résumé pour le moment)');
+      $('summaryModal').setAttribute('open',''); $('summaryModal').setAttribute('aria-hidden','false');
+    }
+    function closeSummary(){
+      $('summaryModal').removeAttribute('open'); $('summaryModal').setAttribute('aria-hidden','true');
     }
 
     /* ====== Filtre + tri ====== */
@@ -491,7 +677,7 @@ finished=Terminé"></textarea>
           for(const t of selectedTags){ if(!tagsSet.has(t)) return false; }
         }
         if(sTerm){
-          const hay=deburr([g.title,g.platform,(g.tags||[]).join(' '),g.notes,g.review,g.reviewSafe,String(g.rating??''),String(g.ratingStars??'')].join(' '));
+          const hay=deburr([g.title,g.platform,(g.tags||[]).join(' '),g.notes,g.review,g.reviewSafe,g.summary,String(g.rating??''),String(g.ratingStars??'')].join(' '));
           if(!hay.includes(sTerm)) return false;
         }
         return true;
@@ -541,7 +727,6 @@ finished=Terminé"></textarea>
       render();
     }
 
-    /* ====== Tags overflow ====== */
     function setupBadgesOverflow(container, inner, btn){
       inner.style.flexWrap='nowrap'; inner.style.overflow='hidden'; inner.style.width='auto';
       const need = inner.scrollWidth > inner.clientWidth + 4;
@@ -559,7 +744,6 @@ finished=Terminé"></textarea>
       }
     }
 
-    /* ====== Rendu ====== */
     function render(){
       grid.innerHTML='';
       if(filtered.length===0){ emptyEl.hidden=false; return }
@@ -591,7 +775,6 @@ finished=Terminé"></textarea>
         }
         inner.appendChild(subtitle);
 
-        // Tags
         const badgesWrap=document.createElement('div'); badgesWrap.className='badges';
         const innerBadges=document.createElement('div'); innerBadges.className='badgesInner';
         if(g.tags?.length){
@@ -607,14 +790,12 @@ finished=Terminé"></textarea>
         badgesWrap.appendChild(innerBadges); badgesWrap.appendChild(moreBtn);
         inner.appendChild(badgesWrap);
 
-        // Progression
         if(typeof g.progress==='number'){
           const wrap=document.createElement('div'); wrap.className='progress';
           const bar=document.createElement('span'); bar.style.width=Math.max(0,Math.min(100,g.progress))+'%';
           wrap.appendChild(bar); inner.appendChild(wrap);
         }
 
-        // Liens (VOD + Voir l'avis)
         const links=document.createElement('div'); links.className='links';
         if(g.link){
           const a=document.createElement('a'); a.className='linkbtn vod'; a.href=g.link; a.target='_blank'; a.rel='noopener';
@@ -626,15 +807,18 @@ finished=Terminé"></textarea>
           r.onclick=()=>openReviewChoice(g);
           links.appendChild(r);
         }
+        if( g.summary && g.summary.trim() ){
+          const s=document.createElement('button'); s.className='linkbtn summary'; s.type='button'; s.textContent="Voir résumé";
+          s.onclick=()=>openSummaryWarn(g);
+          links.appendChild(s);
+        }
         if(links.children.length>0) inner.appendChild(links);
 
-        // Notes (extrait)
         if(g.notes){
           const p=document.createElement('p'); p.style.marginTop='10px'; p.style.color='var(--muted)'; p.textContent=g.notes;
           inner.appendChild(p);
         }
 
-        // Actions admin
         if(ADMIN_ENABLED){
           const actions=document.createElement('div'); actions.className='actions';
           const editBtn=document.createElement('button'); editBtn.className='ghost'; editBtn.textContent='✏️ Modifier'; editBtn.onclick=()=>openModal(g.id);
@@ -648,7 +832,6 @@ finished=Terminé"></textarea>
       requestAnimationFrame(()=>{ measureJobs.forEach(fn=>fn()); });
     }
 
-    // Recompute badges on resize
     window.addEventListener('resize', ()=>{
       document.querySelectorAll('.badges').forEach(bw=>{
         const inner=bw.querySelector('.badgesInner'); const btn=bw.querySelector('.moreBtn');
@@ -656,7 +839,6 @@ finished=Terminé"></textarea>
       });
     });
 
-    // UI statuts
     function buildStatusUI(){
       chipsWrap.innerHTML='';
       for(const s of STATUS){
@@ -670,7 +852,7 @@ finished=Terminé"></textarea>
 
     function toggleTagFilter(tag){const key=String(tag).toLowerCase(); if(selectedTags.has(key)) selectedTags.delete(key); else selectedTags.add(key); applyFilters();}
 
-    /* ====== STAR PICKER (modale) ====== */
+    /* ====== STAR PICKER ====== */
     let pickerRow=null;
     function buildRatingPicker(initial=0){
       const wrap=$('ratingPickerWrap'); wrap.innerHTML='';
@@ -706,14 +888,15 @@ finished=Terminé"></textarea>
     function clearForm(){
       fTitle.value=''; fPlatform.value=''; fStatus.value=(STATUS[0]?.id||'planned');
       fProgress.value=''; fTags.value=''; fRating.value=''; fNotes.value='';
-      fReview.value=''; fReviewSafe.value='';
+      fReview.value=''; fReviewSafe.value=''; fSummary.value='';
       fLink.value=''; fLinkLabel.value='VOD'; fCover.value='';
     }
     function fillForm(g){
-      fTitle.value=g.title; fPlatform.value=g.platform; fStatus.value=g.status;
+      fTitle.value=g.title
+            fPlatform.value=g.platform; fStatus.value=g.status;
       fProgress.value=(g.progress??''); fTags.value=(g.tags||[]).join(', ');
       const rs=getRatingStars(g)||''; fRating.value=rs;
-      fNotes.value=g.notes||''; fReview.value=g.review||''; fReviewSafe.value=g.reviewSafe||'';
+      fNotes.value=g.notes||''; fReview.value=g.review||''; fReviewSafe.value=g.reviewSafe||''; fSummary.value=g.summary||'';
       fLink.value=g.link??''; fLinkLabel.value=g.linkLabel||'VOD'; fCover.value=g.cover??'';
     }
     function readForm(){
@@ -729,12 +912,12 @@ finished=Terminé"></textarea>
         notes:fNotes.value.trim(),
         review:fReview.value.trim(),
         reviewSafe:fReviewSafe.value.trim(),
+        summary:fSummary.value.trim(),
         link:fLink.value.trim()||null,
         linkLabel:fLinkLabel.value.trim()||'VOD',
         cover:fCover.value.trim()||null
       }
     }
-
     function upsertGame(){
       if(!ADMIN_ENABLED) return;
       const data=readForm();
@@ -744,11 +927,10 @@ finished=Terminé"></textarea>
         const idx=games.findIndex(g=>g.id===editingId);
         if(idx>-1){games[idx]={...games[idx],...data,updatedAt:nowIso()}}
       } else {
-        games.push({id:uid(),createdAt:nowIso(),updatedAt:nowIso(),progress:null,rating:null,ratingStars:null,notes:'',review:'',reviewSafe:'',cover:null,link:null,linkLabel:'VOD',tags:[],...data});
+        games.push({id:uid(),createdAt:nowIso(),updatedAt:nowIso(),progress:null,rating:null,ratingStars:null,notes:'',review:'',reviewSafe:'',summary:'',cover:null,link:null,linkLabel:'VOD',tags:[],...data});
       }
       saveLS(); computePlatformsSelect(); applyFilters(); setupTwitch(); closeModal();
     }
-
     function deleteGame(){
       if(!ADMIN_ENABLED) return;
       if(!editingId)return;
@@ -761,12 +943,10 @@ finished=Terminé"></textarea>
     function bundleJSON(){
       return JSON.stringify({settings:{...settings,customStatuses:STATUS},games}, null, 2);
     }
-
     function exportJSON(){
       const blob=new Blob([bundleJSON()],{type:'application/json'});
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='games_bundle.json'; a.click(); URL.revokeObjectURL(a.href);
     }
-
     async function copyJSON(){
       const text=bundleJSON();
       try{
@@ -783,7 +963,6 @@ finished=Terminé"></textarea>
         alert('Impossible de copier le JSON : '+e.message);
       }
     }
-
     function importJSON(file){
       if(!ADMIN_ENABLED) return;
       const reader=new FileReader();
@@ -801,6 +980,7 @@ finished=Terminé"></textarea>
           ...g,
           review: (g.review ?? ''),
           reviewSafe: (g.reviewSafe ?? ''),
+          summary: (g.summary ?? ''),
           ratingStars: (typeof g.ratingStars==='number'? g.ratingStars : (typeof g.rating==='number'? g.rating/2 : null))
         }));
         saveLS(); computePlatformsSelect(); buildStatusUI(); applyFilters(); setupTwitch(); closeModal();
@@ -808,74 +988,20 @@ finished=Terminé"></textarea>
       reader.readAsText(file);
     }
 
-    /* ====== Twitch ====== */
-    let liveTimer=null;
-    function setLiveUI(live){
-      livePill.className='pill'+(live?' live':'');
-      liveText.textContent=live?'En direct':'Hors ligne';
-      mobileTwitchBtn.textContent=live?'Twitch (LIVE)':'Twitch';
-    }
-
-    async function fetchLiveHelix(channel, clientId, token){
-      try{
-        const res = await fetch(`https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(channel)}`, {
-          headers: { 'Client-ID': clientId, 'Authorization': `Bearer ${token}` }
-        });
-        if(!res.ok) throw new Error('Helix error');
-        const data=await res.json();
-        return Array.isArray(data.data) && data.data.length>0;
-      }catch{ return null } // null = inconnu (erreur)
-    }
-    async function fetchLiveFallback(channel){
-      try{
-        const res=await fetch(`https://decapi.me/twitch/uptime/${encodeURIComponent(channel)}`, {cache:'no-store'});
-        if(!res.ok) throw new Error('decapi error');
-        const txt=await res.text();
-        const offline = /offline/i.test(txt);
-        if(offline) return false;
-        const live = /(live|uptime|has been live)/i.test(txt);
-        return live ? true : false;
-      }catch{ return null }
-    }
-
-    async function updateLive(){
-      const channel=(settings.twitchChannel||'').trim();
-      if(!settings.showTwitch || !channel){ setLiveUI(false); return; }
-
-      if(settings.isLive==='live'){ setLiveUI(true); return; }
-      if(settings.isLive==='offline'){ setLiveUI(false); return; }
-
-      // Auto
-      let live=null;
-      if(settings.twitchClientId && settings.twitchToken){
-        live = await fetchLiveHelix(channel, settings.twitchClientId, settings.twitchToken);
-      }
-      if(live===null){
-        live = await fetchLiveFallback(channel);
-      }
-      if(live===null){
-        // indéterminé -> ne rien changer
-        return;
-      }
-      setLiveUI(!!live);
-    }
-
+    /* ====== Twitch (placeholder si non configuré) ====== */
     function setupTwitch(){
-      const show=!!settings.showTwitch; const channel=(settings.twitchChannel||'').trim(); const parent=encodeURIComponent(location.hostname||'localhost'); const twitchUrl=`https://www.twitch.tv/${channel}`;
-      if(!show||!channel){twitchPanel.hidden=true; mobileTwitchBtn.style.display='none'; if(liveTimer) clearInterval(liveTimer); return;}
-      twitchPanel.hidden=false; twitchLink.href=twitchUrl; twitchTitle.textContent=channel?`@${channel}`:''; mobileTwitchBtn.href=twitchUrl;
-
-      // Embed
-      twitchEmbed.innerHTML=''; const ifr=document.createElement('iframe'); ifr.allow='autoplay; fullscreen; picture-in-picture'; ifr.frameBorder='0'; ifr.width='100%'; ifr.height='100%'; ifr.src=`https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=${parent}&muted=true`; twitchEmbed.appendChild(ifr);
-      twitchChat.innerHTML=''; const chat=document.createElement('iframe'); chat.frameBorder='0'; chat.width='100%'; chat.height='100%'; chat.src=`https://www.twitch.tv/embed/${encodeURIComponent(channel)}/chat?parent=${parent}`; twitchChat.appendChild(chat);
-
-      // Auto live polling
-      if(liveTimer) clearInterval(liveTimer);
-      updateLive();
-      liveTimer=setInterval(updateLive, 60000); // 60s
+      // par défaut on masque si non configuré (évite les erreurs)
+      const show=!!settings.showTwitch && settings.twitchChannel;
+      twitchPanel.hidden=!show;
+      mobileTwitchBtn.style.display= show? 'block' : 'none';
+      if(show){
+        twitchTitle.textContent='@'+settings.twitchChannel;
+        twitchLink.href='https://www.twitch.tv/'+encodeURIComponent(settings.twitchChannel);
+        mobileTwitchBtn.href=twitchLink.href;
+      }
     }
 
-    /* ====== Param helpers ====== */
+    /* ====== Paramètres ====== */
     function statusesToText(arr) { return arr.map(s => `${s.id}=${s.label}`).join('\n'); }
     function parseStatuses(text) {
       const out = [];
@@ -909,28 +1035,176 @@ finished=Terminé"></textarea>
       saveLS(); buildStatusUI(); applyFilters(); setupTwitch(); closeSettingsModal();
     }
 
-    /* ====== Données d'exemple ====== */
-    function initSample(){return[
-      {id:uid(),title:'Batman: Arkham City',platform:'PC',status:'replaying',progress:35,tags:['action','Batman'],ratingStars:4.5,rating:9,notes:'Reprise en hard mode.',reviewSafe:'Quelques faiblesses de rythme, mais une boucle de gameplay encore super efficace.',review:'Un classique qui tient encore bien la route. Les combats sont toujours top, quelques longueurs au milieu et la cam n’aide pas dans certains couloirs.',link:'',linkLabel:'VOD | 1h37',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'The Last of Us Part I',platform:'PC',status:'finished',progress:100,tags:['narratif'],ratingStars:5,rating:10,notes:'Coup de cœur.',reviewSafe:'Une histoire forte et émouvante, servie par une réalisation irréprochable.',review:'Histoire et rythme impeccables. La scène du **spoiler** fonctionne toujours autant, et le final est percutant.',link:'',linkLabel:'VOD | 2h05',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Red Dead Redemption 2',platform:'PC',status:'planned',progress:null,tags:['open-world'],ratingStars:null,rating:null,notes:'Prévu pour stream.',reviewSafe:'',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Days Gone',platform:'PC',status:'unfinished',progress:52,tags:['zombies'],ratingStars:3,rating:6,notes:'Hésite à reprendre.',reviewSafe:'Bon défouloir mais répétitif.',review:'Bons gunfights, répétitif sur la durée.',link:'',linkLabel:'VOD | 45:12',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-      {id:uid(),title:'Metal Gear Solid',platform:'PS1',status:'playing',progress:18,tags:['infiltration','classique'],ratingStars:null,rating:null,notes:'Découverte.',reviewSafe:'',review:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
-    ]}
+    /* ====== Mini barre d’édition (gras/italique/taille) ====== */
+    let activeEditor=null, lastMouse={x:0,y:0};
+    document.addEventListener('mousemove',e=>{ lastMouse.x=e.clientX; lastMouse.y=e.clientY; });
 
-    /* ====== Bundle JSON embarqué (optionnel) ====== */
-    async function loadBundle() {
-      try {
-        const res = await fetch('games_bundle.json?ts=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) throw new Error('no json');
-        const data = await res.json();
-        if (Array.isArray(data)) return { games: data, settings: null };
-        if (data && Array.isArray(data.games)) return data;
-      } catch (e) {}
-      return null;
+    function wrapSelection(el,before,after){
+      const start=el.selectionStart, end=el.selectionEnd;
+      if(start==null || end==null || end<=start) return;
+      const v=el.value;
+      el.value=v.slice(0,start)+before+v.slice(start,end)+after+v.slice(end);
+      el.focus();
+      el.selectionStart=start+before.length;
+      el.selectionEnd=end+before.length;
+      triggerInput(el);
+    }
+    function applySize(el, code){
+      if(!code){ hideFormatPop(); return; }
+      wrapSelection(el, `[size=${code}]`, `[/size]`);
+      hideFormatPop();
+      sizeSelect.value='';
+    }
+    function showFormatPop(x, y){
+  formatPop.style.left = Math.max(8, x - formatPop.offsetWidth/2) + 'px';
+  formatPop.style.top  = Math.max(8, y - (formatPop.offsetHeight + 12)) + 'px';
+  formatPop.setAttribute('aria-hidden','false');
+}
+    function hideFormatPop(){
+  formatPop.setAttribute('aria-hidden','true');
+  formatPop.style.left = '-9999px';
+  formatPop.style.top  = '-9999px';
+}
+    function triggerInput(el){ el.dispatchEvent(new Event('input',{bubbles:true})); }
+
+    // Remplace la ligne existante par ceci :
+formatPop.addEventListener('mousedown', (e)=>{
+  // On empêche juste le drag sur les boutons, pas sur le <select>
+  if (e.target.closest('button')) e.preventDefault();
+});
+
+    formatPop.addEventListener('click',e=>{
+      if(!activeEditor) return;
+      const btn=e.target.closest('button');
+      if(btn){
+        const cmd=btn.dataset.cmd;
+        if(cmd==='bold') wrapSelection(activeEditor,'**','**');
+        if(cmd==='italic') wrapSelection(activeEditor,'*','*');
+      }
+    });
+    sizeSelect.addEventListener('change',()=>{ if(activeEditor) applySize(activeEditor,sizeSelect.value); });
+
+    function editorSelectionHandler(e){
+      activeEditor=e.currentTarget;
+      const el=activeEditor;
+      if(el.selectionStart!==el.selectionEnd){
+        showFormatPop(lastMouse.x,lastMouse.y);
+      }else{
+        hideFormatPop();
+      }
     }
 
+    /* ====== Panneau image : convertir URL -> image + sliders ====== */
+    let imageCtx=null; // {el, start, end, url}
+    function getCurrentLine(el){
+      const v=el.value, pos=el.selectionStart??0;
+      let a=v.lastIndexOf('\n', Math.max(0,pos-1)); if(a===-1) a=0; else a=a+1;
+      let b=v.indexOf('\n', pos); if(b===-1) b=v.length;
+      return {start:a, end:b, text:v.slice(a,b)};
+    }
+    function openImagePopFor(el, url){
+      imageCtx={el, url, ...getCurrentLine(el)};
+      imgPrev.src=url; imgPrev.alt='image';
+      imgW.value='70'; imgP.value='8';
+      positionPopupNearCaret(el, imagePop);
+      imagePop.setAttribute('aria-hidden','false');
+      // inject default params into the line immediately
+      commitImageLine();
+    }
+    function commitImageLine(){
+  if(!imageCtx) return;
+  const { el, url } = imageCtx;
+
+  // Reprend toujours la ligne COURANTE
+  const { start, end, text } = getCurrentLine(el);
+
+  // Nettoie d'abord les éventuels paramètres existants : "url [....]" -> "url"
+  const cleaned = text.replace(/\s*\[[^\]]*\]\s*$/, '').trim();
+
+  // Si la ligne ne commence plus par l'URL attendue, on abandonne (l'utilisateur a écrit ailleurs)
+  if(!cleaned.startsWith(url)) return;
+
+  const w = imgW.value, p = imgP.value;
+  const line = `${url} [w=${w}% p=${p}]`;
+
+  const v = el.value;
+  el.value = v.slice(0, start) + line + v.slice(end);
+
+  // Place le curseur en fin de ligne et met à jour le contexte
+  const newEnd = start + line.length;
+  el.selectionStart = el.selectionEnd = newEnd;
+  imageCtx = { el, url, start, end: newEnd };
+
+  triggerInput(el);
+}
+
+    function closeImagePop(){
+  imagePop.setAttribute('aria-hidden','true');
+  imagePop.style.left = '-9999px';
+  imagePop.style.top  = '-9999px';
+  imageCtx = null;
+}
+    function positionPopupNearCaret(el, pop){
+  // On calcule une position proche du curseur, puis on la "clamp" dans la fenêtre
+  const r = el.getBoundingClientRect();
+  let x = Math.min(lastMouse.x, r.right - 8) + 8;
+  let y = Math.max(r.top + 8,  lastMouse.y) + 8;
+
+  // Mesure (fallbacks au cas où)
+  const w = pop.offsetWidth  || 320;
+  const h = pop.offsetHeight || 180;
+
+  // Clamp aux bords de la fenêtre
+  x = Math.max(8, Math.min(x, window.innerWidth  - w - 8));
+  y = Math.max(8, Math.min(y, window.innerHeight - h - 8));
+
+  pop.style.left = x + 'px';
+  pop.style.top  = y + 'px';
+}
+    imgW.addEventListener('input',commitImageLine);
+    imgP.addEventListener('input',commitImageLine);
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ hideFormatPop(); closeImagePop(); } });
+    document.addEventListener('click',e=>{
+      if(!e.target.closest('.image-pop') && !e.target.closest('.rich-editor')) closeImagePop();
+      if(!e.target.closest('.format-pop') && !e.target.closest('.rich-editor')) hideFormatPop();
+    });
+
+    function editorInputHandler(e){
+      const el=e.currentTarget;
+      // si la ligne courante est une URL d'image brute => ouvrir panneau image
+      const {text}=getCurrentLine(el);
+      const m=text.match(/^\s*(https?:\/\/\S+\.(?:png|jpe?g|webp|gif|bmp|svg))\s*$/i);
+      if(m){
+        openImagePopFor(el, m[1]);
+      }
+    }
+
+    function attachEditor(el){
+      el.addEventListener('mouseup',editorSelectionHandler);
+      el.addEventListener('keyup',editorSelectionHandler);
+      el.addEventListener('input',editorInputHandler);
+      el.addEventListener('blur', ()=>{
+  setTimeout(()=>{
+    const a=document.activeElement;
+    if (!a || !a.closest('.format-pop')) hideFormatPop();
+  }, 0);
+});
+    }
+
+    /* ====== Données d'exemple ====== */
+    function initSample(){return[
+      {id:uid(),title:'Batman: Arkham City',platform:'PC',status:'replaying',progress:35,tags:['action','Batman'],ratingStars:4.5,rating:9,notes:'Reprise en hard mode.',
+       reviewSafe:'Quelques faiblesses de rythme, mais une boucle de gameplay encore super efficace.\nhttps://shared.fastly.steamstatic.com/store_item_assets/steam/apps/200260/header.jpg',
+       review:'Un classique qui tient encore bien la route. Les combats sont toujours top, quelques longueurs au milieu et la cam n’aide pas dans certains couloirs.',
+       summary:"Batman frappe ensuite le Joker.\nhttps://shared.fastly.steamstatic.com/store_item_assets/steam/apps/208650/header.jpg",
+       link:'',linkLabel:'VOD | 1h37',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'The Last of Us Part I',platform:'PC',status:'finished',progress:100,tags:['narratif'],ratingStars:5,rating:10,notes:'Coup de cœur.',reviewSafe:'Une histoire forte et émouvante, servie par une réalisation irréprochable.',review:'Histoire et rythme impeccables.',summary:'',link:'',linkLabel:'VOD | 2h05',cover:null,createdAt:nowIso(),updatedAt:nowIso()},
+      {id:uid(),title:'Red Dead Redemption 2',platform:'PC',status:'planned',progress:null,tags:['open-world'],ratingStars:null,rating:null,notes:'Prévu pour stream.',reviewSafe:'',review:'',summary:'',link:'',linkLabel:'',cover:null,createdAt:nowIso(),updatedAt:nowIso()}
+    ]}
+
     /* ====== INIT ====== */
+    function loadBundle(){ return Promise.resolve(null); } // pas de bundle par défaut
+
     async function init(){
       if(ADMIN_ENABLED){fab.hidden=false; settingsFab.hidden=false}
 
@@ -952,11 +1226,11 @@ finished=Terminé"></textarea>
         }
       }
 
-      // compat anciennes sauvegardes
       games = games.map(g => ({
         ...g,
         review: (g.review ?? ''),
         reviewSafe: (g.reviewSafe ?? ''),
+        summary: (g.summary ?? ''),
         ratingStars: (typeof g.ratingStars==='number' ? g.ratingStars : (typeof g.rating==='number' ? g.rating/2 : null))
       }));
 
@@ -967,7 +1241,7 @@ finished=Terminé"></textarea>
 
       buildStatusUI(); computePlatformsSelect(); applyFilters(); setupTwitch();
 
-      // Events
+      // Events filtre/tri
       searchInput.addEventListener('input',e=>{searchTerm=e.target.value; applyFilters()});
       platformSelect.addEventListener('change',e=>{selectedPlatform=e.target.value; applyFilters()});
       sortSelect.addEventListener('change', e=>{
@@ -977,7 +1251,6 @@ finished=Terminé"></textarea>
         applyFilters(); savePrefs();
       });
       sortDirInput.addEventListener('change', e=>{ sortDir = e.target.checked ? 'asc' : 'desc'; applyFilters(); savePrefs(); });
-
       clearFiltersBtn.onclick=()=>{
         selectedStatuses.clear(); [...chipsWrap.children].forEach(ch=>ch.dataset.active='false');
         selectedPlatform=''; platformSelect.value='';
@@ -1004,25 +1277,33 @@ finished=Terminé"></textarea>
       $('sCloseBtn').onclick=()=>closeSettingsModal();
       $('sSaveBtn').onclick=()=>saveSettings();
 
-      // Raccourci admin (easter egg)
+      // Modales Avis & Résumé
+      revCloseBtn.onclick = closeReview;
+      reviewModal.addEventListener('click', (e)=>{ if(e.target===reviewModal) closeReview(); });
+      revChoiceClose.onclick = closeReviewChoice;
+      reviewChoiceModal.addEventListener('click', (e)=>{ if(e.target===reviewChoiceModal) closeReviewChoice(); });
+      revChoiceSafe.onclick = ()=>{ if(pendingReviewGame){ closeReviewChoice(); openReview(pendingReviewGame,'safe'); } };
+      revChoiceFull.onclick = ()=>{ if(pendingReviewGame){ closeReviewChoice(); openReview(pendingReviewGame,'full'); } };
+
+      sumCloseBtn.onclick = closeSummary;
+      summaryModal.addEventListener('click', (e)=>{ if(e.target===summaryModal) closeSummary(); });
+      sumWarnClose.onclick = closeSummaryWarn;
+      sumWarnBack.onclick = closeSummaryWarn;
+      summaryWarnModal.addEventListener('click', (e)=>{ if(e.target===summaryWarnModal) closeSummaryWarn(); });
+      sumWarnRead.onclick = ()=>{ if(pendingSummaryGame){ closeSummaryWarn(); openSummary(pendingSummaryGame); } };
+
+      // Barre d’édition sur les 3 champs
+      document.querySelectorAll('.rich-editor').forEach(attachEditor);
+
+      // Raccourci admin
       let seq=''; document.addEventListener('keydown',e=>{
         if((e.ctrlKey&&e.altKey&&e.key.toLowerCase()==='a')&&ADMIN_ENABLED){openModal()}
         seq+=e.key.toLowerCase(); if(seq.length>7) seq=seq.slice(-7);
         if(seq.endsWith('scotch')&&ADMIN_ENABLED){openSettingsModal(); seq=''}
       });
 
-      // Twitch minimize
-      minimizeTwitch.onclick=()=>{const hidden=twitchEmbed.style.display==='none'; twitchEmbed.style.display=hidden?'block':'none'; minimizeTwitch.textContent=hidden?'Réduire':'Agrandir'};
-
-      // Modale Avis
-      revCloseBtn.onclick = closeReview;
-      reviewModal.addEventListener('click', (e)=>{ if(e.target===reviewModal) closeReview(); });
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') { closeReview(); closeReviewChoice(); } });
-
-      revChoiceClose.onclick = closeReviewChoice;
-      reviewChoiceModal.addEventListener('click', (e)=>{ if(e.target===reviewChoiceModal) closeReviewChoice(); });
-      revChoiceSafe.onclick = ()=>{ if(pendingReviewGame){ closeReviewChoice(); openReview(pendingReviewGame,'safe'); } };
-      revChoiceFull.onclick = ()=>{ if(pendingReviewGame){ closeReviewChoice(); openReview(pendingReviewGame,'full'); } };
+      // ESC global
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') { closeReview(); closeReviewChoice(); closeSummaryWarn(); closeSummary(); } });
     }
     document.addEventListener('DOMContentLoaded',init);
   </script>
