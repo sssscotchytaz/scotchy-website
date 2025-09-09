@@ -429,6 +429,8 @@ finished=Terminé"></textarea>
     <div class="row"><label>Aperçu</label><img id="imgPrev" class="rich-img" alt="" style="max-width:100%"></div>
   </div>
 
+  <script src="https://player.twitch.tv/js/embed/v1.js"></script>
+
   <script>
     /* ====== Statuts ====== */
     let STATUS=[
@@ -989,17 +991,63 @@ finished=Terminé"></textarea>
     }
 
     /* ====== Twitch (placeholder si non configuré) ====== */
-    function setupTwitch(){
-      // par défaut on masque si non configuré (évite les erreurs)
-      const show=!!settings.showTwitch && settings.twitchChannel;
-      twitchPanel.hidden=!show;
-      mobileTwitchBtn.style.display= show? 'block' : 'none';
-      if(show){
-        twitchTitle.textContent='@'+settings.twitchChannel;
-        twitchLink.href='https://www.twitch.tv/'+encodeURIComponent(settings.twitchChannel);
-        mobileTwitchBtn.href=twitchLink.href;
-      }
-    }
+   let twitchPlayerInstance = null;
+
+function setupTwitch(){
+  const show = !!settings.showTwitch && settings.twitchChannel;
+  twitchPanel.hidden = !show;
+  mobileTwitchBtn.style.display = show ? 'block' : 'none';
+  if(!show) return;
+
+  const channel = settings.twitchChannel.trim();
+  const parents = [];
+  // parents requis par Twitch
+  // localhost
+  if(location.hostname === 'localhost' || location.hostname === '127.0.0.1'){
+    parents.push('localhost','127.0.0.1');
+  } else {
+    // domaine exact (github pages ou custom)
+    parents.push(location.hostname);
+  }
+
+  twitchTitle.textContent = '@'+channel;
+  const urlBase = 'https://www.twitch.tv/'+encodeURIComponent(channel);
+  twitchLink.href = urlBase;
+  mobileTwitchBtn.href = urlBase;
+
+  // ===== Player =====
+  // Détruit l’existant si on reconfigure
+  if(twitchPlayerInstance && twitchPlayerInstance.remove){
+    try{ twitchPlayerInstance.remove(); }catch{}
+    twitchEmbed.innerHTML = '';
+  }
+
+  // (re)crée le player
+  try{
+    twitchPlayerInstance = new Twitch.Player('twitchEmbed', {
+      channel,
+      parent: parents,
+      width: '100%',
+      height: '100%',
+      muted: true,       // évite les soucis d’autoplay
+      controls: true
+    });
+  }catch(e){
+    console.warn('Twitch.Player init failed:', e);
+    // Fallback en iframe si besoin
+    twitchEmbed.innerHTML =
+      `<iframe src="https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=${parents.map(encodeURIComponent).join('&parent=')}"
+               allowfullscreen frameborder="0" scrolling="no"
+               style="width:100%;height:100%;display:block"></iframe>`;
+  }
+
+  // ===== Chat =====
+  const chatSrc = `https://www.twitch.tv/embed/${encodeURIComponent(channel)}/chat?parent=${parents.map(encodeURIComponent).join('&parent=')}`;
+  twitchChat.innerHTML =
+    `<iframe src="${chatSrc}" frameborder="0" scrolling="no"
+             style="width:100%;height:100%;display:block"></iframe>`;
+}
+
 
     /* ====== Paramètres ====== */
     function statusesToText(arr) { return arr.map(s => `${s.id}=${s.label}`).join('\n'); }
@@ -1203,7 +1251,21 @@ formatPop.addEventListener('mousedown', (e)=>{
     ]}
 
     /* ====== INIT ====== */
-    function loadBundle(){ return Promise.resolve(null); } // pas de bundle par défaut
+    async function loadBundle(){
+  try{
+    const res = await fetch('./games_bundle.json', {cache:'no-store'});
+    if(!res.ok) return null;            // 404 => on tombe sur LS / samples
+    const data = await res.json();
+    // structure attendue: { settings:{...}, games:[...] }
+    if(Array.isArray(data)) return {settings:null, games:data}; // compat ancien format
+    if(data && Array.isArray(data.games)) return data;
+    return null;
+  }catch(e){
+    console.warn('Bundle fetch failed:', e);
+    return null;
+  }
+}
+
 
     async function init(){
       if(ADMIN_ENABLED){fab.hidden=false; settingsFab.hidden=false}
