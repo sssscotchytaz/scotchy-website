@@ -29,6 +29,8 @@
   a{color:var(--blue);text-decoration:none}
   a:hover{text-decoration:underline}
 
+  .hidden{display:none !important}
+
   /* ===== Layout ===== */
   .app{display:grid; grid-template-columns: 270px 1fr; min-height:100vh; grid-template-areas:"sidebar right";}
   .sidebar{grid-area:sidebar; position:sticky; top:0; align-self:start; height:100vh; overflow:auto; background:linear-gradient(180deg,var(--panel),var(--panel-2)); border-right:1px solid var(--line); z-index:150}
@@ -231,8 +233,11 @@
             <input id="q" placeholder="Rechercher (titre, auteurs, artistes, synopsis, univers, VO/VF, catégories, avis...)" />
           </div>
           <button class="btn btn-outline" id="btn-reading">Mode lecture</button>
-          <button class="btn btn-primary" id="btn-import">Importer JSON</button>
-          <button class="btn btn-primary" id="btn-export">Exporter JSON</button>
+
+          <!-- Admin-only buttons -->
+          <button class="btn btn-primary admin-only" id="btn-import">Importer JSON</button>
+          <button class="btn btn-primary admin-only" id="btn-export">Exporter JSON</button>
+          <button class="btn btn-outline admin-only" id="btn-copy-json">Copier le JSON</button>
         </div>
       </div>
 
@@ -250,9 +255,11 @@
 
         <div class="spacer"></div>
         <select id="timelineSelect" class="select" title="Changer de timeline"></select>
-        <button class="btn btn-primary" id="btn-new-timeline">Nouvelle</button>
-        <button class="btn btn-outline" id="btn-rename-timeline">Renommer</button>
-        <button class="btn btn-outline" id="btn-delete-timeline">Supprimer</button>
+
+        <!-- Admin-only timeline mgmt -->
+        <button class="btn btn-primary admin-only" id="btn-new-timeline">Nouvelle</button>
+        <button class="btn btn-outline admin-only" id="btn-rename-timeline">Renommer</button>
+        <button class="btn btn-outline admin-only" id="btn-delete-timeline">Supprimer</button>
       </div>
 
       <main class="content">
@@ -264,8 +271,8 @@
     </div>
   </div>
 
-  <!-- FAB -->
-  <div class="fab">
+  <!-- FAB (admin only) -->
+  <div class="fab admin-only">
     <button class="btn btn-primary" id="btn-add-comic">+ Ajouter un comic</button>
     <button class="btn btn-outline" id="btn-add-marker">+ Ajouter un repère</button>
   </div>
@@ -286,6 +293,37 @@
   </div>
 
 <script>
+/* ===== Admin / Prod detection ===== */
+/* Admin = Live Server/local (localhost/127/192.168.*), ou param ?admin=1, ou drapeau localStorage. */
+const host = location.hostname;
+const isLocalHost =
+  host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local') ||
+  /^192\.168\.\d+\.\d+$/.test(host) || /^10\.\d+\.\d+\.\d+$/.test(host) || host === '';
+
+const query = new URLSearchParams(location.search);
+const qsAdmin = query.get('admin') === '1';
+const savedAdmin = localStorage.getItem('scotchy_admin') === '1';
+const IS_EDITOR = isLocalHost || qsAdmin || savedAdmin;
+
+/* Raccourci caché pour basculer l'admin: Ctrl+Alt+A */
+window.addEventListener('keydown', (e)=>{
+  if(e.ctrlKey && e.altKey && (e.key==='a' || e.key==='A')){
+    const now = !(localStorage.getItem('scotchy_admin') === '1');
+    localStorage.setItem('scotchy_admin', now ? '1' : '0');
+    alert('Mode admin: ' + (now ? 'activé' : 'désactivé') + ' — rechargement.');
+    location.reload();
+  }
+});
+
+/* Appliquer la visibilité des éléments admin */
+function applyAdminVisibility(){
+  document.querySelectorAll('.admin-only').forEach(el=>{
+    if(IS_EDITOR) el.classList.remove('hidden'); else el.classList.add('hidden');
+  });
+  // Le body expose l'état (utile si tu veux styler différemment)
+  document.body.dataset.admin = IS_EDITOR ? 'true' : 'false';
+}
+
 /* ===== Helpers & State ===== */
 const STORAGE_KEY = 'scotchy_comics_timelines_v3';
 const $ = s=>document.querySelector(s);
@@ -326,7 +364,7 @@ function renderStars(r){
   return '<div class="stars">'+stars.join('')+'</div>';
 }
 
-/* ===== Data ===== */
+/* ===== Data (seed) ===== */
 const seed={timelines:[{id:'opt',name:'Lecture optimale',items:[
   {type:'marker', id:'m1', label:'Les origines de Batman'},
   {type:'comic', id:'c_yearone', title:'Batman: Année Un', altTitle:'Year One', tome:'One-Shot', authors:['Frank Miller'], artists:['David Mazzucchelli'], pages:144, release:'1987', publisher:'DC', universe:'Post-Crisis', category:'indispensable', status:'VF', cover:'https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=480&auto=format&fit=crop', synopsis:"Enfant, Bruce Wayne a vu ses parents se faire assassiner sous ses yeux.\nAprès un entraînement intensif, il revient à Gotham City pour mener une guerre sans merci contre le crime… mais ce ne sera pas facile. Face à la corruption des autorités de la ville et leurs liens avec la pègre, Bruce, sous le déguisement du vigilant Batman, va forger une alliance avec un policier nouveau venu à Gotham : le lieutenant James Gordon.", altOptions:[{label:'Regarder le film d\'animation "Year One"', url:'https://www.imdb.com/title/tt1672723/'}], why:{pro:['Origines réalistes, ancre la psyché de Bruce','Introduit Gordon comme pilier'], con:[]}, links:[{label:'Commander — 18,50 € (VF)', url:'https://www.google.com'}], review:{stars:4.5, md:'# Une claque\n\n**Année Un** c\'est la base.\n- Rituel chauve-souris\n- Gordon incroyable\n\n||La fin sur les Falcone est masterclass||'}},
@@ -337,10 +375,30 @@ const seed={timelines:[{id:'opt',name:'Lecture optimale',items:[
   {type:'comic', id:'c_else', title:'Gotham by Gaslight', tome:'One-Shot', authors:['Brian Augustyn'], artists:['Mike Mignola'], pages:64, release:'1989', publisher:'DC', universe:'Elseworld', category:'horschemin', status:'VO/VF', cover:'https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?q=80&w=480&auto=format&fit=crop', synopsis:"Batman à l'époque victorienne traque Jack l’Eventreur.", why:{pro:['Elseworld culte, lecture à part'], con:[]}, links:[{label:'VO', url:'https://www.google.com'}]},
   {type:'comic', id:'c_cross', title:'Batman / Huntress: Cry for Blood', tome:'Mini-série', authors:['Greg Rucka'], artists:['Rick Burchett'], pages:152, release:'2000', publisher:'DC', universe:'Post-Crisis', category:'standard', status:'VF rare', cover:'https://images.unsplash.com/photo-1526413232647-8a3038f2b0c1?q=80&w=480&auto=format&fit=crop', synopsis:'Crossover focalisé sur Huntress et sa quête identitaire.', why:{pro:['Liens utiles pour No Man\'s Land'], con:[]}, links:[{label:'VF (occasion)', url:'https://www.google.com'}], alerts:['🚨 Plus dispo en VF, cherchez en occasion (Vinted, Leboncoin, etc.)']}
 ]}]};
-function loadState(){ const raw=localStorage.getItem(STORAGE_KEY); if(!raw){ localStorage.setItem(STORAGE_KEY, JSON.stringify(seed)); return structuredClone(seed);} try{ return JSON.parse(raw);}catch{ return structuredClone(seed);} }
-function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state));}
-let state = loadState();
-let currentTimelineId = state.timelines[0]?.id || 'opt';
+
+/* Chargement: en ADMIN -> localStorage (avec seed si vide).
+   en PROD -> essayer de charger 'scotchy_comics.json' à la racine, sinon fallback localStorage/seed. */
+async function loadState(){
+  if(IS_EDITOR){
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw){ localStorage.setItem(STORAGE_KEY, JSON.stringify(seed)); return structuredClone(seed); }
+    try{ return JSON.parse(raw); }catch{ return structuredClone(seed); }
+  }else{
+    try{
+      const res = await fetch('scotchy_comics.json', {cache:'no-store'});
+      if(res.ok){
+        const json = await res.json();
+        if(json && json.timelines) return json;
+      }
+    }catch(e){ /* ignore, fallback below */ }
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(raw){ try{ return JSON.parse(raw); }catch{} }
+    return structuredClone(seed);
+  }
+}
+function saveState(){ if(IS_EDITOR){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } }
+let state; // défini après load
+let currentTimelineId; // défini après load
 
 function getTimeline(){ return state.timelines.find(t=>t.id===currentTimelineId); }
 function byId(id){ return getTimeline().items.find(x=>x.id===id); }
@@ -423,10 +481,12 @@ function render(){
   items.forEach(it=>{
     if(it.type==='marker'){
       const row=el('div','marker-link',`<span class="marker-dot"></span><span>${it.label}</span>`);
-      const controls=el('div','marker-controls');
-      const eBtn=el('button','iconbtn','✏️'); eBtn.onclick=()=>editMarker(it.id);
-      const dBtn=el('button','iconbtn','🗑️'); dBtn.onclick=()=>delMarker(it.id);
-      controls.append(eBtn,dBtn); row.appendChild(controls);
+      if(IS_EDITOR){
+        const controls=el('div','marker-controls');
+        const eBtn=el('button','iconbtn','✏️'); eBtn.onclick=(ev)=>{ev.stopPropagation(); editMarker(it.id);};
+        const dBtn=el('button','iconbtn','🗑️'); dBtn.onclick=(ev)=>{ev.stopPropagation(); delMarker(it.id);};
+        controls.append(eBtn,dBtn); row.appendChild(controls);
+      }
       row.onclick=()=>scrollNode(it.id);
       markerEl.appendChild(row);
     }
@@ -435,9 +495,9 @@ function render(){
   // Cards
   items.forEach((it,idx)=>{
     if(it.type==='marker'){
-      const m=el('div','marker'); m.id='node-'+it.id; m.dataset.id=it.id; m.draggable=true;
+      const m=el('div','marker'); m.id='node-'+it.id; m.dataset.id=it.id; m.draggable=IS_EDITOR;
       m.innerHTML=`<div class="label">${it.label}</div>`;
-      attachDnd(m,idx); 
+      if(IS_EDITOR) attachDnd(m,idx); 
       cardsEl.appendChild(m); 
       return;
     }
@@ -445,9 +505,9 @@ function render(){
     const card=el('div','card'); 
     card.id='node-'+it.id; 
     card.dataset.id=it.id; 
-    card.draggable=true; 
+    card.draggable=IS_EDITOR; 
     card.setAttribute('data-cat', it.category||'standard');
-    attachDnd(card,idx);
+    if(IS_EDITOR) attachDnd(card,idx);
 
     // Barre de catégorie (gauche)
     const edge = el('div','cat-edge'); edge.dataset.cat = it.category||'standard'; edge.setAttribute('data-label',categoryLabel(it.category||'standard')); 
@@ -509,13 +569,17 @@ function render(){
     if(it.review?.md) actions.appendChild(btn('Voir l\'avis','cta',()=>confirmReview(it)));
     actions.appendChild(btn('Pourquoi dans la timeline ?','outline',()=>confirmWhy(it)));
 
-    // Controls
-    const controls=el('div','card-controls');
-    controls.appendChild(ic('✏️',()=>editComic(it.id)));
-    controls.appendChild(ic('🗑️',()=>delComic(it.id)));
+    // Controls (ADMIN uniquement)
+    if(IS_EDITOR){
+      const controls=el('div','card-controls');
+      controls.appendChild(ic('✏️',()=>editComic(it.id)));
+      controls.appendChild(ic('🗑️',()=>delComic(it.id)));
+      card.append(cov, body, controls);
+    }else{
+      card.append(cov, body);
+    }
 
     body.append(titleRow, meta, excerpt, below, actions);
-    card.append(cov, body, controls);
     cardsEl.appendChild(card);
   });
 
@@ -529,7 +593,7 @@ function ic(txt,fn){const b=el('button','icon',txt); b.onclick=fn; return b;}
 function btn(txt,variant,fn){const b=el('button','btn btn-'+variant,txt); b.onclick=fn; return b;}
 function scrollNode(id){ const n=document.getElementById('node-'+id); if(n) n.scrollIntoView({behavior:'smooth',block:'center',inline:'center'}); }
 
-/* ===== Drag & Drop + Smooth Scroll (rAF) + molette ===== */
+/* ===== Drag & Drop + Smooth Scroll + molette ===== */
 let dragId=null; 
 let dragActive=false;
 let dragY=null, rafId=null;
@@ -573,7 +637,7 @@ document.addEventListener('dragover',(e)=>{
   e.preventDefault();
 },{passive:false});
 
-/* molette pendant drag — capture au niveau window (certains navigateurs bloquent, on force) */
+/* molette pendant drag */
 window.addEventListener('wheel',(e)=>{
   if(!dragActive) return;
   e.preventDefault();
@@ -610,8 +674,9 @@ function showReview(it){
   openModal(`<h3>${it.title} — Note</h3>${renderStars(it.review?.stars||0)}${mdRender(it.review?.md||'')}`);
 }
 
-/* ===== Add / Edit / Delete (identiques) ===== */
+/* ===== Add / Edit / Delete ===== */
 function editComic(id){
+  if(!IS_EDITOR) return;
   const it=byId(id);
   openModal(`
     <h3>Modifier le comic</h3>
@@ -654,16 +719,19 @@ function editComic(id){
   };
 }
 function delComic(id){
+  if(!IS_EDITOR) return;
   if(!confirm('Supprimer ce comic ?')) return;
   const items=getTimeline().items; const idx=items.findIndex(x=>x.id===id);
   if(idx>-1){ items.splice(idx,1); saveState(); render(); }
 }
 function editMarker(id){
+  if(!IS_EDITOR) return;
   const it=byId(id);
   openModal(`<h3>Modifier le repère</h3><input id="lab" class="select" value="${it.label}"><div class="actions"><button class="btn btn-primary" id="ok">Enregistrer</button></div>`);
   $('#ok').onclick=()=>{ it.label=$('#lab').value.trim(); saveState(); render(); closeModal(); };
 }
 function delMarker(id){
+  if(!IS_EDITOR) return;
   if(!confirm('Supprimer ce repère ?')) return;
   const items=getTimeline().items; const idx=items.findIndex(x=>x.id===id);
   if(idx>-1){ items.splice(idx,1); saveState(); render(); }
@@ -671,6 +739,7 @@ function delMarker(id){
 
 /* ===== Add dialogs ===== */
 document.getElementById('btn-add-marker')?.addEventListener('click',()=>{
+  if(!IS_EDITOR) return;
   openModal(`
     <h3>Nouveau repère</h3>
     <div style="display:grid;gap:8px">
@@ -684,6 +753,7 @@ document.getElementById('btn-add-marker')?.addEventListener('click',()=>{
   };
 });
 document.getElementById('btn-add-comic')?.addEventListener('click',()=>{
+  if(!IS_EDITOR) return;
   openModal(`
     <h3>Ajouter un comic</h3>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
@@ -735,12 +805,26 @@ document.getElementById('btn-add-comic')?.addEventListener('click',()=>{
   };
 });
 
-/* ===== Import/Export ===== */
-document.getElementById('btn-export')?.addEventListener('click',()=> 
-  download('scotchy_comics.json', JSON.stringify(state,null,2)));
-document.getElementById('btn-import')?.addEventListener('click',()=> 
-  document.getElementById('fileInput').click());
+/* ===== Import/Export/Copy ===== */
+document.getElementById('btn-export')?.addEventListener('click',()=>{
+  if(!IS_EDITOR){ alert('Export disponible en mode admin uniquement.'); return; }
+  download('scotchy_comics.json', JSON.stringify(state,null,2));
+});
+document.getElementById('btn-copy-json')?.addEventListener('click', async ()=>{
+  if(!IS_EDITOR){ alert('Copie disponible en mode admin uniquement.'); return; }
+  try{
+    await navigator.clipboard.writeText(JSON.stringify(state,null,2));
+    toast('JSON copié dans le presse-papiers ✅');
+  }catch(e){
+    alert('Impossible de copier. Erreur: '+e.message);
+  }
+});
+document.getElementById('btn-import')?.addEventListener('click',()=>{
+  if(!IS_EDITOR){ alert('Import disponible en mode admin uniquement.'); return; }
+  document.getElementById('fileInput').click();
+});
 document.getElementById('fileInput')?.addEventListener('change',(e)=>{
+  if(!IS_EDITOR) return;
   const file=e.target.files[0]; if(!file) return;
   const reader=new FileReader();
   reader.onload=()=>{ try{
@@ -749,9 +833,22 @@ document.getElementById('fileInput')?.addEventListener('change',(e)=>{
       state=data; saveState();
       currentTimelineId=state.timelines[0]?.id;
       render(); 
+      toast('Import réussi ✅');
     }catch(err){ alert('Échec import: '+err.message); } };
   reader.readAsText(file);
 });
+
+/* Petit toast visuel simple */
+function toast(msg){
+  const t=el('div',null,msg);
+  Object.assign(t.style,{
+    position:'fixed', left:'50%', bottom:'24px', transform:'translateX(-50%)',
+    background:'#0f1526', color:'#e9eef9', border:'1px solid #29406e',
+    padding:'10px 14px', borderRadius:'12px', boxShadow:'0 8px 24px rgba(0,0,0,.35)', zIndex:10000
+  });
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 1500);
+}
 
 /* ===== Filtres ===== */
 document.getElementById('q')?.addEventListener('input', render);
@@ -761,6 +858,7 @@ document.querySelectorAll('.chip').forEach(chip=>{
 
 /* ===== Timelines ===== */
 function newTimeline(){
+  if(!IS_EDITOR) return;
   const name=prompt('Nom de la nouvelle timeline ?'); if(!name) return;
   const id='t'+Date.now();
   state.timelines.push({id,name,items:[{type:'marker',id:'m'+Date.now(),label:name}]});
@@ -771,14 +869,14 @@ function renderTimelinesOptions(){
   sel.innerHTML='';
   state.timelines.forEach(t=>{ const o=document.createElement('option'); o.value=t.id; o.textContent=t.name; if(t.id===currentTimelineId) o.selected=true; sel.appendChild(o); });
 }
-renderTimelinesOptions();
-
 document.getElementById('btn-new-timeline')?.addEventListener('click',newTimeline);
 document.getElementById('btn-rename-timeline')?.addEventListener('click',()=>{
+  if(!IS_EDITOR) return;
   const t=getTimeline(); const name=prompt('Nouveau nom ?',t.name);
   if(!name) return; t.name=name; saveState(); renderTimelinesOptions();
 });
 document.getElementById('btn-delete-timeline')?.addEventListener('click',()=>{
+  if(!IS_EDITOR) return;
   if(state.timelines.length<=1) return alert('Conserve au moins une timeline.');
   if(!confirm('Supprimer cette timeline ?')) return;
   state.timelines=state.timelines.filter(t=>t.id!==currentTimelineId);
@@ -812,8 +910,14 @@ window.addEventListener('load', updateStickyOffsets);
 setTimeout(updateStickyOffsets, 300);
 setTimeout(updateStickyOffsets, 1200);
 
-/* ===== Init ===== */
-render();
+/* ===== Init (async) ===== */
+(async function init(){
+  applyAdminVisibility();
+  state = await loadState();
+  currentTimelineId = state.timelines[0]?.id || (state.timelines[0]={id:'opt',name:'Lecture optimale',items:[]}, 'opt');
+  renderTimelinesOptions();
+  render();
+})();
 </script>
 </body>
 </html>
