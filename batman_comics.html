@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scotchy Comics • Timeline Batman</title>
+
+  <!-- Police -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+  :root{
+    --bg:#0d1117; --panel:#121826; --panel-2:#0f1522; --soft:#111a2c;
+    --text:#e9eef9; --muted:#9fb2d0; --line:#2b3550;
+    --brand:#3b82f6; --brand-2:#60a5fa;
+    --teal:#10b981; --teal-2:#34d399;
+    --yellow:#ffd166; --green:#3ddc97; --blue:#6cb2ff; --violet:#b18cff;
+    --danger:#ff6b6b; --warn:#f0b84c;
+    --radius:18px; --shadow:0 14px 40px rgba(0,0,0,.45);
+    --topbar-h:64px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,var(--bg),#0a0f18); color:var(--text);
+    font:500 16px/1.5 "Plus Jakarta Sans", Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,"Helvetica Neue", Arial, sans-serif;
+  }
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ===== Layout ===== */
+  .app{display:grid; grid-template-columns: 270px 1fr; min-height:100vh; grid-template-areas:"sidebar right";}
+  .sidebar{grid-area:sidebar; position:sticky; top:0; align-self:start; height:100vh; overflow:auto; background:linear-gradient(180deg,var(--panel),var(--panel-2)); border-right:1px solid var(--line); z-index:150}
+  .sidebar h3{margin:18px 16px 10px; font-size:13px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase}
+  .markers{padding:10px 12px 120px}
+  .marker-link{display:flex;align-items:center;gap:10px; padding:12px 12px; margin:8px 4px; border-radius:12px; background:transparent; border:1px solid transparent; color:var(--text); cursor:pointer}
+  .marker-link:hover{background:rgba(255,255,255,.03); border-color:var(--line)}
+  .marker-controls{margin-left:auto; display:flex; gap:6px}
+  .marker-dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(118,224,194,.18)}
+  .iconbtn{border:1px solid var(--line); background:#0c1424; color:var(--text); border-radius:9px; padding:4px 8px; cursor:pointer; font-size:12px}
+
+  .right{grid-area:right; min-width:0; display:flex; flex-direction:column; position:relative; overflow:visible}
+
+  /* ===== Topbar & Filtres ===== */
+  .topbar{position:sticky; top:0; z-index:200; background:rgba(10,15,24,.95); backdrop-filter: blur(10px); border-bottom:1px solid var(--line)}
+  .topbar-inner{display:flex; align-items:center; gap:12px; padding:14px 18px}
+  .title{font-weight:800; letter-spacing:.02em}
+  .spacer{flex:1}
+
+  .filters{
+    position:sticky; top:var(--topbar-h); z-index:190;
+    display:flex; flex-wrap:wrap; gap:8px 8px; row-gap:8px;
+    padding:8px 18px 12px; border-bottom:1px solid var(--line);
+    background:rgba(10,15,24,.92); backdrop-filter: blur(10px);
+  }
+  .chip{display:inline-flex;align-items:center;gap:8px; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:#0f1526; color:var(--text); cursor:pointer; user-select:none; font-size:13px; white-space:nowrap}
+  .chip small{color:var(--muted)}
+  .chip.active{box-shadow: inset 0 0 0 2px currentColor;}
+  .chip[data-tag="indispensable"]{color:var(--yellow)}
+  .chip[data-tag="recommande"]{color:var(--green)}
+  .chip[data-tag="standard"]{color:#9aa4b7}
+  .chip[data-tag="optionnel"]{color:var(--violet)}
+  .chip[data-tag="horschemin"]{color:var(--blue)}
+  /* Sélecteur timeline avec flèche */
+  .select{
+    padding:10px 40px 10px 12px; border-radius:12px; border:1px solid var(--line); background:#0f1526; color:#eaf1ff; position:relative; z-index:400; appearance:none;
+    background-image:linear-gradient(0,0), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239fb2d0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center; background-size:18px;
+  }
+
+  /* Switch VO/VF */
+  .lang-filters{display:flex; align-items:center; gap:8px; margin-left:4px}
+  .switch{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#0f1526; cursor:pointer; user-select:none}
+  .switch .knob{position:relative; width:34px; height:18px; border-radius:999px; background:#132036; box-shadow:inset 0 0 0 1px #1e2d4a}
+  .switch .dot{position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#9fb2d0; transition:transform .18s ease, background .18s ease}
+  .switch.on .knob{background:#173058}
+  .switch.on .dot{transform:translateX(14px); background:#6cb2ff}
+  .switch .label{font-size:12px; color:#cfe1ff}
+
+  /* ===== Boutons (variantes) ===== */
+  .btn{padding:10px 14px; border-radius:14px; font-weight:800; font-size:14px; cursor:pointer; transition:transform .12s ease, filter .12s ease, box-shadow .12s ease; border:0}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn:focus{outline:none; box-shadow:0 0 0 3px rgba(99,102,241,.35)}
+  .btn-primary{
+    color:#fff; background:linear-gradient(135deg,var(--brand),var(--brand-2));
+    box-shadow:0 10px 24px rgba(59,130,246,.22), inset 0 0 0 1px #ffffff26;
+  }
+  .btn-buy{
+    color:#062817; background:linear-gradient(135deg,var(--teal),var(--teal-2));
+    box-shadow:0 10px 24px rgba(16,185,129,.20), inset 0 0 0 1px #ffffff1f;
+  }
+  .btn-cta{
+    color:#fff; background:linear-gradient(135deg,#7c3aed,#60a5fa);
+    box-shadow:0 10px 24px rgba(124,58,237,.2), inset 0 0 0 1px #ffffff1f;
+  }
+  .btn-outline{ color:#dbe7ff; background:#0f1526; border:1px solid var(--line); }
+
+  /* ===== Search ===== */
+  .search{position:relative; display:flex; align-items:center; flex:1; min-width:220px; max-width:720px}
+  .search input{width:100%; padding:12px 14px 12px 42px; border-radius:12px; border:1px solid var(--line); background:#0e1422; color:var(--text)}
+  .search svg{position:absolute; left:12px; width:18px; height:18px; opacity:.65}
+
+  /* ===== Content — écart supprimé sous les filtres ===== */
+  .content{padding:18px 18px 160px}
+
+  .timeline-wrap{position:relative; display:flex; gap:26px}
+  .timeline-line{position:relative; width:6px; background:linear-gradient(180deg, transparent 0, var(--line) 40px, var(--line)); border-radius:999px; margin-left:10px}
+  .cards{flex:1; display:flex; flex-direction:column; gap:26px}
+
+  /* Repères */
+  .marker{display:inline-block; transform: rotate(-4deg); background:#131a2b; padding:10px 16px; border-radius:12px; border:2px solid #fff1; width:max-content; box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 0 0 2px #0006; margin:6px 0 2px}
+  .marker .label{font-weight:900; text-transform:uppercase; letter-spacing:.06em}
+
+  /* ===== Card ===== */
+  .card{position:relative; background:linear-gradient(180deg,#0e1526,#0b111e); border:1.5px solid var(--line); border-left-width:10px; border-radius:18px; padding:18px; box-shadow: var(--shadow); display:grid; grid-template-columns: 120px 1fr auto; gap:16px}
+  .card.dragging{opacity:.6}
+  .cover{width:100%; height:160px; background:#0a0f18; border-radius:12px; overflow:hidden; border:1px solid var(--line); cursor:pointer}
+  .cover img{width:100%; height:100%; object-fit:cover; display:block}
+
+  .title-row{display:flex; align-items:center; gap:10px}
+  .title-row .title{font-size:19px; font-weight:800}
+  .badge{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#0f1526; color:#cfd8ea; font-size:12px; font-weight:700; letter-spacing:.02em}
+
+  .meta{font-size:13.5px; color:var(--muted); margin-top:6px}
+
+  /* barre de catégorie à gauche uniquement */
+  .cat-edge{position:absolute; left:-10px; top:12px; bottom:12px; width:10px; border-radius:8px}
+  .cat-edge[data-cat="indispensable"]{background:var(--yellow)}
+  .cat-edge[data-cat="recommande"]{background:var(--green)}
+  .cat-edge[data-cat="standard"]{background:#9aa4b7}
+  .cat-edge[data-cat="optionnel"]{background:var(--violet)}
+  .cat-edge[data-cat="horschemin"]{background:var(--blue)}
+  .cat-edge::after{content:attr(data-label); position:absolute; left:14px; top:-22px; background:#000c; padding:4px 8px; border-radius:6px; font-size:12px; opacity:0; pointer-events:none; transform:translateY(4px); transition:.15s}
+  .cat-edge:hover::after{opacity:1; transform:translateY(0)}
+
+  .tag{display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; border:1px solid var(--line); background:#0f1526; color:#cfd8ea; font-size:12px; margin-right:8px}
+  .tag.warn{border-color:#a8822a; background:#1b160a; color:#ffd166}
+  .tag.crit{border-color:#6b1f1f; background:#150b0b; color:#ff6b6b}
+
+  .excerpt{font-size:15px; color:#d6ddee; opacity:.95; margin-top:10px}
+  .excerpt .more{font-weight:800; cursor:pointer}
+
+  .below{margin-top:14px}
+  /* OU : bleu clair + fusion */
+  .altrow{display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px dashed #2b5ea8; background:#0e1f3a; border-radius:12px;}
+  .ou-pill{display:inline-grid; place-items:center; height:26px; min-width:36px; padding:0 10px; border-radius:999px; border:1px solid #2b5ea8; background:#1c3f73; color:#cfe6ff; text-transform:uppercase; font-weight:800; letter-spacing:.06em; font-size:11px;}
+  .altlinks{display:flex; flex-wrap:wrap; gap:8px}
+  .altlink{font-weight:700}
+
+  .alerts{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+
+  .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
+
+  .card-controls{display:flex; gap:6px; align-self:start}
+  .icon{border:1px solid var(--line); background:#0c1424; color:#fff; border-radius:10px; padding:8px 10px; cursor:pointer}
+
+  /* étoiles */
+  .stars{display:flex; gap:2px; font-size:20px; line-height:1}
+  .star{position:relative; width:1.15em; height:1.15em; display:inline-grid; place-items:center}
+  .star::before{content:'☆'}
+  .star.full::before{content:'★'; color:#ffa86b}
+  .star.half::before{content:'★'; background:linear-gradient(90deg,#ffa86b 50%, transparent 50%); -webkit-background-clip:text; background-clip:text; color:transparent}
+
+  /* modal */
+  .modal{position:fixed; inset:0; display:none; place-items:center; z-index:400}
+  .modal.open{display:grid}
+  .modal .scrim{position:absolute; inset:0; background:rgba(0,0,0,.65); backdrop-filter: blur(2px)}
+  .dialog{position:relative; background:linear-gradient(180deg,#0f1628,#0a1020); border:1px solid var(--line); border-radius:16px; padding:18px 18px 22px; width:min(860px,92vw); max-height:88vh; overflow:auto; box-shadow: var(--shadow)}
+  .dialog h3{margin:0 0 8px}
+  .dialog .close{position:absolute; top:10px; right:10px; cursor:pointer; background:#1b2a46; color:#fff; border:1px solid #29406e; border-radius:10px; padding:7px 10px; font-weight:800}
+
+  /* Markdown — espacement très serré */
+  .md{line-height:1.18}
+  .md h1,.md h2,.md h3{margin:.28em 0 .14em}
+  .md h1{font-size:22px} .md h2{font-size:19px} .md h3{font-size:17px}
+  .md p{margin:.18em 0}
+  .md ul{padding-left:1.1em; margin:.06em 0}
+  .md li{margin:.04em 0; line-height:1.18}
+  .md .spoiler{background:#333;color:#333;border-radius:4px;padding:0 .25em;cursor:pointer}
+  .md .spoiler.reveal{color:inherit}
+
+  .separator{height:1px;background:var(--line);opacity:.7;margin:8px 0 12px}
+
+  /* FAB */
+  .fab{position:fixed; right:22px; bottom:22px; z-index:250; display:flex; flex-direction:column; gap:10px}
+  .fab .btn{padding:14px 16px; border-radius:16px}
+
+  /* reading mode — on garde Repères visible */
+  .reading .topbar, .reading .filters, .reading .fab{display:none}
+  .reading .app{grid-template-columns: 270px 1fr}
+  .reading .content{padding:18px}
+  .exit-reading{display:none; position:fixed; right:18px; top:18px; z-index:450; padding:10px 14px; border-radius:12px; border:1px solid #1b2a46; background:#0f1526; color:#fff; font-weight:800; box-shadow:0 8px 22px rgba(0,0,0,.35); cursor:pointer}
+  .reading .exit-reading{display:block}
+
+  /* responsive */
+  @media (max-width: 980px){
+    .app{grid-template-columns: 1fr}
+    .sidebar{display:none}
+    .card{grid-template-columns: 100px 1fr auto}
+  }
+  @media (max-width: 720px){
+    .content{padding:18px 10px 120px}
+    .timeline-wrap{flex-direction:column}
+    .timeline-line{height:6px; width:auto}
+    .cards{flex-direction:row; overflow:auto; padding-bottom:8px}
+    .card{min-width: 320px}
+    .cat-edge{left:10px; width:6px}
+  }
+</style>
+</head>
+<body>
+
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h3>Repères</h3>
+      <div class="markers" id="markerList"></div>
+    </aside>
+
+    <!-- COLONNE DROITE : TOPBAR + FILTRES + CONTENU -->
+    <div class="right">
+      <!-- TOP BAR -->
+      <div class="topbar">
+        <div class="topbar-inner">
+          <div class="title">🦇 Scotchy Comics — Timeline Batman</div>
+          <div class="spacer"></div>
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/></svg>
+            <input id="q" placeholder="Rechercher (titre, auteurs, artistes, synopsis, univers, VO/VF, catégories, avis...)" />
+          </div>
+          <button class="btn btn-outline" id="btn-reading">Mode lecture</button>
+          <button class="btn btn-primary" id="btn-import">Importer JSON</button>
+          <button class="btn btn-primary" id="btn-export">Exporter JSON</button>
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="chip" data-tag="indispensable"><span>●</span> Indispensable <small>— à lire en priorité</small></div>
+        <div class="chip" data-tag="recommande"><span>●</span> Recommandé <small>— fortement conseillé</small></div>
+        <div class="chip" data-tag="optionnel"><span>●</span> Optionnel <small>— bonus/complément</small></div>
+        <div class="chip" data-tag="horschemin"><span>●</span> Hors-chemin <small>— focus autres persos / à part</small></div>
+        <div class="chip" data-tag="standard"><span>●</span> Standard <small>— sans étiquette</small></div>
+
+        <div class="lang-filters">
+          <span class="switch on" id="sw-vf"><span class="knob"><span class="dot"></span></span><span class="label">VF</span></span>
+          <span class="switch on" id="sw-vo"><span class="knob"><span class="dot"></span></span><span class="label">VO</span></span>
+        </div>
+
+        <div class="spacer"></div>
+        <select id="timelineSelect" class="select" title="Changer de timeline"></select>
+        <button class="btn btn-primary" id="btn-new-timeline">Nouvelle</button>
+        <button class="btn btn-outline" id="btn-rename-timeline">Renommer</button>
+        <button class="btn btn-outline" id="btn-delete-timeline">Supprimer</button>
+      </div>
+
+      <main class="content">
+        <div class="timeline-wrap">
+          <div class="timeline-line"></div>
+          <div class="cards" id="cards"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <div class="fab">
+    <button class="btn btn-primary" id="btn-add-comic">+ Ajouter un comic</button>
+    <button class="btn btn-outline" id="btn-add-marker">+ Ajouter un repère</button>
+  </div>
+
+  <!-- Bouton pour quitter le mode lecture -->
+  <button class="exit-reading" id="btn-reading-exit">Quitter le mode lecture</button>
+
+  <!-- Hidden file input -->
+  <input type="file" id="fileInput" accept="application/json" style="display:none" />
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="scrim"></div>
+    <div class="dialog" id="dialog">
+      <button class="close" id="modalClose">Fermer ✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+<script>
+/* ===== Helpers & State ===== */
+const STORAGE_KEY = 'scotchy_comics_timelines_v3';
+const $ = s=>document.querySelector(s);
+function el(t,c,h){const n=document.createElement(t);if(c)n.className=c;if(h!==undefined)n.innerHTML=h;return n;}
+function norm(s){return (s||'').toString().normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();}
+function includes(h,needle){return norm(h).includes(norm(needle));}
+function fuzzyScore(hay,needle){hay=norm(hay);needle=norm(needle);if(!needle)return 1; if(hay.includes(needle))return 1; let i=0; for(const ch of hay){ if(ch===needle[i]) i++; if(i===needle.length) break; } return i/needle.length; }
+function download(filename,text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'application/json'})); a.download=filename; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); }
+function splitList(sel){ return $(sel).value.split(',').map(s=>s.trim()).filter(Boolean); }
+function splitLines(sel){ return $(sel).value.split(/\n/).map(s=>s.trim()).filter(Boolean); }
+function splitPairs(sel){
+  return $(sel).value.split(/\n/).map(s=>s.trim()).filter(Boolean).map(line=>{
+    const i=line.indexOf('|'); if(i===-1) return {label:line, url:'#'};
+    return {label:line.slice(0,i).trim(), url:line.slice(i+1).trim()};
+  });
+}
+function mdRender(md){
+  if(!md) return '';
+  md = md.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  md = md.replace(/\|\|(.*?)\|\|/g,(m,p1)=>`<span class="spoiler" onclick="this.classList.add('reveal')">${p1}</span>`);
+  md = md.replace(/^###\s*(.*)$/gm,'<h3>$1</h3>')
+         .replace(/^##\s*(.*)$/gm,'<h2>$1</h2>')
+         .replace(/^#\s*(.*)$/gm,'<h1>$1</h1>')
+         .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+         .replace(/\*(.*?)\*/g,'<em>$1</em>')
+         .replace(/\[(.*?)\]\((.*?)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+         .replace(/^(?:-\s.*(?:\n|$))+?/gm, m=>'<ul>'+m.trim().split(/\n/).map(li=>'\n<li>'+li.replace(/^[-*]\s*/,'')+'</li>').join('')+'\n</ul>');
+  md = md.replace(/\n/g,'<br/>');
+  return '<div class="md">'+md+'</div>';
+}
+function renderStars(r){
+  r=Math.max(0,Math.min(5,Math.round(r*2)/2));
+  const stars=[]; for(let i=1;i<=5;i++){
+    if(r>=i) stars.push('<span class="star full"></span>');
+    else if(r>=i-0.5) stars.push('<span class="star half"></span>');
+    else stars.push('<span class="star"></span>');
+  }
+  return '<div class="stars">'+stars.join('')+'</div>';
+}
+
+/* ===== Data ===== */
+const seed={timelines:[{id:'opt',name:'Lecture optimale',items:[
+  {type:'marker', id:'m1', label:'Les origines de Batman'},
+  {type:'comic', id:'c_yearone', title:'Batman: Année Un', altTitle:'Year One', tome:'One-Shot', authors:['Frank Miller'], artists:['David Mazzucchelli'], pages:144, release:'1987', publisher:'DC', universe:'Post-Crisis', category:'indispensable', status:'VF', cover:'https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=480&auto=format&fit=crop', synopsis:"Enfant, Bruce Wayne a vu ses parents se faire assassiner sous ses yeux.\nAprès un entraînement intensif, il revient à Gotham City pour mener une guerre sans merci contre le crime… mais ce ne sera pas facile. Face à la corruption des autorités de la ville et leurs liens avec la pègre, Bruce, sous le déguisement du vigilant Batman, va forger une alliance avec un policier nouveau venu à Gotham : le lieutenant James Gordon.", altOptions:[{label:'Regarder le film d\'animation "Year One"', url:'https://www.imdb.com/title/tt1672723/'}], why:{pro:['Origines réalistes, ancre la psyché de Bruce','Introduit Gordon comme pilier'], con:[]}, links:[{label:'Commander — 18,50 € (VF)', url:'https://www.google.com'}], review:{stars:4.5, md:'# Une claque\n\n**Année Un** c\'est la base.\n- Rituel chauve-souris\n- Gordon incroyable\n\n||La fin sur les Falcone est masterclass||'}},
+  {type:'comic', id:'c_zero', title:"Batman: L'an Zéro — 1ère partie", tome:'Tome 4', authors:['Scott Snyder'], artists:['Greg Capullo'], pages:192, release:'2014', publisher:'DC', universe:'New 52', category:'recommande', status:'VF', cover:'https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=480&auto=format&fit=crop', synopsis:'Il y a cinq ans, Bruce Wayne, jusqu\'alors porté disparu, est revenu à Gotham, bien décidé à mener une guerre au crime. Mais le poids de son héritage le pèse, et son plus grand adversaire ne sera pas le Red Hood et son gang mais bel et bien...', why:{pro:['Vision blockbuster de la naissance du mythe'], con:['⚠️ Chevauche Année Un']}, links:[{label:'Commander — 20,50 €', url:'https://www.google.com'}], alerts:['⚠️ Ce tome est le tome 4 de la série de Scott Snyder, mais il n\'y a pas besoin d\'acheter le Tome 1, 2 & 3 pour pouvoir lire le 4 & 5']},
+  {type:'marker', id:'m2', label:'Chevaliers & chutes'},
+  {type:'comic', id:'c_kn1', title:'Knightfall — Tome 1', tome:'Tome 1', authors:['Doug Moench','Chuck Dixon'], artists:['Jim Aparo','Graham Nolan'], pages:640, release:'1993', publisher:'DC', universe:'Post-Crisis', category:'indispensable', status:'VF', cover:'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?q=80&w=480&auto=format&fit=crop', synopsis:'Bane libère Arkham, épuise Batman et finit par lui briser le dos.', why:{pro:['Évènement majeur: chute de Batman'], con:[]}, links:[{label:'VF intégrale', url:'https://www.google.com'}]},
+  {type:'comic', id:'c_kn2', title:'Knightfall — Tome 2', tome:'Tome 2', authors:['Doug Moench','Chuck Dixon'], artists:['Jim Aparo','Graham Nolan'], pages:640, release:'1993', publisher:'DC', universe:'Post-Crisis', category:'recommande', status:'VF', cover:'https://images.unsplash.com/photo-1558980664-10b2f3b1fd1a?q=80&w=480&auto=format&fit=crop', synopsis:'Jean-Paul Valley devient Batman, plus violent et instable.', why:{pro:['Évolution du mythe'], con:[]}},
+  {type:'comic', id:'c_else', title:'Gotham by Gaslight', tome:'One-Shot', authors:['Brian Augustyn'], artists:['Mike Mignola'], pages:64, release:'1989', publisher:'DC', universe:'Elseworld', category:'horschemin', status:'VO/VF', cover:'https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?q=80&w=480&auto=format&fit=crop', synopsis:"Batman à l'époque victorienne traque Jack l’Eventreur.", why:{pro:['Elseworld culte, lecture à part'], con:[]}, links:[{label:'VO', url:'https://www.google.com'}]},
+  {type:'comic', id:'c_cross', title:'Batman / Huntress: Cry for Blood', tome:'Mini-série', authors:['Greg Rucka'], artists:['Rick Burchett'], pages:152, release:'2000', publisher:'DC', universe:'Post-Crisis', category:'standard', status:'VF rare', cover:'https://images.unsplash.com/photo-1526413232647-8a3038f2b0c1?q=80&w=480&auto=format&fit=crop', synopsis:'Crossover focalisé sur Huntress et sa quête identitaire.', why:{pro:['Liens utiles pour No Man\'s Land'], con:[]}, links:[{label:'VF (occasion)', url:'https://www.google.com'}], alerts:['🚨 Plus dispo en VF, cherchez en occasion (Vinted, Leboncoin, etc.)']}
+]}]};
+function loadState(){ const raw=localStorage.getItem(STORAGE_KEY); if(!raw){ localStorage.setItem(STORAGE_KEY, JSON.stringify(seed)); return structuredClone(seed);} try{ return JSON.parse(raw);}catch{ return structuredClone(seed);} }
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state));}
+let state = loadState();
+let currentTimelineId = state.timelines[0]?.id || 'opt';
+
+function getTimeline(){ return state.timelines.find(t=>t.id===currentTimelineId); }
+function byId(id){ return getTimeline().items.find(x=>x.id===id); }
+
+/* ===== VO/VF switches (FIX) ===== */
+const swVO = document.getElementById('sw-vo');
+const swVF = document.getElementById('sw-vf');
+const lang = { vo:true, vf:true };
+swVO.addEventListener('click', ()=>{ lang.vo=!lang.vo; swVO.classList.toggle('on',lang.vo); render(); });
+swVF.addEventListener('click', ()=>{ lang.vf=!lang.vf; swVF.classList.toggle('on',lang.vf); render(); });
+const hasVO = s => /(^|\W)VO(\W|$)/i.test(s||'');
+const hasVF = s => /(^|\W)VF(\W|$)/i.test(s||'');
+
+/* ===== Recherche & tags + langue ===== */
+function searchFilterItems(items){
+  const q=$('#q')?.value?.trim()||'';
+  const tags=[...document.querySelectorAll('.chip.active')].map(x=>x.dataset.tag);
+  const tokens = norm(q).split(/\s+/).filter(Boolean);
+
+  const keepIdx=new Set(); const keepMarkerIdx=new Set();
+
+  items.forEach((it,idx)=>{
+    if(it.type!=='comic') return;
+
+    if(tags.length && !tags.includes(it.category||'standard')) return;
+
+    // Langue
+    const s = it.status||'';
+    const langActive = !(lang.vo && lang.vf);
+    if(langActive){
+      const ok = (lang.vo && hasVO(s)) || (lang.vf && hasVF(s));
+      if(!ok) return;
+    }
+
+    if(!tokens.length){
+      keepIdx.add(idx);
+      for(let j=idx-1;j>=0;j--){ if(items[j].type==='marker'){ keepMarkerIdx.add(j); break; } }
+      return;
+    }
+
+    const hayTitle = [it.title,it.altTitle,it.tome].filter(Boolean).join(' | ');
+    const hayCreators = [(it.authors||[]).join(','),(it.artists||[]).join(',')].join('|');
+    const hayOther = [it.universe,it.status,it.publisher,it.category].filter(Boolean).join('|');
+    const hayLong = [it.synopsis, it.review?.md].filter(Boolean).join('|');
+
+    let all = true;
+    tokens.forEach(tok=>{
+      const solid = includes(hayTitle,tok) || includes(hayCreators,tok);
+      const good  = solid || includes(hayOther,tok) || fuzzyScore(hayTitle,tok)>=.9 || fuzzyScore(hayCreators,tok)>=.9;
+      const weak  = !good && (includes(hayLong,tok) || fuzzyScore(hayLong,tok)>.92);
+      if(!(good || weak)) all=false;
+    });
+    if(!all) return;
+
+    keepIdx.add(idx);
+    for(let j=idx-1;j>=0;j--){ if(items[j].type==='marker'){ keepMarkerIdx.add(j); break; } }
+  });
+
+  const out=[];
+  items.forEach((it,idx)=>{ if(it.type==='marker'){ if(keepMarkerIdx.has(idx)) out.push(it); } else { if(keepIdx.has(idx)) out.push(it); } });
+  return out.length?out:items.filter(x=>x.type!=='_never_');
+}
+
+/* ===== Render ===== */
+const cardsEl = document.getElementById('cards'); 
+const markerEl = document.getElementById('markerList');
+
+function categoryLabel(cat){
+  return ({indispensable:'Indispensable',recommande:'Recommandé',standard:'Standard',optionnel:'Optionnel',horschemin:'Hors-chemin'})[cat] || 'Standard';
+}
+
+function render(){
+  const t=getTimeline(); 
+  cardsEl.innerHTML=''; 
+  markerEl.innerHTML='';
+
+  const items = searchFilterItems(t.items);
+
+  // Sidebar markers
+  items.forEach(it=>{
+    if(it.type==='marker'){
+      const row=el('div','marker-link',`<span class="marker-dot"></span><span>${it.label}</span>`);
+      const controls=el('div','marker-controls');
+      const eBtn=el('button','iconbtn','✏️'); eBtn.onclick=()=>editMarker(it.id);
+      const dBtn=el('button','iconbtn','🗑️'); dBtn.onclick=()=>delMarker(it.id);
+      controls.append(eBtn,dBtn); row.appendChild(controls);
+      row.onclick=()=>scrollNode(it.id);
+      markerEl.appendChild(row);
+    }
+  });
+
+  // Cards
+  items.forEach((it,idx)=>{
+    if(it.type==='marker'){
+      const m=el('div','marker'); m.id='node-'+it.id; m.dataset.id=it.id; m.draggable=true;
+      m.innerHTML=`<div class="label">${it.label}</div>`;
+      attachDnd(m,idx); 
+      cardsEl.appendChild(m); 
+      return;
+    }
+
+    const card=el('div','card'); 
+    card.id='node-'+it.id; 
+    card.dataset.id=it.id; 
+    card.draggable=true; 
+    card.setAttribute('data-cat', it.category||'standard');
+    attachDnd(card,idx);
+
+    // Barre de catégorie (gauche)
+    const edge = el('div','cat-edge'); edge.dataset.cat = it.category||'standard'; edge.setAttribute('data-label',categoryLabel(it.category||'standard')); 
+    card.appendChild(edge);
+
+    // Cover
+    const cov=el('div','cover');
+    const img=new Image(); img.src=it.cover||''; img.alt=it.title; 
+    cov.appendChild(img); cov.onclick=()=>openLightbox(img.src,it.title);
+
+    // Body
+    const body=el('div');
+
+    // Title row
+    const titleRow=el('div','title-row');
+    const titleDiv=el('div','title',it.title);
+    titleRow.appendChild(titleDiv);
+    if(it.tome){ titleRow.appendChild(el('span','badge',it.tome)); }
+
+    // Meta
+    const meta = el('div','meta', [
+      it.authors?.length?`✍️ ${it.authors.join(', ')}`:null,
+      it.artists?.length?`🎨 ${it.artists.join(', ')}`:null,
+      it.pages?`📄 ${it.pages} pages`:null,
+      it.release?`🗓️ ${it.release}`:null,
+      it.publisher?`🏷️ ${it.publisher}`:null,
+      it.universe?`🪐 ${it.universe}`:null,
+      it.status?`📦 ${it.status}`:null
+    ].filter(Boolean).join('  •  '));
+
+    // Excerpt
+    const txt=it.synopsis||'';
+    const short = txt.length>220
+      ? txt.slice(0,170).replace(/\s\S*?$/,'') + `... <span class="more" data-id="${it.id}">Voir le synopsis</span>`
+      : txt;
+    const excerpt=el('div','excerpt',short);
+
+    // Below: Alt options (fusionnées) + alerts
+    const below=el('div','below');
+    if(it.altOptions?.length){
+      const row=el('div','altrow');
+      const links=el('div','altlinks', it.altOptions.map(o=>`<a class="altlink" target="_blank" rel="noopener" href="${o.url}">${o.label}</a>`).join(' • '));
+      row.innerHTML = `<span class="ou-pill">OU</span>`;
+      row.appendChild(links);
+      below.appendChild(row);
+    }
+    if(it.alerts?.length){
+      const alertWrap=el('div','alerts');
+      it.alerts.forEach(a=>{
+        const lvl=a.trim().startsWith('🚨')?'crit':'warn';
+        alertWrap.appendChild(el('span','tag '+lvl,a));
+      });
+      below.appendChild(alertWrap);
+    }
+
+    // Actions — variantes de boutons
+    const actions=el('div','actions');
+    if(it.links?.length) actions.appendChild(btn('🛒 Commander','buy',()=>showLinks(it)));
+    if(it.review?.md) actions.appendChild(btn('Voir l\'avis','cta',()=>confirmReview(it)));
+    actions.appendChild(btn('Pourquoi dans la timeline ?','outline',()=>confirmWhy(it)));
+
+    // Controls
+    const controls=el('div','card-controls');
+    controls.appendChild(ic('✏️',()=>editComic(it.id)));
+    controls.appendChild(ic('🗑️',()=>delComic(it.id)));
+
+    body.append(titleRow, meta, excerpt, below, actions);
+    card.append(cov, body, controls);
+    cardsEl.appendChild(card);
+  });
+
+  // Synopsis handlers
+  cardsEl.querySelectorAll('.more').forEach(m=>{
+    m.addEventListener('click',()=> showSynopsis(byId(m.dataset.id)));
+  });
+}
+
+function ic(txt,fn){const b=el('button','icon',txt); b.onclick=fn; return b;}
+function btn(txt,variant,fn){const b=el('button','btn btn-'+variant,txt); b.onclick=fn; return b;}
+function scrollNode(id){ const n=document.getElementById('node-'+id); if(n) n.scrollIntoView({behavior:'smooth',block:'center',inline:'center'}); }
+
+/* ===== Drag & Drop + Smooth Scroll (rAF) + molette ===== */
+let dragId=null; 
+let dragActive=false;
+let dragY=null, rafId=null;
+
+function attachDnd(node){
+  node.addEventListener('dragstart',e=>{
+    dragId=node.dataset.id; node.classList.add('dragging');
+    e.dataTransfer.setData('text/plain',dragId);
+    dragActive=true; startDragScroll();
+  });
+  node.addEventListener('dragend',()=>{
+    node.classList.remove('dragging'); dragId=null; dragActive=false; dragY=null; stopDragScroll();
+  });
+  node.addEventListener('dragover',e=>{e.preventDefault(); node.style.outline='2px dashed #88a';});
+  node.addEventListener('dragleave',()=>{node.style.outline='none'});
+  node.addEventListener('drop',()=>{
+    node.style.outline='none'; if(!dragId||dragId===node.dataset.id) return;
+    const items=getTimeline().items; const from=items.findIndex(x=>x.id===dragId); const to=items.findIndex(x=>x.id===node.dataset.id);
+    const [m]=items.splice(from,1); items.splice(to,0,m); saveState(); render();
+  });
+}
+
+/* autoscroll progressif */
+function stepScroll(){
+  if(!dragActive){ rafId=null; return; }
+  const m=100; const h=window.innerHeight;
+  let v=0;
+  if(dragY!==null){
+    if(dragY<m) v = -(1 - dragY/m);
+    else if(dragY>h-m) v = (dragY-(h-m))/m;
+  }
+  if(v!==0) window.scrollBy(0, v*30);
+  rafId = requestAnimationFrame(stepScroll);
+}
+function startDragScroll(){ if(rafId==null) rafId=requestAnimationFrame(stepScroll); }
+function stopDragScroll(){ if(rafId!=null){ cancelAnimationFrame(rafId); rafId=null; } }
+
+document.addEventListener('dragover',(e)=>{
+  if(!dragActive) return;
+  dragY = e.clientY;
+  e.preventDefault();
+},{passive:false});
+
+/* molette pendant drag — capture au niveau window (certains navigateurs bloquent, on force) */
+window.addEventListener('wheel',(e)=>{
+  if(!dragActive) return;
+  e.preventDefault();
+  window.scrollBy({top:e.deltaY, left:e.deltaX, behavior:'auto'});
+},{passive:false});
+
+/* ===== Modals ===== */
+const modal=$('#modal'); const modalBody=$('#modalBody'); const modalClose=$('#modalClose');
+function openModal(html){ modalBody.innerHTML=html; modal.classList.add('open'); }
+function closeModal(){ modal.classList.remove('open'); modalBody.innerHTML=''; }
+modalClose.onclick=closeModal; $('.scrim').onclick=closeModal;
+window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+function showSynopsis(it){ openModal(`<h3>${it.title}</h3><p>${(it.synopsis||'').replace(/\n/g,'<br/>')}</p>`); }
+function openLightbox(src,alt){ openModal(`<div style="display:grid;place-items:center"><img src="${src}" alt="${alt}" style="width:min(70vw,520px); height:auto; border-radius:14px; border:1px solid var(--line)"/></div>`); }
+function showLinks(it){ openModal(`<h3>Commander</h3>${(it.status?`<p class="meta">Statut: ${it.status}</p>`:'')}<ul>${(it.links||[]).map(l=>`<li><a target="_blank" rel="noopener" href="${l.url}">${l.label}</a></li>`).join('')}</ul>`); }
+function confirmWhy(it){
+  openModal(`<h3>Attention</h3><p class="meta">Cette section peut contenir des spoilers.</p><div class="actions"><button class="btn btn-primary" id="seeWhy">Voir quand même</button></div>`);
+  document.getElementById('seeWhy').onclick=()=> openModal(renderWhy(it));
+}
+function confirmReview(it){
+  openModal(`<h3>Attention — spoilers possibles</h3><p class="meta">Certaines remarques de l'avis peuvent révéler des éléments clés.</p><div class="actions"><button class="btn btn-cta" id="goReview">Voir l'avis</button></div>`);
+  document.getElementById('goReview').onclick=()=> showReview(it);
+}
+function renderWhy(it){
+  return `<h3>Pourquoi dans la timeline ?</h3>
+  <div class="separator"></div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+    <div><h4>Concordances</h4><ul>${(it.why?.pro||[]).map(x=>`<li>${x}</li>`).join('')||'<li>—</li>'}</ul></div>
+    <div><h4>Incohérences</h4><ul>${(it.why?.con||[]).map(x=>`<li>${x}</li>`).join('')||'<li>—</li>'}</ul></div>
+  </div>`;
+}
+function showReview(it){
+  openModal(`<h3>${it.title} — Note</h3>${renderStars(it.review?.stars||0)}${mdRender(it.review?.md||'')}`);
+}
+
+/* ===== Add / Edit / Delete (identiques) ===== */
+function editComic(id){
+  const it=byId(id);
+  openModal(`
+    <h3>Modifier le comic</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+      <input id="f_title" class="select" value="${it.title||''}" placeholder="Titre"/>
+      <input id="f_tome" class="select" value="${it.tome||''}" placeholder="Tome"/>
+      <input id="f_authors" class="select" value="${(it.authors||[]).join(', ')}" placeholder="Auteurs"/>
+      <input id="f_artists" class="select" value="${(it.artists||[]).join(', ')}" placeholder="Artistes"/>
+      <input id="f_universe" class="select" value="${it.universe||''}" placeholder="Univers"/>
+      <input id="f_pages" class="select" value="${it.pages||''}" placeholder="Pages"/>
+      <input id="f_release" class="select" value="${it.release||''}" placeholder="Date de sortie"/>
+      <input id="f_publisher" class="select" value="${it.publisher||''}" placeholder="Éditeur"/>
+      <select id="f_category" class="select">
+        ${['indispensable','recommande','standard','optionnel','horschemin'].map(v=>`<option ${it.category===v?'selected':''} value="${v}">${v}</option>`).join('')}
+      </select>
+      <input id="f_status" class="select" value="${it.status||''}" placeholder="Statut"/>
+      <input id="f_cover" class="select" value="${it.cover||''}" placeholder="URL cover"/>
+      <textarea id="f_synopsis" class="select" style="grid-column:1/3; min-height:120px" placeholder="Synopsis">${it.synopsis||''}</textarea>
+      <textarea id="f_review" class="select" style="grid-column:1/3; min-height:120px" placeholder="Avis (Markdown avec ||spoilers||)">${(it.review?.md||'')}</textarea>
+      <input id="f_stars" class="select" value="${(it.review?.stars||'')}" placeholder="Note (0.5 à 5)"/>
+      <textarea id="f_pro" class="select" style="grid-column:1/3; min-height:70px" placeholder="Concordances (une par ligne)">${(it.why?.pro||[]).join('\n')}</textarea>
+      <textarea id="f_con" class="select" style="grid-column:1/3; min-height:70px" placeholder="Incohérences (une par ligne)">${(it.why?.con||[]).join('\n')}</textarea>
+      <textarea id="f_alerts" class="select" style="grid-column:1/3; min-height:60px" placeholder="Alertes (une par ligne)">${(it.alerts||[]).join('\n')}</textarea>
+      <textarea id="f_alt" class="select" style="grid-column:1/3; min-height:60px" placeholder="Alternatives OU (label | url)">${(it.altOptions||[]).map(o=>`${o.label} | ${o.url}`).join('\n')}</textarea>
+      <textarea id="f_links" class="select" style="grid-column:1/3; min-height:60px" placeholder="Liens (label | url)">${(it.links||[]).map(o=>`${o.label} | ${o.url}`).join('\n')}</textarea>
+      <button class="btn btn-primary" id="saveComic">Enregistrer</button>
+    </div>`);
+  $('#saveComic').onclick=()=>{
+    Object.assign(it,{
+      title:$('#f_title').value.trim(), tome:$('#f_tome').value.trim(),
+      authors:splitList('#f_authors'), artists:splitList('#f_artists'), universe:$('#f_universe').value.trim(),
+      pages:parseInt($('#f_pages').value,10)||undefined, release:$('#f_release').value.trim(), publisher:$('#f_publisher').value.trim(),
+      category:$('#f_category').value, status:$('#f_status').value.trim(), cover:$('#f_cover').value.trim(),
+      synopsis:$('#f_synopsis').value.trim(),
+      review:($('#f_review').value.trim()?{stars:parseFloat($('#f_stars').value)||0, md:$('#f_review').value.trim()}:undefined),
+      why:{pro:splitLines('#f_pro'), con:splitLines('#f_con')},
+      alerts:splitLines('#f_alerts'), altOptions:splitPairs('#f_alt'), links:splitPairs('#f_links')
+    });
+    saveState(); render(); closeModal();
+  };
+}
+function delComic(id){
+  if(!confirm('Supprimer ce comic ?')) return;
+  const items=getTimeline().items; const idx=items.findIndex(x=>x.id===id);
+  if(idx>-1){ items.splice(idx,1); saveState(); render(); }
+}
+function editMarker(id){
+  const it=byId(id);
+  openModal(`<h3>Modifier le repère</h3><input id="lab" class="select" value="${it.label}"><div class="actions"><button class="btn btn-primary" id="ok">Enregistrer</button></div>`);
+  $('#ok').onclick=()=>{ it.label=$('#lab').value.trim(); saveState(); render(); closeModal(); };
+}
+function delMarker(id){
+  if(!confirm('Supprimer ce repère ?')) return;
+  const items=getTimeline().items; const idx=items.findIndex(x=>x.id===id);
+  if(idx>-1){ items.splice(idx,1); saveState(); render(); }
+}
+
+/* ===== Add dialogs ===== */
+document.getElementById('btn-add-marker')?.addEventListener('click',()=>{
+  openModal(`
+    <h3>Nouveau repère</h3>
+    <div style="display:grid;gap:8px">
+      <input id="markLabel" placeholder="Titre du repère" class="select"/>
+      <button class="btn btn-primary" id="doAdd">Ajouter</button>
+    </div>`);
+  $('#doAdd').onclick=()=>{
+    const label=$('#markLabel').value.trim(); if(!label) return;
+    getTimeline().items.push({type:'marker', id:'m'+Date.now(), label});
+    saveState(); render(); closeModal();
+  };
+});
+document.getElementById('btn-add-comic')?.addEventListener('click',()=>{
+  openModal(`
+    <h3>Ajouter un comic</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+      <input id="f_title" class="select" placeholder="Titre"/>
+      <input id="f_tome" class="select" placeholder="Tome (ex: Tome 2, One-Shot, Série)"/>
+      <input id="f_authors" class="select" placeholder="Auteurs (séparés par des virgules)"/>
+      <input id="f_artists" class="select" placeholder="Dessinateurs/Artistes"/>
+      <input id="f_universe" class="select" placeholder="Univers/continuité"/>
+      <input id="f_pages" class="select" placeholder="Nombre de pages"/>
+      <input id="f_release" class="select" placeholder="Date de sortie"/>
+      <input id="f_publisher" class="select" placeholder="Éditeur"/>
+      <select id="f_category" class="select">
+        <option value="indispensable">Indispensable</option>
+        <option value="recommande">Recommandé</option>
+        <option value="standard" selected>Standard</option>
+        <option value="optionnel">Optionnel</option>
+        <option value="horschemin">Hors-chemin</option>
+      </select>
+      <input id="f_status" class="select" placeholder="Statut (VF, VO uniquement, VF rare...)"/>
+      <input id="f_cover" class="select" placeholder="URL cover (optionnel)"/>
+      <textarea id="f_synopsis" class="select" placeholder="Synopsis" style="grid-column:1/3; min-height:100px"></textarea>
+      <textarea id="f_pro" class="select" placeholder="Concordances (une par ligne)" style="grid-column:1/3; min-height:70px"></textarea>
+      <textarea id="f_con" class="select" placeholder="Incohérences (une par ligne)" style="grid-column:1/3; min-height:70px"></textarea>
+      <textarea id="f_alerts" class="select" placeholder="Alertes (une par ligne)" style="grid-column:1/3; min-height:60px"></textarea>
+      <textarea id="f_alt" class="select" placeholder="Alternatives OU (label | url)" style="grid-column:1/3; min-height:60px"></textarea>
+      <textarea id="f_links" class="select" placeholder="Liens (label | url)" style="grid-column:1/3; min-height:60px"></textarea>
+      <textarea id="f_review" class="select" placeholder="Avis (Markdown). Entourez les spoilers de ||comme ceci||" style="grid-column:1/3; min-height:120px"></textarea>
+      <input id="f_stars" class="select" placeholder="Note (0.5 à 5)"/>
+      <button class="btn btn-primary" id="doAdd">Ajouter</button>
+    </div>`);
+  $('#doAdd').onclick=()=>{
+    const t=getTimeline();
+    const title=$('#f_title').value.trim(); const tome=$('#f_tome').value.trim();
+    if(!title){ alert('Titre obligatoire'); return; }
+    const dup=t.items.some(x=>x.type==='comic' && norm(x.title)===norm(title) && norm(x.tome||'')===norm(tome||''));
+    if(dup){ alert('Doublon détecté (même titre et même tome).'); return; }
+    const obj={
+      type:'comic', id:'c'+Date.now(), title, tome,
+      authors:splitList('#f_authors'), artists:splitList('#f_artists'),
+      universe:$('#f_universe').value.trim(), pages:parseInt($('#f_pages').value,10)||undefined,
+      release:$('#f_release').value.trim(), publisher:$('#f_publisher').value.trim(),
+      category:$('#f_category').value, status:$('#f_status').value.trim(), cover:$('#f_cover').value.trim(),
+      synopsis:$('#f_synopsis').value.trim(),
+      why:{pro:splitLines('#f_pro'), con:splitLines('#f_con')}, alerts:splitLines('#f_alerts'),
+      altOptions:splitPairs('#f_alt'), links:splitPairs('#f_links'),
+      review:($('#f_review').value.trim()?{ md:$('#f_review').value.trim(), stars:parseFloat($('#f_stars').value)||0 }:undefined)
+    };
+    t.items.push(obj); saveState(); render(); closeModal();
+  };
+});
+
+/* ===== Import/Export ===== */
+document.getElementById('btn-export')?.addEventListener('click',()=> 
+  download('scotchy_comics.json', JSON.stringify(state,null,2)));
+document.getElementById('btn-import')?.addEventListener('click',()=> 
+  document.getElementById('fileInput').click());
+document.getElementById('fileInput')?.addEventListener('change',(e)=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{ try{
+      const data=JSON.parse(reader.result);
+      if(!data.timelines) throw new Error('JSON invalide');
+      state=data; saveState();
+      currentTimelineId=state.timelines[0]?.id;
+      render(); 
+    }catch(err){ alert('Échec import: '+err.message); } };
+  reader.readAsText(file);
+});
+
+/* ===== Filtres ===== */
+document.getElementById('q')?.addEventListener('input', render);
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.onclick=()=>{ chip.classList.toggle('active'); render(); };
+});
+
+/* ===== Timelines ===== */
+function newTimeline(){
+  const name=prompt('Nom de la nouvelle timeline ?'); if(!name) return;
+  const id='t'+Date.now();
+  state.timelines.push({id,name,items:[{type:'marker',id:'m'+Date.now(),label:name}]});
+  currentTimelineId=id; saveState(); renderTimelinesOptions(); render();
+}
+function renderTimelinesOptions(){
+  const sel=$('#timelineSelect'); if(!sel) return;
+  sel.innerHTML='';
+  state.timelines.forEach(t=>{ const o=document.createElement('option'); o.value=t.id; o.textContent=t.name; if(t.id===currentTimelineId) o.selected=true; sel.appendChild(o); });
+}
+renderTimelinesOptions();
+
+document.getElementById('btn-new-timeline')?.addEventListener('click',newTimeline);
+document.getElementById('btn-rename-timeline')?.addEventListener('click',()=>{
+  const t=getTimeline(); const name=prompt('Nouveau nom ?',t.name);
+  if(!name) return; t.name=name; saveState(); renderTimelinesOptions();
+});
+document.getElementById('btn-delete-timeline')?.addEventListener('click',()=>{
+  if(state.timelines.length<=1) return alert('Conserve au moins une timeline.');
+  if(!confirm('Supprimer cette timeline ?')) return;
+  state.timelines=state.timelines.filter(t=>t.id!==currentTimelineId);
+  currentTimelineId=state.timelines[0].id;
+  saveState(); renderTimelinesOptions(); render();
+});
+document.getElementById('timelineSelect')?.addEventListener('change',e=>{
+  currentTimelineId=e.target.value; render();
+});
+
+/* ===== Mode lecture ===== */
+let reading=false;
+document.getElementById('btn-reading')?.addEventListener('click',()=>{
+  reading=!reading;
+  document.body.classList.toggle('reading',reading);
+  document.getElementById('btn-reading').textContent = reading ? 'Quitter le mode lecture' : 'Mode lecture';
+});
+document.getElementById('btn-reading-exit')?.addEventListener('click',()=>{
+  document.body.classList.remove('reading');
+  reading=false;
+  document.getElementById('btn-reading').textContent='Mode lecture';
+});
+
+/* ===== Sticky offsets dynamiques ===== */
+function updateStickyOffsets(){
+  const h=document.querySelector('.topbar')?.offsetHeight||64;
+  document.documentElement.style.setProperty('--topbar-h', h+'px');
+}
+window.addEventListener('resize', updateStickyOffsets);
+window.addEventListener('load', updateStickyOffsets);
+setTimeout(updateStickyOffsets, 300);
+setTimeout(updateStickyOffsets, 1200);
+
+/* ===== Init ===== */
+render();
+</script>
+</body>
+</html>
