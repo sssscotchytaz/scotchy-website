@@ -1,1 +1,270 @@
-
+{
+  "timelines": [
+    {
+      "id": "opt",
+      "name": "Lecture optimale",
+      "items": [
+        {
+          "type": "marker",
+          "id": "m1",
+          "label": "Les origines de Batmannb,"
+        },
+        {
+          "type": "comic",
+          "id": "c_kn1",
+          "title": "Knightfall — Tome 1",
+          "tome": "Tome 1",
+          "authors": [
+            "Doug Moench",
+            "Chuck Dixon",
+            "Snyder"
+          ],
+          "artists": [
+            "Jim Aparo",
+            "Graham Nolan"
+          ],
+          "pages": 640,
+          "release": "1993",
+          "publisher": "DC",
+          "universe": "Post-Crisis",
+          "category": "indispensable",
+          "status": "VF",
+          "cover": "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?q=80&w=480&auto=format&fit=crop",
+          "synopsis": "Bane libère Arkham, épuise Batman et finit par lui briser le dos.",
+          "why": {
+            "pro": [
+              "Évènement majeur: chute de Batman"
+            ],
+            "con": []
+          },
+          "links": [
+            {
+              "label": "VF intégrale",
+              "url": "https://www.google.com"
+            }
+          ],
+          "alerts": [],
+          "altOptions": []
+        },
+        {
+          "type": "comic",
+          "id": "c_else",
+          "title": "Gotham by Gaslight",
+          "tome": "One-Shot",
+          "authors": [
+            "Brian Augustyn"
+          ],
+          "artists": [
+            "Mike Mignola"
+          ],
+          "pages": 64,
+          "release": "1989",
+          "publisher": "DC",
+          "universe": "Elseworld",
+          "category": "horschemin",
+          "status": "VO/VF",
+          "cover": "https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?q=80&w=480&auto=format&fit=crop",
+          "synopsis": "Batman à l'époque victorienne traque Jack l’Eventreur.",
+          "why": {
+            "pro": [
+              "Elseworld culte, lecture à part"
+            ],
+            "con": []
+          },
+          "links": [
+            {
+              "label": "VO",
+              "url": "https://www.google.com"
+            },
+            {
+              "label": "VF",
+              "url": "https://www.google.com"
+            }
+          ],
+          "alerts": [],
+          "altOptions": []
+        },
+        {
+          "type": "marker",
+          "id": "m2",
+          "label": "Chevaliers & chutes"
+        },
+        {
+          "type": "comic",
+          "id": "c_yearone",
+          "title": "Batman: Année Un",
+          "altTitle": "Year One",
+          "tome": "One-Shot",
+          "authors": [
+            "Frank Miller"
+          ],
+          "artists": [
+            "David Mazzucchelli"
+          ],
+          "pages": 144,
+          "release": "1987",
+          "publisher": "DC",
+          "universe": "Post-Crisis",
+          "category": "indispensable",
+          "status": "VF/VO",
+          "cover": "https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=480&auto=format&fit=crop",
+          "synopsis": "Enfant, Bruce Wayne a vu ses parents se faire assassiner sous ses yeux.\nAprès un entraînement intensif, il revient à Gotham City pour mener une guerre sans merci contre le crime qdsfq sd qsd mais ce ne sera pas facile. Face à la corruption des autorités de la ville et leurs liens avec la pègre, Bruce, sous le déguisement du vigilant Batman, va forger une alliance avec un policier nouveau venu à Gotham : le lieutenant James Gordon.",
+          "altOptions": [
+            {
+              "label": "Regarder le film d'animation \"Year One\"",
+              "url": "https://www.imdb.com/title/tt1672723/"
+            },
+            {
+              "label": "Regarder le film d'animation \"Year One\"",
+              "url": "https://www.imdb.com/title/tt1672723/"
+            }
+          ],
+          "why": {
+            "pro": [
+              "Origines réalistes, ancre la psyché de Bruce",
+              "Introduit Gordon comme pilier"
+            ],
+            "con": []
+          },
+          "links": [
+            {
+              "label": "Commander — 18,50 € (VF)",
+              "url": "https://www.google.com"
+            }
+          ],
+          "review": {
+            "stars": 4.5,
+            "md": "# Une claque\n\n**Année Un** c'est la base.\n- Rituel chauve-souris\n- Gordon incroyable\n\nqsdqsdqsd qqsd qsd qsd qsd qsd qs\nqsdqsdqsdqsdqsdqsd\nqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsdqsd\n\n||La fin sur les Falcone est masterclass||"
+          },
+          "alerts": [
+            "rsfsfsfd",
+            "sdfsdf"
+          ]
+        },
+        {
+          "type": "comic",
+          "id": "c_zero",
+          "title": "Batman: L'an Zéro — 1ère partie",
+          "tome": "Tome 4",
+          "authors": [
+            "Scott Snyder"
+          ],
+          "artists": [
+            "Greg Capullo"
+          ],
+          "pages": 192,
+          "release": "2014",
+          "publisher": "DC",
+          "universe": "New 52",
+          "category": "indispensable",
+          "status": "VF",
+          "cover": "https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=480&auto=format&fit=crop",
+          "synopsis": "Il y a cinq ans, Bruce Wayne, jusqu'alors porté disparu, est revenu à Gotham, bien décidé à mener une guerre au crime. Mais le poids de son héritage le pèse, et son plus grand adversaire ne sera pas le Red Hood et son gang mais bel et bien...",
+          "why": {
+            "pro": [
+              "Vision blockbuster de la naissance du mythe"
+            ],
+            "con": [
+              "⚠️ Chevauche Année Un"
+            ]
+          },
+          "links": [
+            {
+              "label": "Commander — 20,50 €",
+              "url": "https://www.google.com"
+            }
+          ],
+          "alerts": [
+            "⚠️ Ce tome est le tome 4 de la série de Scott Snyder, mais il n'y a pas besoin d'acheter le Tome 1, 2 & 3 pour pouvoir lire le 4 & 5"
+          ],
+          "altOptions": []
+        },
+        {
+          "type": "comic",
+          "id": "c_kn2",
+          "title": "Knightfall — Tome 2",
+          "tome": "Tome 2",
+          "authors": [
+            "Doug Moench",
+            "Chuck Dixon"
+          ],
+          "artists": [
+            "Jim Aparo",
+            "Graham Nolan"
+          ],
+          "pages": 640,
+          "release": "1993",
+          "publisher": "DC",
+          "universe": "Post-Crisis",
+          "category": "recommande",
+          "status": "VF",
+          "cover": "https://images.unsplash.com/photo-1558980664-10b2f3b1fd1a?q=80&w=480&auto=format&fit=crop",
+          "synopsis": "Jean-Paul Valley devient Batman, plus violent et instable.",
+          "why": {
+            "pro": [
+              "Évolution du mythe"
+            ],
+            "con": []
+          }
+        },
+        {
+          "type": "comic",
+          "id": "c_cross",
+          "title": "Batman / Huntress: Cry for Blood",
+          "tome": "Mini-série",
+          "authors": [
+            "Greg Rucka"
+          ],
+          "artists": [
+            "Rick Burchett"
+          ],
+          "pages": 152,
+          "release": "2000",
+          "publisher": "DC",
+          "universe": "Post-Crisis",
+          "category": "standard",
+          "status": "VF rare",
+          "cover": "https://images.unsplash.com/photo-1526413232647-8a3038f2b0c1?q=80&w=480&auto=format&fit=crop",
+          "synopsis": "Crossover focalisé sur Huntress et sa quête identitaire.",
+          "why": {
+            "pro": [
+              "Liens utiles pour No Man's Land"
+            ],
+            "con": []
+          },
+          "links": [
+            {
+              "label": "VF (occasion)",
+              "url": "https://www.google.com"
+            }
+          ],
+          "alerts": [
+            "🚨 Plus dispo en VF, cherchez en occasion (Vinted, Leboncoin, etc.)"
+          ]
+        },
+        {
+          "type": "comic",
+          "id": "c1758081385408",
+          "title": "gfdgfre",
+          "tome": "",
+          "authors": [],
+          "artists": [],
+          "universe": "",
+          "release": "",
+          "publisher": "",
+          "category": "standard",
+          "status": "",
+          "cover": "",
+          "synopsis": "",
+          "why": {
+            "pro": [],
+            "con": []
+          },
+          "alerts": [],
+          "altOptions": [],
+          "links": []
+        }
+      ]
+    }
+  ]
+}
