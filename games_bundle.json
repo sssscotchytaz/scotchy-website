@@ -1382,8 +1382,8 @@
     {
       "id": "bqxa8xy2je6mfwl2lsn",
       "createdAt": "2025-09-23T13:20:56.279Z",
-      "updatedAt": "2025-09-23T13:20:56.279Z",
-      "progress": 50,
+      "updatedAt": "2025-09-25T12:25:52.310Z",
+      "progress": 78,
       "rating": null,
       "ratingStars": null,
       "notes": "",
@@ -1417,12 +1417,12 @@
     {
       "id": "s29c1svxfpbmfwl4h5i",
       "createdAt": "2025-09-23T13:22:23.574Z",
-      "updatedAt": "2025-09-23T13:22:23.574Z",
-      "progress": 0,
-      "rating": null,
-      "ratingStars": null,
+      "updatedAt": "2025-09-25T12:21:43.377Z",
+      "progress": 30,
+      "rating": 3,
+      "ratingStars": 1.5,
       "notes": "",
-      "review": "",
+      "review": "Silent Hill F EST décevant, c’est une catastrophe industrielle maquillée derrière deux-trois jolis screens pour appâter les fans.\n\nOn nous vend un \"retour aux sources\", mais ce que j’ai eu entre les mains, c’est un jeu qui ressemble plus à une mauvaise démo technique qu’à une expérience horrifique digne de ce nom.\n\nLes points faibles (et ils sont nombreux) :\n\n- Zéro fun. Le jeu n’est pas amusant une seule seconde. On se traîne du début à la fin avec une lassitude qui tue toute envie d’aller plus loin.\n\n- Les énigmes, déjà qu’il y en si peu et en plus elles sont nulles et sans intérêt. Silent Hill, c’était des puzzles qui mettaient ton cerveau sous pression. Là, c’est juste du remplissage.\n\n- Les combats. Répétitifs, simplistes, sans aucune tension. On a l’impression de taper dans du carton-pâte en boucle. Et quand tu crois que ça va enfin évoluer, et bah non.\n\n- Les déplacements foireux et arcades à mort, collisions qui partent en sucette à certains moments et le perso pars dans tout les sens… Même marcher en ligne droite devient un enfer à certains moments.\n\n- Un bestiaire ridicule. On te promettait des créatures cauchemardesques, tu récoltes trois monstres recyclés qui perdent tout impact après 10 minutes.\n\nEt c’est pas fini :\n\n- L’ambiance n’est pas terrifiante du tout. Genre ça fait pas peur enfait...\n\n- Le scénario est criblé de trous énormes, limite écrit sur un coin de table avec des post-it manquants, entre la meuf qui survit à des coups de couteaux puis s'évanoui car elle tombe de 3 marches d'escalier, la meuf qui veut passer par une ancienne autoroute, par un champ, par une montagne car un pont est détruit (il y a 1 mètre d'écart, même un saut est faisable) puis 5 minutes plus tard dans le jeu, elle récupère un énorme katana et ça fait spawn un pont ???? bon...\n\n- Le level design est une purge. Couloirs sans âme, zones vides, structure plate… tout est éclaté. La dimension de chercher n'est pas récompenser, ton perso qui veut pas descendre dans le champ et qui est bloqué par une botte de foin mdr.\n\n- Les animations et déplacements sentent le jeu arcade de bas étage. Pas un gramme de réalisme, rien qui colle à la lourdeur psychologique qu’on attendait.\n\n- Le menu et l’inventaire ? Une horreur, pas dans le bon sens. Pas intuitif, mal pensé, tu perds plus de temps à te rappeler des touches qu’à utiliser tes items.\n\n- Mention spéciale pour certaines séquences de gameplay complètement ratées, où tu sens que personne n’a testé avant de valider genre au hasard les combats de boss juste trop simples.\n\nLes rares trucs qui sauvent du naufrage :\n\n- Le développement psychologique des personnages. Ça, c’est la seule chose qui tient debout. Quand ça creuse un peu l’esprit humain, ça marche. Mais ça reste noyé dans tout le reste qui s’effondre.\n- Graphiquement correct même si j'ai eu quelques bugs.",
       "reviewSafe": "",
       "summary": "",
       "cover": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2947440/7e5d923ac622bd1775ebc9b5d4b5b0a24bf5ed40/header.jpg?t=1758558348",
@@ -1447,7 +1447,42 @@
       ],
       "title": "SILENT HILL F",
       "platform": "PC",
-      "status": "playing"
+      "status": "abandoned"
+    },
+    {
+      "id": "hyphvufv9wtmfzdy75s",
+      "createdAt": "2025-09-25T12:24:51.904Z",
+      "updatedAt": "2025-09-25T12:25:25.774Z",
+      "progress": 100,
+      "rating": 5,
+      "ratingStars": 2.5,
+      "notes": "",
+      "review": "c'est franchement sympa malheureusement pas mon style de jeu mais j'ai quand-même pris du plaisir. Juste la fin que j'ai trouvé trop brute",
+      "reviewSafe": "",
+      "summary": "",
+      "cover": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3180070/fadebc14211b17b5a6603926612ead9294cad9ce/header.jpg?t=1758293511",
+      "link": "https://youtu.be/z76a1m1yXrk",
+      "linkLabel": "VOD | 1h50",
+      "tags": [
+        "Horreur",
+        "Choix multiples",
+        "Solo",
+        "Horreur psychologique",
+        "Indépendant",
+        "Narratif",
+        "Atmosphère",
+        "Fins multiples",
+        "Sombre",
+        "Gore",
+        "Psychologique",
+        "Mystère",
+        "Thriller",
+        "Simulation de catastrophe",
+        "Psychédélique"
+      ],
+      "title": "No, I'm not a Human",
+      "platform": "PC",
+      "status": "finished"
     }
   ]
 }
