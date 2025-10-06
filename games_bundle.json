@@ -1107,8 +1107,8 @@
     {
       "id": "wef2nyp5c1omfdemuns",
       "createdAt": "2025-09-10T03:13:06.232Z",
-      "updatedAt": "2025-09-10T03:13:06.232Z",
-      "progress": null,
+      "updatedAt": "2025-10-06T17:34:31.864Z",
+      "progress": 0,
       "rating": null,
       "ratingStars": null,
       "notes": "",
@@ -1136,7 +1136,7 @@
       ],
       "title": "DEATH STRANDING",
       "platform": "PC",
-      "status": "planned"
+      "status": "playing"
     },
     {
       "id": "vyrp9d1ko3qmfderexq",
